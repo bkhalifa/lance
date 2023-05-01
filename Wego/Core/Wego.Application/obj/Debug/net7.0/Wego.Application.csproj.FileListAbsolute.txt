@@ -1,0 +1,15 @@
+C:\Source\Lance\Wego\Core\Wego.Application\bin\Debug\net7.0\Wego.Application.deps.json
+C:\Source\Lance\Wego\Core\Wego.Application\bin\Debug\net7.0\Wego.Application.dll
+C:\Source\Lance\Wego\Core\Wego.Application\bin\Debug\net7.0\Wego.Application.pdb
+C:\Source\Lance\Wego\Core\Wego.Application\obj\Debug\net7.0\Wego.Application.csproj.AssemblyReference.cache
+C:\Source\Lance\Wego\Core\Wego.Application\obj\Debug\net7.0\Wego.Application.GeneratedMSBuildEditorConfig.editorconfig
+C:\Source\Lance\Wego\Core\Wego.Application\obj\Debug\net7.0\Wego.Application.AssemblyInfoInputs.cache
+C:\Source\Lance\Wego\Core\Wego.Application\obj\Debug\net7.0\Wego.Application.AssemblyInfo.cs
+C:\Source\Lance\Wego\Core\Wego.Application\obj\Debug\net7.0\Wego.Application.csproj.CoreCompileInputs.cache
+C:\Source\Lance\Wego\Core\Wego.Application\obj\Debug\net7.0\Wego.Application.dll
+C:\Source\Lance\Wego\Core\Wego.Application\obj\Debug\net7.0\refint\Wego.Application.dll
+C:\Source\Lance\Wego\Core\Wego.Application\obj\Debug\net7.0\Wego.Application.pdb
+C:\Source\Lance\Wego\Core\Wego.Application\obj\Debug\net7.0\ref\Wego.Application.dll
+C:\Source\Lance\Wego\Core\Wego.Application\bin\Debug\net7.0\Wego.Domain.dll
+C:\Source\Lance\Wego\Core\Wego.Application\bin\Debug\net7.0\Wego.Domain.pdb
+C:\Source\Lance\Wego\Core\Wego.Application\obj\Debug\net7.0\Wego.Application.csproj.CopyComplete
