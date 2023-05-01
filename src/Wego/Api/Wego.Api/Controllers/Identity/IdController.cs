@@ -6,7 +6,7 @@ using Wego.Application.Models.Authentification;
 namespace Wego.Api.Controllers.Identity;
 
 
-[Route("api/id")]
+[Route("api/[controller]")]
 [ApiController]
 public class IdController : ControllerBase
 {
