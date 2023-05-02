@@ -12,7 +12,7 @@ namespace Wego.ApplicationTests.Categories.Queries;
 public class GetCategoriesListQueryHandlerTests
 {
     private readonly Mock<IAsyncRepository<Category>> _mockCategoryRepository;
-
+    // comm 1
     public GetCategoriesListQueryHandlerTests()
     {
         _mockCategoryRepository = RepositoryMocks.GetCategoryRepository();
