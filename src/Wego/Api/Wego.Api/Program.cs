@@ -67,7 +67,7 @@ app.UseAuthentication();
 app.UseSwagger();
 app.UseSwaggerUI(c =>
 {
-    c.SwaggerEndpoint("/swagger/v1/swagger.json", "Wego API");
+    c.SwaggerEndpoint("../swagger/v1/swagger.json", "Wego API");
 });
 
 app.UseResponseCompression();
