@@ -1,7 +1,7 @@
 ﻿using Mapster;
 
 
-namespace Wego.Application.Extension
+namespace Wego.Application.Extensions
 {
     public static class MappingExtension
     {

@@ -1,8 +1,7 @@
 ﻿using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Identity.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore;
-
-using Wego.Identity.Models;
+using Wego.Application.Models.Authentification;
 using Wego.Identity.Seed;
 
 namespace Wego.Identity;

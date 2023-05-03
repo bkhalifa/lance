@@ -1,6 +1,7 @@
 
 
 
+using Hellang.Middleware.ProblemDetails;
 using Microsoft.AspNetCore.Identity;
 
 using Serilog;
@@ -9,8 +10,9 @@ using Wego.Api.Middleware;
 using Wego.Api.Services;
 using Wego.Application;
 using Wego.Application.Contracts;
+using Wego.Application.Extensions;
+using Wego.Application.Models.Authentification;
 using Wego.Identity;
-using Wego.Identity.Models;
 using Wego.Identity.Seed;
 using Wego.Persistence;
 
@@ -24,10 +26,11 @@ builder.Services.AddEndpointsApiExplorer();
 builder.Services.AddSwaggerGen();
 
 builder.Services.AddSwagger();
+builder.Services.AddResponseCompression(options => { options.EnableForHttps = true; });
 builder.Services.AddApplicationServices();
 builder.Services.AddPersistenceServices(builder.Configuration);
 builder.Services.AddIdentityServices(builder.Configuration);
-
+builder.Services.AddCustomProblemDetails(builder.Environment);
 builder.Services.AddScoped<ILoggedInUserService, LoggedInUserService>();
 
 builder.Services.AddCors(options =>
@@ -57,7 +60,7 @@ if (app.Environment.IsDevelopment())
 }
 
 app.UseHttpsRedirection();
-
+app.UseProblemDetails();
 app.UseRouting();
 app.UseAuthentication();
 
@@ -67,7 +70,7 @@ app.UseSwaggerUI(c =>
     c.SwaggerEndpoint("../swagger/v1/swagger.json", "Wego API");
 });
 
-app.UseCustomExceptionHandler();
+app.UseResponseCompression();
 
 app.UseCors("Open");
 app.UseAuthorization();

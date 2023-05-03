@@ -1,6 +1,6 @@
 ﻿using Microsoft.AspNetCore.Identity;
 
-namespace Wego.Identity.Models
+namespace Wego.Application.Models.Authentification
 {
     public class ApplicationUser : IdentityUser
     {

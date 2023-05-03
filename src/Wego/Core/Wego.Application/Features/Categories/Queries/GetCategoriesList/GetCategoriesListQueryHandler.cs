@@ -4,7 +4,7 @@ using MediatR;
 
 
 using Wego.Application.Contracts.Persistence;
-using Wego.Application.Extension;
+using Wego.Application.Extensions;
 using Wego.Application.Features.Categories.Queries.GetCategoriesList;
 using Wego.Domain.Entities;
 

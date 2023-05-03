@@ -12,8 +12,6 @@ using System.Text;
 
 using Wego.Application.Contracts.Identity;
 using Wego.Application.Models.Authentification;
-
-using Wego.Identity.Models;
 using Wego.Identity.Service;
 
 namespace Wego.Identity;
@@ -31,6 +29,7 @@ public static class IdentityServiceExtensions
             .AddEntityFrameworkStores<InetDbContext>().AddDefaultTokenProviders();
 
         services.AddTransient<IAuthenticationService, AuthenticationService>();
+        services.AddTransient<IJwtTokenService, JwtTokenService>();
 
         services.AddAuthentication(options =>
         {
