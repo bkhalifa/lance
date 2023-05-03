@@ -1,8 +1,8 @@
 {
   "version": 2,
-  "dgSpecHash": "dtffurunXuC2TJ85ftqyxyJCY7AtDcjD52SGQXPW/D4vsUBvMGrbjrYA5uEr4uGEe4YgLBDROnXUkBP7LgycFw==",
+  "dgSpecHash": "wNXUPLm+KAVKE3PVRdNLp4rerL106JtDfkIQjirkg0Z2A6AUAjfAvFav2B+LFLZ4J9202aeF1Hwsii9FDVjxfw==",
   "success": true,
-  "projectFilePath": "C:\\InfoLancer\\lance\\src\\Wego\\Infrastucture\\Wego.Infrastructure\\Wego.Infrastructure.csproj",
+  "projectFilePath": "C:\\Source\\Lance\\src\\Wego\\Infrastucture\\Wego.Infrastructure\\Wego.Infrastructure.csproj",
   "expectedPackageFiles": [],
   "logs": []
 }
