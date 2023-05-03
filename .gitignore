@@ -358,3 +358,10 @@ MigrationBackup/
 # Ionide (cross platform F# VS Code tools) working folder
 .ionide/
 
+/src/Wego/Api/Wego.Api/bin/Debug/net7.0/Wego.Identity.dll
+/src/Wego/Api/Wego.Api/bin/Debug/net7.0/Wego.Identity.pdb
+/src/Wego/Api/Wego.Api/obj/Debug/net7.0/Wego.Api.csproj.AssemblyReference.cache
+/src/Wego/Infrastucture/Wego.Identity/bin/Debug/net7.0/Wego.Identity.dll
+/src/Wego/Infrastucture/Wego.Identity/bin/Debug/net7.0/Wego.Identity.pdb
+/src/Wego/Infrastucture/Wego.Identity/obj/Debug/net7.0/Wego.Identity.dll
+/src/Wego/Infrastucture/Wego.Identity/obj/Debug/net7.0/Wego.Identity.pdb
