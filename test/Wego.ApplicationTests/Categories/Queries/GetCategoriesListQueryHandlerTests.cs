@@ -18,6 +18,10 @@ public class GetCategoriesListQueryHandlerTests
         _mockCategoryRepository = RepositoryMocks.GetCategoryRepository();
     }
 
+    /// <summary>
+    /// get all ctegories
+    /// </summary>
+    /// <returns></returns>
     [Fact]
     public async Task GetCategoriesListTest()
     {
