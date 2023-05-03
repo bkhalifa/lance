@@ -365,3 +365,6 @@ MigrationBackup/
 /src/Wego/Infrastucture/Wego.Identity/bin/Debug/net7.0/Wego.Identity.pdb
 /src/Wego/Infrastucture/Wego.Identity/obj/Debug/net7.0/Wego.Identity.dll
 /src/Wego/Infrastucture/Wego.Identity/obj/Debug/net7.0/Wego.Identity.pdb
+/test/Wego.ApplicationTests/obj/Debug/net7.0/Wego.ApplicationTests.csproj.AssemblyReference.cache
+/test/Wego.ApplicationTests/obj/Release/net7.0/Wego.ApplicationTests.assets.cache
+/test/Wego.ApplicationTests/obj/Release/net7.0/Wego.ApplicationTests.csproj.AssemblyReference.cache
