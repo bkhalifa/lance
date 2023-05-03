@@ -22,3 +22,15 @@ C:\Source\Lance\src\Wego\Infrastucture\Wego.Infrastructure\obj\Debug\net7.0\Wego
 C:\Source\Lance\src\Wego\Infrastucture\Wego.Infrastructure\obj\Debug\net7.0\refint\Wego.Infrastructure.dll
 C:\Source\Lance\src\Wego\Infrastucture\Wego.Infrastructure\obj\Debug\net7.0\Wego.Infrastructure.pdb
 C:\Source\Lance\src\Wego\Infrastucture\Wego.Infrastructure\obj\Debug\net7.0\ref\Wego.Infrastructure.dll
+C:\InfoLancer\lance\src\Wego\Infrastucture\Wego.Infrastructure\bin\Debug\net7.0\Wego.Infrastructure.deps.json
+C:\InfoLancer\lance\src\Wego\Infrastucture\Wego.Infrastructure\bin\Debug\net7.0\Wego.Infrastructure.dll
+C:\InfoLancer\lance\src\Wego\Infrastucture\Wego.Infrastructure\bin\Debug\net7.0\Wego.Infrastructure.pdb
+C:\InfoLancer\lance\src\Wego\Infrastucture\Wego.Infrastructure\obj\Debug\net7.0\Wego.Infrastructure.csproj.AssemblyReference.cache
+C:\InfoLancer\lance\src\Wego\Infrastucture\Wego.Infrastructure\obj\Debug\net7.0\Wego.Infrastructure.GeneratedMSBuildEditorConfig.editorconfig
+C:\InfoLancer\lance\src\Wego\Infrastucture\Wego.Infrastructure\obj\Debug\net7.0\Wego.Infrastructure.AssemblyInfoInputs.cache
+C:\InfoLancer\lance\src\Wego\Infrastucture\Wego.Infrastructure\obj\Debug\net7.0\Wego.Infrastructure.AssemblyInfo.cs
+C:\InfoLancer\lance\src\Wego\Infrastucture\Wego.Infrastructure\obj\Debug\net7.0\Wego.Infrastructure.csproj.CoreCompileInputs.cache
+C:\InfoLancer\lance\src\Wego\Infrastucture\Wego.Infrastructure\obj\Debug\net7.0\Wego.Infrastructure.dll
+C:\InfoLancer\lance\src\Wego\Infrastucture\Wego.Infrastructure\obj\Debug\net7.0\refint\Wego.Infrastructure.dll
+C:\InfoLancer\lance\src\Wego\Infrastucture\Wego.Infrastructure\obj\Debug\net7.0\Wego.Infrastructure.pdb
+C:\InfoLancer\lance\src\Wego\Infrastucture\Wego.Infrastructure\obj\Debug\net7.0\ref\Wego.Infrastructure.dll

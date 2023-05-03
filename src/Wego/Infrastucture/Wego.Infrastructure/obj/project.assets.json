@@ -8,30 +8,20 @@
     "net7.0": []
   },
   "packageFolders": {
-    "C:\\Users\\benkh\\.nuget\\packages\\": {},
-    "C:\\Program Files (x86)\\Microsoft Visual Studio\\Shared\\NuGetPackages": {},
-    "C:\\Program Files (x86)\\Microsoft\\Xamarin\\NuGet\\": {},
-    "C:\\Program Files\\dotnet\\sdk\\NuGetFallbackFolder": {}
+    "C:\\Users\\33621\\.nuget\\packages\\": {}
   },
   "project": {
     "version": "1.0.0",
     "restore": {
-      "projectUniqueName": "C:\\Source\\Lance\\src\\Wego\\Infrastucture\\Wego.Infrastructure\\Wego.Infrastructure.csproj",
+      "projectUniqueName": "C:\\InfoLancer\\lance\\src\\Wego\\Infrastucture\\Wego.Infrastructure\\Wego.Infrastructure.csproj",
       "projectName": "Wego.Infrastructure",
-      "projectPath": "C:\\Source\\Lance\\src\\Wego\\Infrastucture\\Wego.Infrastructure\\Wego.Infrastructure.csproj",
-      "packagesPath": "C:\\Users\\benkh\\.nuget\\packages\\",
-      "outputPath": "C:\\Source\\Lance\\src\\Wego\\Infrastucture\\Wego.Infrastructure\\obj\\",
+      "projectPath": "C:\\InfoLancer\\lance\\src\\Wego\\Infrastucture\\Wego.Infrastructure\\Wego.Infrastructure.csproj",
+      "packagesPath": "C:\\Users\\33621\\.nuget\\packages\\",
+      "outputPath": "C:\\InfoLancer\\lance\\src\\Wego\\Infrastucture\\Wego.Infrastructure\\obj\\",
       "projectStyle": "PackageReference",
-      "fallbackFolders": [
-        "C:\\Program Files (x86)\\Microsoft Visual Studio\\Shared\\NuGetPackages",
-        "C:\\Program Files (x86)\\Microsoft\\Xamarin\\NuGet\\",
-        "C:\\Program Files\\dotnet\\sdk\\NuGetFallbackFolder"
-      ],
       "configFilePaths": [
-        "C:\\Users\\benkh\\AppData\\Roaming\\NuGet\\NuGet.Config",
-        "C:\\Program Files (x86)\\NuGet\\Config\\Microsoft.VisualStudio.FallbackLocation.config",
-        "C:\\Program Files (x86)\\NuGet\\Config\\Microsoft.VisualStudio.Offline.config",
-        "C:\\Program Files (x86)\\NuGet\\Config\\Xamarin.Offline.config"
+        "C:\\Users\\33621\\AppData\\Roaming\\NuGet\\NuGet.Config",
+        "C:\\Program Files (x86)\\NuGet\\Config\\Microsoft.VisualStudio.Offline.config"
       ],
       "originalTargetFrameworks": [
         "net7.0"

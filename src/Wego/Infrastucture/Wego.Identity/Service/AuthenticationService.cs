@@ -7,8 +7,9 @@ using System.Security.Claims;
 using System.Text;
 
 using Wego.Application.Contracts.Identity;
+using Wego.Application.Exceptions;
 using Wego.Application.Models.Authentification;
-using Wego.Identity.Models;
+
 
 namespace Wego.Identity.Service;
 
@@ -17,14 +18,17 @@ public class AuthenticationService : IAuthenticationService
     private readonly UserManager<ApplicationUser> _userManager;
     private readonly SignInManager<ApplicationUser> _signInManager;
     private readonly JwtSettings _jwtSettings;
+    private readonly IJwtTokenService _jwtTokenService;
 
     public AuthenticationService(UserManager<ApplicationUser> userManager,
         IOptions<JwtSettings> jwtSettings,
-        SignInManager<ApplicationUser> signInManager)
+        SignInManager<ApplicationUser> signInManager,
+         IJwtTokenService jwtTokenService)
     {
         _userManager = userManager;
         _jwtSettings = jwtSettings.Value;
         _signInManager = signInManager;
+        _jwtTokenService = jwtTokenService;
     }
 
     public async Task<AuthenticationResponse> AuthenticateAsync(AuthenticationRequest request)
@@ -33,17 +37,17 @@ public class AuthenticationService : IAuthenticationService
 
         if (user is null)
         {
-            throw new Exception($"User with {request.Email} not found.");
+            throw new UserNotFoundException($"User with {request.Email} not found.");
         }
 
         var result = await _signInManager.PasswordSignInAsync(user.UserName, request.Password, false, lockoutOnFailure: false);
 
         if (!result.Succeeded)
         {
-            throw new Exception($"Credentials for '{request.Email} aren't valid'.");
+            throw new CredentialInvalidException($"Credentials for '{request.Email} aren't valid'.");
         }
 
-        JwtSecurityToken jwtSecurityToken = await GenerateToken(user);
+        var jwtSecurityToken = await _jwtTokenService.GenerateTokenAsync(user);
 
         AuthenticationResponse response = new AuthenticationResponse
         {
@@ -62,7 +66,7 @@ public class AuthenticationService : IAuthenticationService
 
         if (existingUser != null)
         {
-            throw new Exception($"Username '{request.UserName}' already exists.");
+            throw new UserNotFoundException($"Username '{request.UserName}' already exists.");
         }
 
         var user = new ApplicationUser
@@ -81,51 +85,13 @@ public class AuthenticationService : IAuthenticationService
             var result = await _userManager.CreateAsync(user, request.Password);
 
             if (result.Succeeded)
-            {
                 return new RegistrationResponse() { UserId = user.Id };
-            }
-            else
-            {
-                throw new Exception($"{result.Errors}");
-            }
+
+            throw new ValidationException(result.Errors.Select(x => x.Description).ToList());
         }
         else
-        {
-            throw new Exception($"Email {request.Email} already exists.");
-        }
+            throw new UserAlreadyExistsException($"Email {request.Email} already exists.");
+
     }
 
-    private async Task<JwtSecurityToken> GenerateToken(ApplicationUser user)
-    {
-        var userClaims = await _userManager.GetClaimsAsync(user);
-        var roles = await _userManager.GetRolesAsync(user);
-
-        var roleClaims = new List<Claim>();
-
-        for (int i = 0; i < roles.Count; i++)
-        {
-            roleClaims.Add(new Claim("roles", roles[i]));
-        }
-
-        var claims = new[]
-        {
-            new Claim(JwtRegisteredClaimNames.Sub, user.UserName),
-            new Claim(JwtRegisteredClaimNames.Jti, Guid.NewGuid().ToString()),
-            new Claim(JwtRegisteredClaimNames.Email, user.Email),
-            new Claim("uid", user.Id)
-        }
-        .Union(userClaims)
-        .Union(roleClaims);
-
-        var symmetricSecurityKey = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(_jwtSettings.Key));
-        var signingCredentials = new SigningCredentials(symmetricSecurityKey, SecurityAlgorithms.HmacSha256);
-
-        var jwtSecurityToken = new JwtSecurityToken(
-            issuer: _jwtSettings.Issuer,
-            audience: _jwtSettings.Audience,
-            claims: claims,
-            expires: DateTime.UtcNow.AddMinutes(_jwtSettings.DurationInMinutes),
-            signingCredentials: signingCredentials);
-        return jwtSecurityToken;
-    }
 }

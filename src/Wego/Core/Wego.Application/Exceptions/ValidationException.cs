@@ -15,5 +15,10 @@ namespace Wego.Application.Exceptions
                 ValdationErrors.Add(validationError.ErrorMessage);
             }
         }
+
+        public ValidationException(List<string> errors)
+        {
+            ValdationErrors = errors ?? new List<string>();
+        }
     }
 }
