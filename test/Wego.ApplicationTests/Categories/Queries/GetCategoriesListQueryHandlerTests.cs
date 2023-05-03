@@ -14,6 +14,7 @@ public class GetCategoriesListQueryHandlerTests
     private readonly Mock<IAsyncRepository<Category>> _mockCategoryRepository;
     // comm 1
     // comm 2
+    // com 3
     public GetCategoriesListQueryHandlerTests()
     {
         _mockCategoryRepository = RepositoryMocks.GetCategoryRepository();
