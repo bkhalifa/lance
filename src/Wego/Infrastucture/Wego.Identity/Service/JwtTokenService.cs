@@ -26,7 +26,7 @@ namespace Wego.Identity.Service
 
         public async Task<JwtSecurityToken> GenerateTokenAsync(ApplicationUser user)
         {
-            if (user is null) throw new UserNotFoundException("User Token not found");
+            if (string.IsNullOrEmpty(user.UserName) || string.IsNullOrEmpty(user.Email)) throw new UserNotFoundException("User Token not found");
 
             var userClaims = await _userManager.GetClaimsAsync(user);
             var roles = await _userManager.GetRolesAsync(user);
