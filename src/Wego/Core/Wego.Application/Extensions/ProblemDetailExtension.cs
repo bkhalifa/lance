@@ -3,8 +3,11 @@ using Microsoft.AspNetCore.Hosting;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
+using Microsoft.Extensions.Options;
 using System.Net;
+using Wego.Application.Contracts.Common;
 using Wego.Application.Exceptions;
+using Wego.Application.Models.Mail;
 
 namespace Wego.Application.Extensions
 {
@@ -14,8 +17,21 @@ namespace Wego.Application.Extensions
         {
             services.AddProblemDetails(setup =>
             {
-                setup.IncludeExceptionDetails = (_, _) => !environment.IsProduction();
+                setup.IncludeExceptionDetails = (_, _) => true;
                 setup.ShouldLogUnhandledException = (_, _, _) => false;
+                setup.OnBeforeWriteDetails = async (context, pr) =>
+                {
+                    if (environment.IsProduction() && pr.Status >= 500)
+                    {
+                        var mailSender = context.RequestServices.GetRequiredService<IEmailSender>();
+                        var mailSettings = context.RequestServices.GetRequiredService<IOptions<EmailSettings>>().Value;
+                        await mailSender.SendMailAsync(new Email(mailSettings.ErrorEmails,
+                            $"Internal error {context.Request.Path} - webapi",
+                            $"{context.TraceIdentifier} </br>{pr.Detail}</br>{pr.Instance}"));
+                    }
+                };
+
+                setup.Map<Exception>(e => e.ToBaseProblemDetails(HttpStatusCode.InternalServerError));
                 setup.Map<ValidationException>(e => e.ToBaseProblemDetails(HttpStatusCode.BadRequest));
                 setup.Map<UserNotFoundException>(e => e.ToBaseProblemDetails(HttpStatusCode.Conflict));
                 setup.Map<CredentialInvalidException>(e => e.ToBaseProblemDetails(HttpStatusCode.Conflict));
@@ -32,6 +48,7 @@ namespace Wego.Application.Extensions
             {
                 Title = exception.Message,
                 Status = (int?)httpCode,
+                Type = HttpCodeToRfc(httpCode),
                 Detail = exception.HelpLink,
                 Instance = exception.StackTrace,
             };

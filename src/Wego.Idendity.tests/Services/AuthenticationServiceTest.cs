@@ -3,21 +3,22 @@ using Microsoft.AspNetCore.Identity;
 using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.Options;
 using System.IdentityModel.Tokens.Jwt;
-
+using Wego.Application.Contracts.Common;
 using Wego.Application.Contracts.Identity;
 using Wego.Application.Exceptions;
 using Wego.Application.Models.Authentification;
+using Wego.Application.Models.Mail;
 using Wego.Identity.Service;
 
-namespace Wego.Idendity.tests.Service
+namespace Wego.Idendity.tests.Services
 {
     public class AuthenticationServiceTest
     {
         private readonly Mock<UserManager<ApplicationUser>> _userManagerMock;
         private readonly Mock<SignInManager<ApplicationUser>> _signInManagerMock;
-        private readonly IOptions<JwtSettings> _jwtSettings;
         private readonly Mock<IJwtTokenService> _jwtTokenServiceMock;
-
+        private readonly Mock<ILogger<IAuthenticationService>> _loggerMock;
+        private readonly Mock<IEmailSender> _emailSenderMock;
 
         public AuthenticationServiceTest()
         {
@@ -40,11 +41,8 @@ namespace Wego.Idendity.tests.Service
                      new Mock<IUserConfirmation<ApplicationUser>>().Object);
 
             _jwtTokenServiceMock = new Mock<IJwtTokenService>();
-
-            _jwtSettings = Options.Create(new JwtSettings
-            {
-                Key = "123456"
-            });
+            _emailSenderMock = new Mock<IEmailSender>();
+            _loggerMock = new Mock<ILogger<IAuthenticationService>>();
         }
 
 
@@ -60,8 +58,11 @@ namespace Wego.Idendity.tests.Service
             var expectedToken = new JwtSecurityToken();
             _jwtTokenServiceMock.Setup(x => x.GenerateTokenAsync(expectedUser)).ReturnsAsync(expectedToken);
 
+            var emailParam = new Email("to@to.com", "User Created");
+            _emailSenderMock.Setup(x => x.SendMailAsync(emailParam, default)).ReturnsAsync(true);
+
             // Act
-            var sut = new AuthenticationService(_userManagerMock.Object, _jwtSettings, _signInManagerMock.Object, _jwtTokenServiceMock.Object);
+            var sut = new AuthenticationService(_userManagerMock.Object, _signInManagerMock.Object, _jwtTokenServiceMock.Object, _loggerMock.Object, _emailSenderMock.Object);
             var result = await sut.AuthenticateAsync(new AuthenticationRequest { Email = email, Password = password });
 
             //Assert
@@ -76,7 +77,7 @@ namespace Wego.Idendity.tests.Service
             _userManagerMock.Setup(x => x.FindByEmailAsync(email)).ReturnsAsync(() => null);
 
             // Act
-            var sut = new AuthenticationService(_userManagerMock.Object, _jwtSettings, _signInManagerMock.Object, _jwtTokenServiceMock.Object);
+            var sut = new AuthenticationService(_userManagerMock.Object, _signInManagerMock.Object, _jwtTokenServiceMock.Object, _loggerMock.Object, _emailSenderMock.Object);
 
             //Assert
             Assert.ThrowsAsync<UserNotFoundException>(async () => await sut.AuthenticateAsync(new AuthenticationRequest { Email = email, Password = password }));
@@ -91,8 +92,7 @@ namespace Wego.Idendity.tests.Service
             _userManagerMock.Setup(x => x.FindByEmailAsync(email)).ReturnsAsync(() => null);
             _signInManagerMock.Setup(x => x.PasswordSignInAsync(expectedUser.UserName, password, false, false)).ReturnsAsync(SignInResult.Failed);
             // Act
-            var sut = new AuthenticationService(_userManagerMock.Object, _jwtSettings, _signInManagerMock.Object, _jwtTokenServiceMock.Object);
-
+            var sut = new AuthenticationService(_userManagerMock.Object, _signInManagerMock.Object, _jwtTokenServiceMock.Object, _loggerMock.Object, _emailSenderMock.Object);
             //Assert
             Assert.ThrowsAsync<CredentialInvalidException>(async () => await sut.AuthenticateAsync(new AuthenticationRequest { Email = email, Password = password }));
         }
@@ -104,14 +104,14 @@ namespace Wego.Idendity.tests.Service
         {
             // Arrange
 
-            _userManagerMock.Setup(x => x.FindByNameAsync(userName)).ReturnsAsync(()=> null);
+            _userManagerMock.Setup(x => x.FindByNameAsync(userName)).ReturnsAsync(() => null);
 
-            _userManagerMock.Setup(x => x.FindByEmailAsync(userName)).ReturnsAsync(()=> null);
+            _userManagerMock.Setup(x => x.FindByEmailAsync(userName)).ReturnsAsync(() => null);
 
             _userManagerMock.Setup(x => x.CreateAsync(It.IsAny<ApplicationUser>(), password)).ReturnsAsync(IdentityResult.Success);
 
             // Act
-            var sut = new AuthenticationService(_userManagerMock.Object, _jwtSettings, _signInManagerMock.Object, _jwtTokenServiceMock.Object);
+            var sut = new AuthenticationService(_userManagerMock.Object, _signInManagerMock.Object, _jwtTokenServiceMock.Object, _loggerMock.Object, _emailSenderMock.Object);
             var result = await sut.RegisterAsync(new RegistrationRequest { Email = email, Password = password, UserName = userName });
 
             //Assert
@@ -128,7 +128,7 @@ namespace Wego.Idendity.tests.Service
             _userManagerMock.Setup(x => x.FindByNameAsync(userName)).ReturnsAsync(() => expectedUser);
 
             // Act
-            var sut = new AuthenticationService(_userManagerMock.Object, _jwtSettings, _signInManagerMock.Object, _jwtTokenServiceMock.Object);
+            var sut = new AuthenticationService(_userManagerMock.Object, _signInManagerMock.Object, _jwtTokenServiceMock.Object, _loggerMock.Object, _emailSenderMock.Object);
 
             //Assert
             Assert.ThrowsAsync<UserNotFoundException>(async () => await sut.RegisterAsync(new RegistrationRequest { Email = email, Password = password }));
@@ -141,11 +141,11 @@ namespace Wego.Idendity.tests.Service
         {
             // Arrange
             var expectedUser = new ApplicationUser() { Email = email, UserName = userName };
-            _userManagerMock.Setup(x => x.FindByNameAsync(userName)).ReturnsAsync(()=> null);
+            _userManagerMock.Setup(x => x.FindByNameAsync(userName)).ReturnsAsync(() => null);
             _userManagerMock.Setup(x => x.FindByEmailAsync(userName)).ReturnsAsync(expectedUser);
 
             // Act
-            var sut = new AuthenticationService(_userManagerMock.Object, _jwtSettings, _signInManagerMock.Object, _jwtTokenServiceMock.Object);
+            var sut = new AuthenticationService(_userManagerMock.Object, _signInManagerMock.Object, _jwtTokenServiceMock.Object, _loggerMock.Object, _emailSenderMock.Object);
 
             //Assert
             Assert.ThrowsAsync<UserAlreadyExistsException>(async () => await sut.RegisterAsync(new RegistrationRequest { Email = email, Password = password }));
@@ -156,9 +156,9 @@ namespace Wego.Idendity.tests.Service
         public void Register_WrongUsername_Throw_ValidationException(string email, string password, string userName)
         {
             // Arrange
-            _userManagerMock.Setup(x => x.FindByNameAsync(userName)).ReturnsAsync(()=> null);
+            _userManagerMock.Setup(x => x.FindByNameAsync(userName)).ReturnsAsync(() => null);
 
-            _userManagerMock.Setup(x => x.FindByEmailAsync(userName)).ReturnsAsync(()=> null);
+            _userManagerMock.Setup(x => x.FindByEmailAsync(userName)).ReturnsAsync(() => null);
 
             var expectedResult = IdentityResult.Failed(new IdentityError()
             {
@@ -168,7 +168,7 @@ namespace Wego.Idendity.tests.Service
             _userManagerMock.Setup(x => x.CreateAsync(It.IsAny<ApplicationUser>(), password)).ReturnsAsync(expectedResult);
 
             // Act
-            var sut = new AuthenticationService(_userManagerMock.Object, _jwtSettings, _signInManagerMock.Object, _jwtTokenServiceMock.Object);
+            var sut = new AuthenticationService(_userManagerMock.Object, _signInManagerMock.Object, _jwtTokenServiceMock.Object, _loggerMock.Object, _emailSenderMock.Object);
 
             //Assert
             Assert.ThrowsAsync<ValidationException>(async () => await sut.RegisterAsync(new RegistrationRequest { Email = email, Password = password }));

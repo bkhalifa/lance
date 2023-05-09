@@ -11,6 +11,7 @@ using Wego.Api.Services;
 using Wego.Application;
 using Wego.Application.Contracts;
 using Wego.Application.Extensions;
+using Wego.Application.LogEnrichers;
 using Wego.Application.Models.Authentification;
 using Wego.Identity;
 using Wego.Identity.Seed;
@@ -26,6 +27,7 @@ builder.Services.AddEndpointsApiExplorer();
 builder.Services.AddSwaggerGen();
 
 builder.Services.AddSwagger();
+builder.Services.AddDistributedMemoryCache();
 builder.Services.AddResponseCompression(options => { options.EnableForHttps = true; });
 builder.Services.AddApplicationServices();
 builder.Services.AddPersistenceServices(builder.Configuration);
@@ -38,16 +40,10 @@ builder.Services.AddCors(options =>
     options.AddPolicy("Open", builder => builder.AllowAnyOrigin().AllowAnyHeader().AllowAnyMethod());
 });
 
-
-var config = new ConfigurationBuilder()
-              .AddJsonFile("appsettings.json")
-              .Build();
-
 Log.Logger = new LoggerConfiguration()
-    .ReadFrom.Configuration(config)
-    .WriteTo.File("Logs/log-.txt", rollingInterval: RollingInterval.Day)
-    .CreateLogger();
+   .ReadFrom.Configuration(builder.Configuration).CreateBootstrapLogger();
 
+builder.Host.UseSerilogConfiguration(builder.Configuration);
 
 var app = builder.Build();
 
@@ -59,6 +55,7 @@ if (app.Environment.IsDevelopment())
     app.UseSwaggerUI();
 }
 
+app.UseSerilogRequestLogging();
 app.UseHttpsRedirection();
 app.UseProblemDetails();
 app.UseRouting();
@@ -71,6 +68,7 @@ app.UseSwaggerUI(c =>
 });
 
 app.UseResponseCompression();
+app.UseSerilogRequestLogging();
 
 app.UseCors("Open");
 app.UseAuthorization();
