@@ -21,6 +21,7 @@
   <ItemGroup>
     <ProjectReference Include="..\..\Core\Wego.Application\Wego.Application.csproj" />
     <ProjectReference Include="..\..\Infrastucture\Wego.Identity\Wego.Identity.csproj" />
+    <ProjectReference Include="..\..\Infrastucture\Wego.Infrastructure\Wego.Infrastructure.csproj" />
     <ProjectReference Include="..\..\Infrastucture\Wego.Persistence\Wego.Persistence.csproj" />
   </ItemGroup>
 

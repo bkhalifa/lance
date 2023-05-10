@@ -1,17 +1,11 @@
-﻿using GloboTicket.TicketManagement.Application.Features.Categories.Queries.GetCategoriesList;
-
-using Moq;
-
-using Wego.Application.Contracts.Persistence;
-using Wego.Application.Features.Categories.Queries.GetCategoriesList;
+﻿using Wego.Application.Features.Categories.Queries;
 using Wego.ApplicationTests.Mock;
-using Wego.Domain.Entities;
 
 namespace Wego.ApplicationTests.Categories.Queries;
 
 public class GetCategoriesListQueryHandlerTests
 {
-    private readonly Mock<IAsyncRepository<Category>> _mockCategoryRepository;
+    private readonly Mock<IBaseRepository<Category>> _mockCategoryRepository;
 
     public GetCategoriesListQueryHandlerTests()
     {

@@ -1,17 +1,12 @@
 ﻿using Microsoft.AspNetCore.Identity;
 using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.Options;
-using Moq;
-using System;
-using System.Collections.Generic;
+
 using System.IdentityModel.Tokens.Jwt;
-using System.Linq;
 using System.Security.Claims;
-using System.Text;
-using System.Threading.Tasks;
+
 using Wego.Application.Exceptions;
 using Wego.Application.Models.Authentification;
-using Wego.Application.Models.Mail;
 using Wego.Identity.Service;
 
 namespace Wego.Idendity.tests.Services

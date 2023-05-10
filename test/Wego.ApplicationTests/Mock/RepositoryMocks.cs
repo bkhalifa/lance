@@ -1,19 +1,11 @@
-﻿using Moq;
-
-using Wego.Application.Contracts.Persistence;
-using Wego.Domain.Entities;
-
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
+﻿
+using Wego.Application.Models.Common;
 
 namespace Wego.ApplicationTests.Mock
 {
     public class RepositoryMocks
     {
-        public static Mock<IAsyncRepository<Category>> GetCategoryRepository()
+        public static Mock<IBaseRepository<Category>> GetCategoryRepository()
         {
 
             var categories = new List<Category>
@@ -40,8 +32,8 @@ namespace Wego.ApplicationTests.Mock
                 }
             };
 
-            var mockCategoryRepository = new Mock<IAsyncRepository<Category>>();
-            mockCategoryRepository.Setup(repo => repo.ListAllAsync()).ReturnsAsync(categories);
+            var mockCategoryRepository = new Mock<IBaseRepository<Category>>();
+            mockCategoryRepository.Setup(repo => repo.GetAllAsync(CacheDuration.OneHour, default)).ReturnsAsync(categories);
 
             mockCategoryRepository.Setup(repo => repo.AddAsync(It.IsAny<Category>())).ReturnsAsync(
                 (Category category) =>
@@ -52,5 +44,6 @@ namespace Wego.ApplicationTests.Mock
 
             return mockCategoryRepository;
         }
+
     }
 }
