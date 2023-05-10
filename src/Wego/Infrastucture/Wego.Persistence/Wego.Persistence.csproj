@@ -24,6 +24,7 @@
   <ItemGroup>
     <ProjectReference Include="..\..\Core\Wego.Application\Wego.Application.csproj" />
     <ProjectReference Include="..\..\Core\Wego.Domain\Wego.Domain.csproj" />
+    <ProjectReference Include="..\Wego.Infrastructure\Wego.Infrastructure.csproj" />
   </ItemGroup>
 
 </Project>
