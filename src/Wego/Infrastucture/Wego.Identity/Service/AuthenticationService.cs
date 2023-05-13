@@ -1,6 +1,5 @@
 ﻿using Microsoft.AspNetCore.Identity;
 using Microsoft.Extensions.Logging;
-using Microsoft.Extensions.Options;
 
 using System.IdentityModel.Tokens.Jwt;
 using Wego.Application.Contracts.Common;
@@ -8,6 +7,7 @@ using Wego.Application.Contracts.Identity;
 using Wego.Application.Exceptions;
 using Wego.Application.Models.Authentification;
 using Wego.Application.Models.Mail;
+using Wego.Application.Contracts.Context;
 
 namespace Wego.Identity.Service;
 
@@ -18,27 +18,30 @@ public class AuthenticationService : IAuthenticationService
     private readonly IJwtTokenService _jwtTokenService;
     private readonly ILogger<IAuthenticationService> _logger;
     private readonly IEmailSender _emailSender;
+    private readonly ICurrentContext _currentContext;
 
     public AuthenticationService(UserManager<ApplicationUser> userManager,
         SignInManager<ApplicationUser> signInManager,
          IJwtTokenService jwtTokenService,
          ILogger<IAuthenticationService> logger,
-         IEmailSender emailSender)
+         IEmailSender emailSender,
+         ICurrentContext currentContext)
     {
         _userManager = userManager;
         _signInManager = signInManager;
         _jwtTokenService = jwtTokenService;
         _logger = logger;
         _emailSender = emailSender;
+        _currentContext = currentContext;
     }
 
-    public async Task<AuthenticationResponse> AuthenticateAsync(AuthenticationRequest request)
+    public async Task<AuthenticationResponse> LoginAsync(AuthenticationRequest request)
     {
         var user = await _userManager.FindByEmailAsync(request.Email);
 
         if (user is null)
         {
-            throw new UserNotFoundException($"User with {request.Email} not found.");
+            throw new CredentialInvalidException($"Credentials for '{request.Email} aren't valid'.");
         }
 
         var result = await _signInManager.PasswordSignInAsync(user.UserName, request.Password, false, lockoutOnFailure: false);
@@ -49,6 +52,7 @@ public class AuthenticationService : IAuthenticationService
         }
 
         var jwtSecurityToken = await _jwtTokenService.GenerateTokenAsync(user);
+        //var tokres = await _userManager.SetAuthenticationTokenAsync(user, "JWT", "JWT Token", new JwtSecurityTokenHandler().WriteToken(jwtSecurityToken));
 
         AuthenticationResponse response = new AuthenticationResponse
         {
@@ -66,9 +70,7 @@ public class AuthenticationService : IAuthenticationService
         var existingUser = await _userManager.FindByNameAsync(request.UserName);
 
         if (existingUser != null)
-        {
-            throw new UserNotFoundException($"Username '{request.UserName}' already exists.");
-        }
+            throw new UserAlreadyExistsException($"Username '{request.UserName}' already exists.");
 
         var user = new ApplicationUser
         {
@@ -92,11 +94,44 @@ public class AuthenticationService : IAuthenticationService
                 return new RegistrationResponse() { UserId = user.Id };
             }
 
-            throw new ValidationException(result.Errors.Select(x => x.Description).ToList());
+            throw new ValidationException(result.Errors.ToDictionary(x => x.Code, x => x.Description));
         }
         else
             throw new UserAlreadyExistsException($"Email {request.Email} already exists.");
 
     }
+    public async Task<bool> ChangePasswordAsync(string oldPassword, string newPassword)
+    {
+        if (string.IsNullOrEmpty(_currentContext.Identity?.Email)) throw new UserNotAuthentificatedException("User not Authentificated");
 
+
+        var user = await _userManager.FindByEmailAsync(_currentContext.Identity.Email);
+
+        if (user == null) throw new UserNotFoundException($"Email '{_currentContext.Identity.Email}' not found");
+
+        if (_userManager.PasswordHasher.VerifyHashedPassword(user, user.PasswordHash, newPassword) == PasswordVerificationResult.Success)
+            throw new PasswordsEqualsException("Password are equals");
+
+        var result = await _userManager.ChangePasswordAsync(user, oldPassword, newPassword);
+        if (result.Succeeded)
+        {
+            await _emailSender.SendMailAsync(new Email(_currentContext.Identity.Email, "Change Password", "Password updated successfully!"));
+            return true;
+        }
+        else
+            throw new ValidationException(result.Errors.ToDictionary(x=> x.Code, x=> x.Description));
+    }
+
+    public async Task LogoutAsync()
+    {
+        if (string.IsNullOrEmpty(_currentContext.Identity?.Email)) throw new UserNotAuthentificatedException("User not Authentificated");
+
+        var user = await _userManager.FindByEmailAsync(_currentContext.Identity.Email);
+
+        if (user == null) throw new UserNotFoundException($"Email '{_currentContext.Identity.Email}' not found");
+
+        await _signInManager.SignOutAsync();
+        //await _userManager.UpdateSecurityStampAsync(user);
+        //await _userManager.RemoveAuthenticationTokenAsync(user, "JWT", "JWT Token");
+    }
 }

@@ -1,24 +1,31 @@
 ﻿using FluentValidation.Results;
+using static System.Runtime.InteropServices.JavaScript.JSType;
 
 namespace Wego.Application.Exceptions
 {
-    public class ValidationException : ApplicationException
+    public class ValidationException : BaseException
     {
-        public List<string> ValdationErrors { get; set; }
-
-        public ValidationException(ValidationResult validationResult)
+        public override string ErrorCode => ExceptionCodes.ValidationError;
+        public Dictionary<string, string> ValdationErrors { get; set; }
+        public ValidationException() : base("One or more validation failures have occurred.")
         {
-            ValdationErrors = new List<string>();
+            ValdationErrors = new Dictionary<string, string>();
+        }
 
-            foreach (var validationError in validationResult.Errors)
+
+        public ValidationException(IEnumerable<ValidationFailure> validationResult) : this()
+        {
+            ValdationErrors = new Dictionary<string, string>();
+
+            foreach (var validationError in validationResult)
             {
-                ValdationErrors.Add(validationError.ErrorMessage);
+                ValdationErrors.Add(validationError.ErrorCode,validationError.ErrorMessage);
             }
         }
 
-        public ValidationException(List<string> errors)
+        public ValidationException(Dictionary<string, string> errors)
         {
-            ValdationErrors = errors ?? new List<string>();
+            ValdationErrors = errors ?? new Dictionary<string, string>();
         }
     }
 }

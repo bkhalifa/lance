@@ -1,28 +1,21 @@
 {
   "format": 1,
   "restore": {
-    "C:\\Source\\Lance\\src\\Wego\\Infrastucture\\Wego.Persistence\\Wego.Persistence.csproj": {}
+    "C:\\InfoLancer\\lance\\src\\Wego\\Infrastucture\\Wego.Persistence\\Wego.Persistence.csproj": {}
   },
   "projects": {
-    "C:\\Source\\Lance\\src\\Wego\\Core\\Wego.Application\\Wego.Application.csproj": {
+    "C:\\InfoLancer\\lance\\src\\Wego\\Core\\Wego.Application\\Wego.Application.csproj": {
       "version": "1.0.0",
       "restore": {
-        "projectUniqueName": "C:\\Source\\Lance\\src\\Wego\\Core\\Wego.Application\\Wego.Application.csproj",
+        "projectUniqueName": "C:\\InfoLancer\\lance\\src\\Wego\\Core\\Wego.Application\\Wego.Application.csproj",
         "projectName": "Wego.Application",
-        "projectPath": "C:\\Source\\Lance\\src\\Wego\\Core\\Wego.Application\\Wego.Application.csproj",
-        "packagesPath": "C:\\Users\\benkh\\.nuget\\packages\\",
-        "outputPath": "C:\\Source\\Lance\\src\\Wego\\Core\\Wego.Application\\obj\\",
+        "projectPath": "C:\\InfoLancer\\lance\\src\\Wego\\Core\\Wego.Application\\Wego.Application.csproj",
+        "packagesPath": "C:\\Users\\33621\\.nuget\\packages\\",
+        "outputPath": "C:\\InfoLancer\\lance\\src\\Wego\\Core\\Wego.Application\\obj\\",
         "projectStyle": "PackageReference",
-        "fallbackFolders": [
-          "C:\\Program Files (x86)\\Microsoft Visual Studio\\Shared\\NuGetPackages",
-          "C:\\Program Files (x86)\\Microsoft\\Xamarin\\NuGet\\",
-          "C:\\Program Files\\dotnet\\sdk\\NuGetFallbackFolder"
-        ],
         "configFilePaths": [
-          "C:\\Users\\benkh\\AppData\\Roaming\\NuGet\\NuGet.Config",
-          "C:\\Program Files (x86)\\NuGet\\Config\\Microsoft.VisualStudio.FallbackLocation.config",
-          "C:\\Program Files (x86)\\NuGet\\Config\\Microsoft.VisualStudio.Offline.config",
-          "C:\\Program Files (x86)\\NuGet\\Config\\Xamarin.Offline.config"
+          "C:\\Users\\33621\\AppData\\Roaming\\NuGet\\NuGet.Config",
+          "C:\\Program Files (x86)\\NuGet\\Config\\Microsoft.VisualStudio.Offline.config"
         ],
         "originalTargetFrameworks": [
           "net7.0"
@@ -35,8 +28,8 @@
           "net7.0": {
             "targetAlias": "net7.0",
             "projectReferences": {
-              "C:\\Source\\Lance\\src\\Wego\\Core\\Wego.Domain\\Wego.Domain.csproj": {
-                "projectPath": "C:\\Source\\Lance\\src\\Wego\\Core\\Wego.Domain\\Wego.Domain.csproj"
+              "C:\\InfoLancer\\lance\\src\\Wego\\Core\\Wego.Domain\\Wego.Domain.csproj": {
+                "projectPath": "C:\\InfoLancer\\lance\\src\\Wego\\Core\\Wego.Domain\\Wego.Domain.csproj"
               }
             }
           }
@@ -51,10 +44,6 @@
         "net7.0": {
           "targetAlias": "net7.0",
           "dependencies": {
-            "FluentValidation": {
-              "target": "Package",
-              "version": "[11.5.2, )"
-            },
             "FluentValidation.DependencyInjectionExtensions": {
               "target": "Package",
               "version": "[11.5.2, )"
@@ -62,6 +51,10 @@
             "Hellang.Middleware.ProblemDetails": {
               "target": "Package",
               "version": "[6.5.1, )"
+            },
+            "MailKit": {
+              "target": "Package",
+              "version": "[4.0.0, )"
             },
             "Mapster": {
               "target": "Package",
@@ -74,6 +67,10 @@
             "Microsoft.AspNetCore.Mvc.Core": {
               "target": "Package",
               "version": "[2.2.5, )"
+            },
+            "Microsoft.Data.SqlClient": {
+              "target": "Package",
+              "version": "[5.0.1, )"
             },
             "System.IdentityModel.Tokens.Jwt": {
               "target": "Package",
@@ -100,25 +97,18 @@
         }
       }
     },
-    "C:\\Source\\Lance\\src\\Wego\\Core\\Wego.Domain\\Wego.Domain.csproj": {
+    "C:\\InfoLancer\\lance\\src\\Wego\\Core\\Wego.Domain\\Wego.Domain.csproj": {
       "version": "1.0.0",
       "restore": {
-        "projectUniqueName": "C:\\Source\\Lance\\src\\Wego\\Core\\Wego.Domain\\Wego.Domain.csproj",
+        "projectUniqueName": "C:\\InfoLancer\\lance\\src\\Wego\\Core\\Wego.Domain\\Wego.Domain.csproj",
         "projectName": "Wego.Domain",
-        "projectPath": "C:\\Source\\Lance\\src\\Wego\\Core\\Wego.Domain\\Wego.Domain.csproj",
-        "packagesPath": "C:\\Users\\benkh\\.nuget\\packages\\",
-        "outputPath": "C:\\Source\\Lance\\src\\Wego\\Core\\Wego.Domain\\obj\\",
+        "projectPath": "C:\\InfoLancer\\lance\\src\\Wego\\Core\\Wego.Domain\\Wego.Domain.csproj",
+        "packagesPath": "C:\\Users\\33621\\.nuget\\packages\\",
+        "outputPath": "C:\\InfoLancer\\lance\\src\\Wego\\Core\\Wego.Domain\\obj\\",
         "projectStyle": "PackageReference",
-        "fallbackFolders": [
-          "C:\\Program Files (x86)\\Microsoft Visual Studio\\Shared\\NuGetPackages",
-          "C:\\Program Files (x86)\\Microsoft\\Xamarin\\NuGet\\",
-          "C:\\Program Files\\dotnet\\sdk\\NuGetFallbackFolder"
-        ],
         "configFilePaths": [
-          "C:\\Users\\benkh\\AppData\\Roaming\\NuGet\\NuGet.Config",
-          "C:\\Program Files (x86)\\NuGet\\Config\\Microsoft.VisualStudio.FallbackLocation.config",
-          "C:\\Program Files (x86)\\NuGet\\Config\\Microsoft.VisualStudio.Offline.config",
-          "C:\\Program Files (x86)\\NuGet\\Config\\Xamarin.Offline.config"
+          "C:\\Users\\33621\\AppData\\Roaming\\NuGet\\NuGet.Config",
+          "C:\\Program Files (x86)\\NuGet\\Config\\Microsoft.VisualStudio.Offline.config"
         ],
         "originalTargetFrameworks": [
           "net7.0"
@@ -168,25 +158,18 @@
         }
       }
     },
-    "C:\\Source\\Lance\\src\\Wego\\Infrastucture\\Wego.Persistence\\Wego.Persistence.csproj": {
+    "C:\\InfoLancer\\lance\\src\\Wego\\Infrastucture\\Wego.Infrastructure\\Wego.Infrastructure.csproj": {
       "version": "1.0.0",
       "restore": {
-        "projectUniqueName": "C:\\Source\\Lance\\src\\Wego\\Infrastucture\\Wego.Persistence\\Wego.Persistence.csproj",
-        "projectName": "Wego.Persistence",
-        "projectPath": "C:\\Source\\Lance\\src\\Wego\\Infrastucture\\Wego.Persistence\\Wego.Persistence.csproj",
-        "packagesPath": "C:\\Users\\benkh\\.nuget\\packages\\",
-        "outputPath": "C:\\Source\\Lance\\src\\Wego\\Infrastucture\\Wego.Persistence\\obj\\",
+        "projectUniqueName": "C:\\InfoLancer\\lance\\src\\Wego\\Infrastucture\\Wego.Infrastructure\\Wego.Infrastructure.csproj",
+        "projectName": "Wego.Infrastructure",
+        "projectPath": "C:\\InfoLancer\\lance\\src\\Wego\\Infrastucture\\Wego.Infrastructure\\Wego.Infrastructure.csproj",
+        "packagesPath": "C:\\Users\\33621\\.nuget\\packages\\",
+        "outputPath": "C:\\InfoLancer\\lance\\src\\Wego\\Infrastucture\\Wego.Infrastructure\\obj\\",
         "projectStyle": "PackageReference",
-        "fallbackFolders": [
-          "C:\\Program Files (x86)\\Microsoft Visual Studio\\Shared\\NuGetPackages",
-          "C:\\Program Files (x86)\\Microsoft\\Xamarin\\NuGet\\",
-          "C:\\Program Files\\dotnet\\sdk\\NuGetFallbackFolder"
-        ],
         "configFilePaths": [
-          "C:\\Users\\benkh\\AppData\\Roaming\\NuGet\\NuGet.Config",
-          "C:\\Program Files (x86)\\NuGet\\Config\\Microsoft.VisualStudio.FallbackLocation.config",
-          "C:\\Program Files (x86)\\NuGet\\Config\\Microsoft.VisualStudio.Offline.config",
-          "C:\\Program Files (x86)\\NuGet\\Config\\Xamarin.Offline.config"
+          "C:\\Users\\33621\\AppData\\Roaming\\NuGet\\NuGet.Config",
+          "C:\\Program Files (x86)\\NuGet\\Config\\Microsoft.VisualStudio.Offline.config"
         ],
         "originalTargetFrameworks": [
           "net7.0"
@@ -199,11 +182,95 @@
           "net7.0": {
             "targetAlias": "net7.0",
             "projectReferences": {
-              "C:\\Source\\Lance\\src\\Wego\\Core\\Wego.Application\\Wego.Application.csproj": {
-                "projectPath": "C:\\Source\\Lance\\src\\Wego\\Core\\Wego.Application\\Wego.Application.csproj"
+              "C:\\InfoLancer\\lance\\src\\Wego\\Core\\Wego.Application\\Wego.Application.csproj": {
+                "projectPath": "C:\\InfoLancer\\lance\\src\\Wego\\Core\\Wego.Application\\Wego.Application.csproj"
+              }
+            }
+          }
+        },
+        "warningProperties": {
+          "warnAsError": [
+            "NU1605"
+          ]
+        }
+      },
+      "frameworks": {
+        "net7.0": {
+          "targetAlias": "net7.0",
+          "dependencies": {
+            "EasyCaching.InMemory": {
+              "target": "Package",
+              "version": "[1.9.0, )"
+            },
+            "Serilog": {
+              "target": "Package",
+              "version": "[2.12.0, )"
+            },
+            "Serilog.Extensions.Hosting": {
+              "target": "Package",
+              "version": "[5.0.1, )"
+            },
+            "Serilog.Settings.Configuration": {
+              "target": "Package",
+              "version": "[3.4.0, )"
+            },
+            "Serilog.Sinks.MSSqlServer": {
+              "target": "Package",
+              "version": "[6.3.0, )"
+            }
+          },
+          "imports": [
+            "net461",
+            "net462",
+            "net47",
+            "net471",
+            "net472",
+            "net48",
+            "net481"
+          ],
+          "assetTargetFallback": true,
+          "warn": true,
+          "frameworkReferences": {
+            "Microsoft.NETCore.App": {
+              "privateAssets": "all"
+            }
+          },
+          "runtimeIdentifierGraphPath": "C:\\Program Files\\dotnet\\sdk\\7.0.203\\RuntimeIdentifierGraph.json"
+        }
+      }
+    },
+    "C:\\InfoLancer\\lance\\src\\Wego\\Infrastucture\\Wego.Persistence\\Wego.Persistence.csproj": {
+      "version": "1.0.0",
+      "restore": {
+        "projectUniqueName": "C:\\InfoLancer\\lance\\src\\Wego\\Infrastucture\\Wego.Persistence\\Wego.Persistence.csproj",
+        "projectName": "Wego.Persistence",
+        "projectPath": "C:\\InfoLancer\\lance\\src\\Wego\\Infrastucture\\Wego.Persistence\\Wego.Persistence.csproj",
+        "packagesPath": "C:\\Users\\33621\\.nuget\\packages\\",
+        "outputPath": "C:\\InfoLancer\\lance\\src\\Wego\\Infrastucture\\Wego.Persistence\\obj\\",
+        "projectStyle": "PackageReference",
+        "configFilePaths": [
+          "C:\\Users\\33621\\AppData\\Roaming\\NuGet\\NuGet.Config",
+          "C:\\Program Files (x86)\\NuGet\\Config\\Microsoft.VisualStudio.Offline.config"
+        ],
+        "originalTargetFrameworks": [
+          "net7.0"
+        ],
+        "sources": {
+          "C:\\Program Files (x86)\\Microsoft SDKs\\NuGetPackages\\": {},
+          "https://api.nuget.org/v3/index.json": {}
+        },
+        "frameworks": {
+          "net7.0": {
+            "targetAlias": "net7.0",
+            "projectReferences": {
+              "C:\\InfoLancer\\lance\\src\\Wego\\Core\\Wego.Application\\Wego.Application.csproj": {
+                "projectPath": "C:\\InfoLancer\\lance\\src\\Wego\\Core\\Wego.Application\\Wego.Application.csproj"
               },
-              "C:\\Source\\Lance\\src\\Wego\\Core\\Wego.Domain\\Wego.Domain.csproj": {
-                "projectPath": "C:\\Source\\Lance\\src\\Wego\\Core\\Wego.Domain\\Wego.Domain.csproj"
+              "C:\\InfoLancer\\lance\\src\\Wego\\Core\\Wego.Domain\\Wego.Domain.csproj": {
+                "projectPath": "C:\\InfoLancer\\lance\\src\\Wego\\Core\\Wego.Domain\\Wego.Domain.csproj"
+              },
+              "C:\\InfoLancer\\lance\\src\\Wego\\Infrastucture\\Wego.Infrastructure\\Wego.Infrastructure.csproj": {
+                "projectPath": "C:\\InfoLancer\\lance\\src\\Wego\\Infrastucture\\Wego.Infrastructure\\Wego.Infrastructure.csproj"
               }
             }
           }

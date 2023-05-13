@@ -1,7 +1,10 @@
 ﻿using Microsoft.AspNetCore.Identity;
+using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Options;
 using Microsoft.IdentityModel.Tokens;
+using System.Collections.Concurrent;
 using System.IdentityModel.Tokens.Jwt;
+using System.Net;
 using System.Security.Claims;
 using System.Text;
 using Wego.Application.Contracts.Identity;
@@ -15,6 +18,8 @@ namespace Wego.Identity.Service
     {
         private readonly UserManager<ApplicationUser> _userManager;
         private readonly JwtSettings _jwtSettings;
+        private static readonly ConcurrentDictionary<string, DateTime> DisavowedSignatures = new();
+
 
         public JwtTokenService(UserManager<ApplicationUser> userManager,
             IOptions<JwtSettings> jwtSettings)
