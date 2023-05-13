@@ -59,6 +59,7 @@
           }
         }
       },
+<<<<<<< HEAD
       "EasyCaching.Core/1.9.0": {
         "type": "package",
         "dependencies": {
@@ -94,6 +95,8 @@
           }
         }
       },
+=======
+>>>>>>> 401a887ca51afefe1c54274c7a146bceaa033524
       "FluentValidation/11.5.2": {
         "type": "package",
         "compile": {
@@ -1482,6 +1485,8 @@
         },
         "runtime": {
           "lib/net6.0/System.Configuration.ConfigurationManager.dll": {
+<<<<<<< HEAD
+=======
             "related": ".xml"
           }
         },
@@ -1489,6 +1494,19 @@
           "buildTransitive/netcoreapp3.1/_._": {}
         }
       },
+      "System.Diagnostics.DiagnosticSource/5.0.0": {
+        "type": "package",
+        "compile": {
+          "lib/net5.0/System.Diagnostics.DiagnosticSource.dll": {
+>>>>>>> 401a887ca51afefe1c54274c7a146bceaa033524
+            "related": ".xml"
+          }
+        },
+        "build": {
+          "buildTransitive/netcoreapp3.1/_._": {}
+        }
+      },
+<<<<<<< HEAD
       "System.Diagnostics.DiagnosticSource/6.0.0": {
         "type": "package",
         "dependencies": {
@@ -1496,16 +1514,30 @@
         },
         "compile": {
           "lib/net6.0/System.Diagnostics.DiagnosticSource.dll": {
+=======
+      "System.Drawing.Common/6.0.0": {
+        "type": "package",
+        "dependencies": {
+          "Microsoft.Win32.SystemEvents": "6.0.0"
+        },
+        "compile": {
+          "lib/net6.0/System.Drawing.Common.dll": {
+>>>>>>> 401a887ca51afefe1c54274c7a146bceaa033524
             "related": ".xml"
           }
         },
         "runtime": {
+<<<<<<< HEAD
           "lib/net6.0/System.Diagnostics.DiagnosticSource.dll": {
+=======
+          "lib/net6.0/System.Drawing.Common.dll": {
+>>>>>>> 401a887ca51afefe1c54274c7a146bceaa033524
             "related": ".xml"
           }
         },
         "build": {
           "buildTransitive/netcoreapp3.1/_._": {}
+<<<<<<< HEAD
         }
       },
       "System.Drawing.Common/6.0.0": {
@@ -1525,6 +1557,8 @@
         },
         "build": {
           "buildTransitive/netcoreapp3.1/_._": {}
+=======
+>>>>>>> 401a887ca51afefe1c54274c7a146bceaa033524
         },
         "runtimeTargets": {
           "runtimes/unix/lib/net6.0/System.Drawing.Common.dll": {
@@ -2040,7 +2074,14 @@
           "Mapster": "7.3.0",
           "MediatR": "12.0.1",
           "Microsoft.AspNetCore.Mvc.Core": "2.2.5",
+<<<<<<< HEAD
           "Microsoft.Data.SqlClient": "5.0.1",
+=======
+          "Serilog": "2.12.0",
+          "Serilog.Extensions.Hosting": "5.0.1",
+          "Serilog.Settings.Configuration": "3.4.0",
+          "Serilog.Sinks.MSSqlServer": "6.3.0",
+>>>>>>> 401a887ca51afefe1c54274c7a146bceaa033524
           "System.IdentityModel.Tokens.Jwt": "6.30.0",
           "Wego.Domain": "1.0.0"
         },
@@ -2143,6 +2184,7 @@
         "packageIcon.png"
       ]
     },
+<<<<<<< HEAD
     "EasyCaching.Core/1.9.0": {
       "sha512": "UGb3IZLEQAFera3nFCTAyHb8fuzcP7Lv61cv5AORc05uInWHzo+4AHUk1Yh/i7V7neh23+KXupyCmEEH/FHONQ==",
       "type": "package",
@@ -2177,6 +2219,8 @@
         "nuget-icon.png"
       ]
     },
+=======
+>>>>>>> 401a887ca51afefe1c54274c7a146bceaa033524
     "FluentValidation/11.5.2": {
       "sha512": "kj/hW/iusp2zq1Vt1YPLgDj6UG0DhoJXGkLwjLwm3j7vUtRF8DVA5vHJfItG3BxDjLWJUR2pvw8fK7rnuysZNA==",
       "type": "package",

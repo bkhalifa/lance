@@ -163,10 +163,29 @@
               "target": "Package",
               "version": "[2.2.5, )"
             },
+<<<<<<< HEAD
             "Microsoft.Data.SqlClient": {
               "target": "Package",
               "version": "[5.0.1, )"
             },
+=======
+            "Serilog": {
+              "target": "Package",
+              "version": "[2.12.0, )"
+            },
+            "Serilog.Extensions.Hosting": {
+              "target": "Package",
+              "version": "[5.0.1, )"
+            },
+            "Serilog.Settings.Configuration": {
+              "target": "Package",
+              "version": "[3.4.0, )"
+            },
+            "Serilog.Sinks.MSSqlServer": {
+              "target": "Package",
+              "version": "[6.3.0, )"
+            },
+>>>>>>> 401a887ca51afefe1c54274c7a146bceaa033524
             "System.IdentityModel.Tokens.Jwt": {
               "target": "Package",
               "version": "[6.30.0, )"
