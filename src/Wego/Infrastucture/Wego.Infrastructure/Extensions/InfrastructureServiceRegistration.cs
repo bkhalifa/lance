@@ -1,5 +1,5 @@
-﻿using Microsoft.Extensions.Configuration;
-using Microsoft.Extensions.DependencyInjection;
+﻿using Microsoft.Extensions.DependencyInjection;
+
 using Wego.Application.Contracts.Context;
 using Wego.Application.Contracts.Infrastructure;
 using Wego.Infrastructure.Context;
