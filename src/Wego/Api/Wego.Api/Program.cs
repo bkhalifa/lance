@@ -11,7 +11,7 @@ using Wego.Application;
 using Wego.Application.Models.Authentification;
 using Wego.Identity;
 using Wego.Identity.Seed;
-using Wego.Infrastructure.Log;
+using Wego.Infrastructure.Logging;
 using Wego.Persistence;
 
 var builder = WebApplication.CreateBuilder(args);
