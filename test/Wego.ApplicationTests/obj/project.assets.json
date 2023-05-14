@@ -9152,30 +9152,20 @@
     ]
   },
   "packageFolders": {
-    "C:\\Users\\benkh\\.nuget\\packages\\": {},
-    "C:\\Program Files (x86)\\Microsoft Visual Studio\\Shared\\NuGetPackages": {},
-    "C:\\Program Files (x86)\\Microsoft\\Xamarin\\NuGet\\": {},
-    "C:\\Program Files\\dotnet\\sdk\\NuGetFallbackFolder": {}
+    "C:\\Users\\33621\\.nuget\\packages\\": {}
   },
   "project": {
     "version": "1.0.0",
     "restore": {
-      "projectUniqueName": "C:\\Source\\Lance\\test\\Wego.ApplicationTests\\Wego.ApplicationTests.csproj",
+      "projectUniqueName": "C:\\InfoLancer\\lance\\test\\Wego.ApplicationTests\\Wego.ApplicationTests.csproj",
       "projectName": "Wego.ApplicationTests",
-      "projectPath": "C:\\Source\\Lance\\test\\Wego.ApplicationTests\\Wego.ApplicationTests.csproj",
-      "packagesPath": "C:\\Users\\benkh\\.nuget\\packages\\",
-      "outputPath": "C:\\Source\\Lance\\test\\Wego.ApplicationTests\\obj\\",
+      "projectPath": "C:\\InfoLancer\\lance\\test\\Wego.ApplicationTests\\Wego.ApplicationTests.csproj",
+      "packagesPath": "C:\\Users\\33621\\.nuget\\packages\\",
+      "outputPath": "C:\\InfoLancer\\lance\\test\\Wego.ApplicationTests\\obj\\",
       "projectStyle": "PackageReference",
-      "fallbackFolders": [
-        "C:\\Program Files (x86)\\Microsoft Visual Studio\\Shared\\NuGetPackages",
-        "C:\\Program Files (x86)\\Microsoft\\Xamarin\\NuGet\\",
-        "C:\\Program Files\\dotnet\\sdk\\NuGetFallbackFolder"
-      ],
       "configFilePaths": [
-        "C:\\Users\\benkh\\AppData\\Roaming\\NuGet\\NuGet.Config",
-        "C:\\Program Files (x86)\\NuGet\\Config\\Microsoft.VisualStudio.FallbackLocation.config",
-        "C:\\Program Files (x86)\\NuGet\\Config\\Microsoft.VisualStudio.Offline.config",
-        "C:\\Program Files (x86)\\NuGet\\Config\\Xamarin.Offline.config"
+        "C:\\Users\\33621\\AppData\\Roaming\\NuGet\\NuGet.Config",
+        "C:\\Program Files (x86)\\NuGet\\Config\\Microsoft.VisualStudio.Offline.config"
       ],
       "originalTargetFrameworks": [
         "net7.0"
@@ -9188,11 +9178,11 @@
         "net7.0": {
           "targetAlias": "net7.0",
           "projectReferences": {
-            "C:\\Source\\Lance\\src\\Wego\\Core\\Wego.Application\\Wego.Application.csproj": {
-              "projectPath": "C:\\Source\\Lance\\src\\Wego\\Core\\Wego.Application\\Wego.Application.csproj"
+            "C:\\InfoLancer\\lance\\src\\Wego\\Core\\Wego.Application\\Wego.Application.csproj": {
+              "projectPath": "C:\\InfoLancer\\lance\\src\\Wego\\Core\\Wego.Application\\Wego.Application.csproj"
             },
-            "C:\\Source\\Lance\\src\\Wego\\Core\\Wego.Domain\\Wego.Domain.csproj": {
-              "projectPath": "C:\\Source\\Lance\\src\\Wego\\Core\\Wego.Domain\\Wego.Domain.csproj"
+            "C:\\InfoLancer\\lance\\src\\Wego\\Core\\Wego.Domain\\Wego.Domain.csproj": {
+              "projectPath": "C:\\InfoLancer\\lance\\src\\Wego\\Core\\Wego.Domain\\Wego.Domain.csproj"
             }
           }
         }
