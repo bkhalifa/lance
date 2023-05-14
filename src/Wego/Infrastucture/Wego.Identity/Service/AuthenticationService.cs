@@ -42,7 +42,7 @@ public class AuthenticationService : IAuthenticationService
         if (user is null)
             throw new CredentialInvalidException($"Credentials for '{request.Email} aren't valid'.");
 
-        var result = await _signInManager.PasswordSignInAsync(user.UserName, request.Password, false, lockoutOnFailure: false);
+        var result = await _signInManager.PasswordSignInAsync(user.UserName!, request.Password, false, lockoutOnFailure: false);
 
         if (!result.Succeeded)
             throw new CredentialInvalidException($"Credentials for '{request.Email} aren't valid'.");
@@ -55,28 +55,25 @@ public class AuthenticationService : IAuthenticationService
             Id = user.Id,
             Token = jwtSecurityToken.AccessToken,
             RefreshToken = jwtSecurityToken.RefreshToken,
-            Email = user.Email,
-            UserName = user.UserName
+            Email = user.Email!,
+            UserName = user.UserName!
         };
     }
 
     public async Task<RegistrationResponse> RegisterAsync(RegistrationRequest request)
     {
-        var existingUser = await _userManager.FindByNameAsync(request.UserName);
+        var existingUser = await _userManager.FindByNameAsync(request.Email);
 
         if (existingUser != null)
-            throw new UserAlreadyExistsException($"Username '{request.UserName}' already exists.");
+            throw new UserAlreadyExistsException($"Email '{request.Email}' already exists.");
 
         var user = new ApplicationUser
         {
-            Email = request.Email,
-            FirstName = request.FirstName,
-            LastName = request.LastName,
-            UserName = request.UserName,
-            EmailConfirmed = true
+            UserName = request.Email,
+            Email = request.Email
         };
 
-        var existingEmail = await _userManager.FindByEmailAsync(request.Email);
+        var existingEmail = await _userManager.FindByEmailAsync(user.Email);
 
         if (existingEmail == null)
         {
@@ -86,7 +83,7 @@ public class AuthenticationService : IAuthenticationService
             {
                 await _emailSender.SendMailAsync(new Email(user.Email, "User Created", "New user created successfully!"));
                 _logger.LogInformation("User Created: {email}", user.Email);
-                return new RegistrationResponse() { UserId = user.Id };
+                return new RegistrationResponse() { UserId = user.Id, Email = user.Email };
             }
 
             throw new ValidationException(result.Errors.ToDictionary(x => x.Code, x => x.Description));

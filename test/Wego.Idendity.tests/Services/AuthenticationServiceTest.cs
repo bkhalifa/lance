@@ -119,7 +119,7 @@ namespace Wego.Idendity.tests.Services
 
             // Act
             var sut = new AuthenticationService(_userManagerMock.Object, _signInManagerMock.Object, _jwtTokenServiceMock.Object, _loggerMock.Object, _emailSenderMock.Object, _currentContextMock.Object);
-            var result = await sut.RegisterAsync(new RegistrationRequest { Email = email, Password = password, UserName = userName });
+            var result = await sut.RegisterAsync(new RegistrationRequest { Email = email, Password = password });
 
             //Assert
             Assert.NotNull(result);

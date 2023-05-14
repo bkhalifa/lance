@@ -9,17 +9,14 @@ namespace Wego.Identity.Seed;
     {
         var applicationUser = new ApplicationUser
         {
-            FirstName = "BB",
-            LastName = "King",
-            UserName = "BBking",
-            Email = "BBking@test.fr",
+            Email = "test@test.fr",
             EmailConfirmed = true
         };
 
         var user = await userManager.FindByEmailAsync(applicationUser.Email);
         if (user is null)
         {
-            await userManager.CreateAsync(applicationUser, "Admin123@");
+            await userManager.CreateAsync(applicationUser, "test123@");
         }
     }
 }
