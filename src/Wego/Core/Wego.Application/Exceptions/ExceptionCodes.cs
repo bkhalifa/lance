@@ -18,5 +18,6 @@ namespace Wego.Application.Exceptions
         public const string UserAlreadyExists = "user_already_exists";
         public const string UserNotAuthentificated = "user_not_authentificated";
         public const string UserNotFound = "user_not_found";
+        public const string TokenInvalid = "token_invalid";
     }
 }

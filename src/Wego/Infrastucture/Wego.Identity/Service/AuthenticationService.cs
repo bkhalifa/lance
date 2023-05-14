@@ -40,29 +40,24 @@ public class AuthenticationService : IAuthenticationService
         var user = await _userManager.FindByEmailAsync(request.Email);
 
         if (user is null)
-        {
             throw new CredentialInvalidException($"Credentials for '{request.Email} aren't valid'.");
-        }
 
         var result = await _signInManager.PasswordSignInAsync(user.UserName, request.Password, false, lockoutOnFailure: false);
 
         if (!result.Succeeded)
-        {
             throw new CredentialInvalidException($"Credentials for '{request.Email} aren't valid'.");
-        }
+
 
         var jwtSecurityToken = await _jwtTokenService.GenerateTokenAsync(user);
-        //var tokres = await _userManager.SetAuthenticationTokenAsync(user, "JWT", "JWT Token", new JwtSecurityTokenHandler().WriteToken(jwtSecurityToken));
 
-        AuthenticationResponse response = new AuthenticationResponse
+        return new AuthenticationResponse
         {
             Id = user.Id,
-            Token = new JwtSecurityTokenHandler().WriteToken(jwtSecurityToken),
+            Token = jwtSecurityToken.AccessToken,
+            RefreshToken = jwtSecurityToken.RefreshToken,
             Email = user.Email,
             UserName = user.UserName
         };
-
-        return response;
     }
 
     public async Task<RegistrationResponse> RegisterAsync(RegistrationRequest request)
@@ -119,7 +114,7 @@ public class AuthenticationService : IAuthenticationService
             return true;
         }
         else
-            throw new ValidationException(result.Errors.ToDictionary(x=> x.Code, x=> x.Description));
+            throw new ValidationException(result.Errors.ToDictionary(x => x.Code, x => x.Description));
     }
 
     public async Task LogoutAsync()
@@ -134,4 +129,14 @@ public class AuthenticationService : IAuthenticationService
         //await _userManager.UpdateSecurityStampAsync(user);
         //await _userManager.RemoveAuthenticationTokenAsync(user, "JWT", "JWT Token");
     }
+    public async Task<TokenModel> RefreshAsync(string refreshToken)
+    {
+        if (string.IsNullOrEmpty(_currentContext.Identity?.Email)) throw new UserNotAuthentificatedException("User not Authentificated");
+
+        var user = await _userManager.FindByEmailAsync(_currentContext.Identity.Email);
+        if (user == null) throw new UserNotFoundException($"Email '{_currentContext.Identity.Email}' not found");
+
+        return await _jwtTokenService.RefreshTokenAsync(user, refreshToken);
+    }
+
 }

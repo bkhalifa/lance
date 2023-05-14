@@ -1,8 +1,6 @@
 ﻿using Microsoft.AspNetCore.Identity;
-using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Options;
 using Microsoft.IdentityModel.Tokens;
-using System.Collections.Concurrent;
 using System.IdentityModel.Tokens.Jwt;
 using System.Net;
 using System.Security.Claims;
@@ -18,7 +16,6 @@ namespace Wego.Identity.Service
     {
         private readonly UserManager<ApplicationUser> _userManager;
         private readonly JwtSettings _jwtSettings;
-        private static readonly ConcurrentDictionary<string, DateTime> DisavowedSignatures = new();
 
 
         public JwtTokenService(UserManager<ApplicationUser> userManager,
@@ -29,9 +26,9 @@ namespace Wego.Identity.Service
 
         }
 
-        public async Task<JwtSecurityToken> GenerateTokenAsync(ApplicationUser user)
+        public async Task<TokenModel> GenerateTokenAsync(ApplicationUser user)
         {
-            if (string.IsNullOrEmpty(user.UserName) || string.IsNullOrEmpty(user.Email)) throw new UserNotFoundException("User Token not found");
+            if (string.IsNullOrEmpty(user?.UserName) || string.IsNullOrEmpty(user?.Email)) throw new UserNotFoundException("User Token not found");
 
             var userClaims = await _userManager.GetClaimsAsync(user);
             var roles = await _userManager.GetRolesAsync(user);
@@ -54,15 +51,61 @@ namespace Wego.Identity.Service
             .Union(roleClaims);
 
             var symmetricSecurityKey = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(_jwtSettings.Key));
-            var signingCredentials = new SigningCredentials(symmetricSecurityKey, SecurityAlgorithms.HmacSha256);
+            var symmetricSecurityRefreshKey = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(_jwtSettings.RefreshKey));
 
-            var jwtSecurityToken = new JwtSecurityToken(
+            var jwtSecurityToken = GetSecurityToken(claims, symmetricSecurityKey);
+            var jwtSecurityRefreshToken = GetSecurityToken(claims, symmetricSecurityRefreshKey);
+
+
+            var result = new TokenModel
+            {
+                AccessToken = new JwtSecurityTokenHandler().WriteToken(jwtSecurityToken),
+                RefreshToken = new JwtSecurityTokenHandler().WriteToken(jwtSecurityRefreshToken),
+            };
+            await _userManager.SetAuthenticationTokenAsync(user, _jwtSettings.Name, _jwtSettings.RefreshName, result.RefreshToken);
+
+            return result;
+        }
+
+        public async Task<TokenModel> RefreshTokenAsync(ApplicationUser user, string refreshToken)
+        {
+            if (string.IsNullOrEmpty(user?.UserName) || string.IsNullOrEmpty(user?.Email)) throw new UserNotFoundException("User Token not found");
+
+            var validationParameters = new TokenValidationParameters
+            {
+                ValidateIssuerSigningKey = true,
+                ValidateIssuer = true,
+                ValidateAudience = true,
+                ValidateLifetime = true,
+                ClockSkew = TimeSpan.Zero,
+                IssuerSigningKey = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(_jwtSettings.RefreshKey)),
+                ValidIssuer = _jwtSettings.Issuer,
+                ValidAudience = _jwtSettings.Audience,
+            };
+
+            JwtSecurityTokenHandler jwtSecurityTokenHandler = new();
+
+            try
+            {
+                jwtSecurityTokenHandler.ValidateToken(refreshToken, validationParameters, out var _);
+            }
+            catch (SecurityTokenSignatureKeyNotFoundException)
+            {
+                throw new TokenInvalidException("Refresh token invalid");
+            }
+
+            return await GenerateTokenAsync(user);
+        }
+
+        private JwtSecurityToken GetSecurityToken(IEnumerable<Claim> claims, SymmetricSecurityKey symmetricSecurityKey)
+        {
+            return new JwtSecurityToken(
                 issuer: _jwtSettings.Issuer,
                 audience: _jwtSettings.Audience,
                 claims: claims,
                 expires: DateTime.UtcNow.AddMinutes(_jwtSettings.DurationInMinutes),
-                signingCredentials: signingCredentials);
-            return jwtSecurityToken;
+                signingCredentials: new SigningCredentials(symmetricSecurityKey, SecurityAlgorithms.HmacSha256));
         }
+
     }
 }
