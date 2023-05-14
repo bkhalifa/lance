@@ -63,7 +63,7 @@ namespace Wego.Idendity.tests.Services
             _signInManagerMock.Setup(x => x.PasswordSignInAsync(expectedUser.UserName, password, false, false)).ReturnsAsync(SignInResult.Success);
 
             var expectedToken = new JwtSecurityToken();
-            _jwtTokenServiceMock.Setup(x => x.GenerateTokenAsync(expectedUser)).ReturnsAsync(expectedToken);
+           // _jwtTokenServiceMock.Setup(x => x.GenerateTokenAsync(expectedUser)).ReturnsAsync(expectedToken);
 
             var emailParam = new Email("to@to.com", "User Created");
             _emailSenderMock.Setup(x => x.SendMailAsync(emailParam, default)).ReturnsAsync(true);
