@@ -73,7 +73,6 @@ using (var scope = app.Services.CreateScope())
 {
     var services = scope.ServiceProvider;
     var loggerFactory = services.GetRequiredService<ILoggerFactory>();
-
     try
     {
         var userManager = services.GetRequiredService<UserManager<ApplicationUser>>();
