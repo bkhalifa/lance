@@ -1,5 +1,5 @@
 ﻿using Microsoft.OpenApi.Models;
-using Wego.Api.Utulity;
+using Wego.Api.Utility;
 
 namespace Wego.Api.Middleware
 {

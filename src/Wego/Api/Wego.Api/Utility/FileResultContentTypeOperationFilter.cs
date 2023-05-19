@@ -1,7 +1,7 @@
 ﻿using Microsoft.OpenApi.Models;
 using Swashbuckle.AspNetCore.SwaggerGen;
 
-namespace Wego.Api.Utulity
+namespace Wego.Api.Utility
 {
     public class FileResultContentTypeOperationFilter : IOperationFilter
     {

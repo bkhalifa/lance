@@ -1,6 +1,3 @@
-
-
-
 using Hellang.Middleware.ProblemDetails;
 
 using Microsoft.AspNetCore.Identity;
@@ -12,6 +9,7 @@ using Wego.Application;
 using Wego.Application.Models.Authentification;
 using Wego.Identity;
 using Wego.Identity.Seed;
+using Wego.Infrastructure.Extensions;
 using Wego.Infrastructure.Logging;
 using Wego.Persistence;
 
