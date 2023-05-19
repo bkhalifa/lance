@@ -1,13 +1,12 @@
 ﻿using Microsoft.AspNetCore.Identity;
 using Microsoft.Extensions.Logging;
 
-using System.IdentityModel.Tokens.Jwt;
 using Wego.Application.Contracts.Common;
+using Wego.Application.Contracts.Context;
 using Wego.Application.Contracts.Identity;
 using Wego.Application.Exceptions;
 using Wego.Application.Models.Authentification;
 using Wego.Application.Models.Mail;
-using Wego.Application.Contracts.Context;
 
 namespace Wego.Identity.Service;
 
@@ -55,8 +54,7 @@ public class AuthenticationService : IAuthenticationService
             Id = user.Id,
             Token = jwtSecurityToken.AccessToken,
             RefreshToken = jwtSecurityToken.RefreshToken,
-            Email = user.Email!,
-            UserName = user.UserName!
+            Email = user.Email!
         };
     }
 
