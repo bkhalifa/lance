@@ -1,7 +1,7 @@
 ﻿using MediatR;
-using Microsoft.AspNetCore.Authorization;
+
 using Microsoft.AspNetCore.Mvc;
-using Wego.Application.Features.Categories.Queries;
+
 using Wego.Application.Features.Locations.Queries;
 
 namespace Wego.Api.Controllers.Features

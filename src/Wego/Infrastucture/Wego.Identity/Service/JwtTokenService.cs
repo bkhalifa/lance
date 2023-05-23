@@ -56,7 +56,6 @@ namespace Wego.Identity.Service
             var jwtSecurityToken = GetSecurityToken(claims, symmetricSecurityKey);
             var jwtSecurityRefreshToken = GetSecurityToken(claims, symmetricSecurityRefreshKey);
 
-
             var result = new TokenModel
             {
                 AccessToken = new JwtSecurityTokenHandler().WriteToken(jwtSecurityToken),
