@@ -8,8 +8,9 @@ using System.Net;
 using Wego.Application.Contracts.Common;
 using Wego.Application.Exceptions;
 using Wego.Application.Models.Mail;
+using Wego.Infrastructure.Extensions;
 
-namespace Wego.Infrastructure.Logging
+namespace Wego.Infrastructure.Extensions
 {
     public static class ProblemDetailExtension
     {
@@ -30,7 +31,7 @@ namespace Wego.Infrastructure.Logging
                             $"{context.TraceIdentifier} </br>{pr.Detail}</br>{pr.Instance}"));
                     }
                 };
-              
+
                 setup.Map<ValidationException>(e => e.ToBaseProblemDetails(HttpStatusCode.BadRequest));
                 setup.Map<UserNotFoundException>(e => e.ToBaseProblemDetails(HttpStatusCode.Conflict));
                 setup.Map<CredentialInvalidException>(e => e.ToBaseProblemDetails(HttpStatusCode.Conflict));
@@ -60,7 +61,7 @@ namespace Wego.Infrastructure.Logging
             switch (exception)
             {
                 case ValidationException e:
-                    result.ValidationErrors= e.ValdationErrors;
+                    result.ValidationErrors = e.ValdationErrors;
                     break;
             }
 
@@ -91,7 +92,7 @@ namespace Wego.Infrastructure.Logging
     public class BaseProblemDetails : ProblemDetails
     {
         public string ErrorCode { get; set; }
-        public Dictionary<string,string> ValidationErrors { get; set; }
+        public Dictionary<string, string> ValidationErrors { get; set; }
     }
 
 }

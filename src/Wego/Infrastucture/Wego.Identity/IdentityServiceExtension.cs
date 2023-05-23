@@ -26,7 +26,7 @@ public static class IdentityServiceExtensions
             b => b.MigrationsAssembly(typeof(InetDbContext).Assembly.FullName)));
 
         services.AddIdentity<ApplicationUser, IdentityRole>()
-            .AddEntityFrameworkStores<InetDbContext>().AddDefaultTokenProviders().AddTokenProvider(configuration["JwtSettings:Name"], typeof(DataProtectorTokenProvider<ApplicationUser>));
+            .AddEntityFrameworkStores<InetDbContext>().AddDefaultTokenProviders();
 
         services.AddTransient<IAuthenticationService, AuthenticationService>();
         services.AddTransient<IJwtTokenService, JwtTokenService>();

@@ -1,4 +1,4 @@
-﻿namespace Wego.Api.Utulity
+﻿namespace Wego.Api.Utility
 {
     [AttributeUsage(AttributeTargets.Method)]
     public class FileResultContentTypeAttribute : Attribute
