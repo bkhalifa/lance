@@ -1,17 +1,16 @@
 using Hellang.Middleware.ProblemDetails;
-
 using Microsoft.AspNetCore.Identity;
-
 using Serilog;
-
 using Wego.Api.Middleware;
 using Wego.Application;
 using Wego.Application.Models.Authentification;
 using Wego.Identity;
 using Wego.Identity.Seed;
 using Wego.Infrastructure.Extensions;
+using Wego.Infrastructure.HealthCheck;
 using Wego.Infrastructure.Logging;
 using Wego.Persistence;
+using Wego.Persistence.EF;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -24,8 +23,8 @@ builder.Services.AddControllers();
 // Learn more about configuring Swagger/OpenAPI at https://aka.ms/aspnetcore/swashbuckle
 builder.Services.AddEndpointsApiExplorer();
 builder.Services.AddSwaggerGen();
-
 builder.Services.AddSwagger();
+
 builder.Services.AddDistributedMemoryCache();
 builder.Services.AddResponseCompression(options => { options.EnableForHttps = true; });
 builder.Services.AddApplicationServices(builder.Configuration);
@@ -33,6 +32,9 @@ builder.Services.AddInfrastructureServices();
 builder.Services.AddPersistenceServices(builder.Configuration);
 builder.Services.AddIdentityServices(builder.Configuration);
 builder.Services.AddCustomProblemDetails(builder.Environment);
+builder.Services.AddCustomHealthCheck(builder.Configuration)
+    .AddDbContextCheck<InetDbContext>()
+    .AddDbContextCheck<PortoDbContext>();
 
 builder.Services.AddCors(options =>
 {
@@ -41,8 +43,6 @@ builder.Services.AddCors(options =>
 
 var app = builder.Build();
 
-
-// Configure the HTTP request pipeline.
 if (app.Environment.IsDevelopment())
 {
     app.UseSwagger();
@@ -54,7 +54,6 @@ app.UseHttpsRedirection();
 app.UseProblemDetails();
 app.UseRouting();
 app.UseAuthentication();
-
 app.UseSwagger();
 app.UseSwaggerUI(c =>
 {
@@ -66,8 +65,8 @@ app.UseSerilogRequestLogging();
 
 app.UseCors("Open");
 app.UseAuthorization();
-
 app.MapControllers();
+app.UseCustomHealthCheck();
 
 using (var scope = app.Services.CreateScope())
 {

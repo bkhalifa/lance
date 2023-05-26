@@ -8,7 +8,12 @@
   </PropertyGroup>
 
   <ItemGroup>
-    <Folder Include="Features\Offer\" />
+    <Compile Remove="Features\Offer\**" />
+    <EmbeddedResource Remove="Features\Offer\**" />
+    <None Remove="Features\Offer\**" />
+  </ItemGroup>
+
+  <ItemGroup>
     <Folder Include="Features\Profile\Queries\" />
   </ItemGroup>
 
