@@ -1,5 +1,6 @@
 ﻿using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
+
 using Wego.Application.Contracts.Context;
 using Wego.Application.Contracts.Identity;
 using Wego.Application.Models.Authentification;
@@ -20,7 +21,10 @@ public class IdController : ControllerBase
     }
 
     [HttpPost(nameof(Login))]
-    public async Task<ActionResult<AuthenticationResponse>> Login([FromBody]AuthenticationRequest request)
+    [ProducesResponseType(StatusCodes.Status200OK)]
+    [ProducesResponseType(StatusCodes.Status500InternalServerError)]
+    [ProducesResponseType(StatusCodes.Status401Unauthorized)]
+    public async Task<ActionResult<AuthenticationResponse>> Login([FromBody] AuthenticationRequest request)
     {
         return Ok(await _authenticationService.LoginAsync(request));
     }

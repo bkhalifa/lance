@@ -1,6 +1,7 @@
 ﻿using MediatR;
-using Microsoft.AspNetCore.Authorization;
+
 using Microsoft.AspNetCore.Mvc;
+
 using Wego.Application.Features.Categories.Queries;
 using Wego.Application.Features.Jobs.Queries;
 using Wego.Application.Features.Skills.Queries;
@@ -18,7 +19,7 @@ namespace Wego.Api.Controllers.Features
             _mediator = mediator;
         }
 
-  
+
         [HttpGet(nameof(GetAllCategories))]
         [ProducesResponseType(StatusCodes.Status200OK)]
         public async Task<ActionResult<List<GetCategoriesModel>>> GetAllCategories()
