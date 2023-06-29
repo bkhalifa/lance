@@ -121,8 +121,8 @@ public class AuthenticationService : IAuthenticationService
         if (user == null) throw new UserNotFoundException($"Email '{_currentContext.Identity.Email}' not found");
 
         await _signInManager.SignOutAsync();
-        //await _userManager.UpdateSecurityStampAsync(user);
-        //await _userManager.RemoveAuthenticationTokenAsync(user, "JWT", "JWT Token");
+        await _userManager.UpdateSecurityStampAsync(user);
+        await _userManager.RemoveAuthenticationTokenAsync(user, "JWT", "JWT Token");
     }
     public async Task<TokenModel> RefreshAsync(string refreshToken)
     {

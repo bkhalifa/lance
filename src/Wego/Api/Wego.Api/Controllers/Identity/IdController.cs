@@ -1,6 +1,8 @@
 ﻿using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 
+using System.Security.Claims;
+
 using Wego.Application.Contracts.Context;
 using Wego.Application.Contracts.Identity;
 using Wego.Application.Models.Authentification;
@@ -35,24 +37,32 @@ public class IdController : ControllerBase
         return Ok(await _authenticationService.RegisterAsync(request));
     }
 
-    [Authorize]
     [HttpPost(nameof(ChangePassword))]
+    [Authorize]
     public async Task<ActionResult<AuthenticationResponse>> ChangePassword([FromBody] ResetPasswordRequest request)
     {
         await _authenticationService.ChangePasswordAsync(request.OldPassword, request.NewPassword);
         return Ok();
     }
 
+
+    [HttpDelete(nameof(Logout))]
     [Authorize]
-    [HttpPost(nameof(Logout))]
     public async Task<ActionResult<AuthenticationResponse>> Logout()
     {
+        string rawUserId = HttpContext.User.FindFirstValue("id")!;
+       if(!Guid.TryParse(rawUserId, out Guid id))
+        {
+            return Unauthorized();
+        }
+
         await _authenticationService.LogoutAsync();
-        return Ok();
+        return NoContent();
     }
 
-    [Authorize]
+
     [HttpPost(nameof(Refresh))]
+    [Authorize]
     public async Task<ActionResult<TokenModel>> Refresh([FromBody] string refreshToken)
     {
         var result = await _authenticationService.RefreshAsync(refreshToken);

@@ -29,7 +29,7 @@ public static class IdentityServiceExtensions
             .AddEntityFrameworkStores<InetDbContext>().AddDefaultTokenProviders();
 
         services.AddTransient<IAuthenticationService, AuthenticationService>();
-        services.AddTransient<IJwtTokenService, JwtTokenService>();
+        services.AddScoped<IJwtTokenService, JwtTokenService>();
 
         services.AddAuthentication(options =>
         {
@@ -58,21 +58,21 @@ public static class IdentityServiceExtensions
                     OnAuthenticationFailed = c =>
                     {
                         c.NoResult();
-                        c.Response.StatusCode = 500;
+                        c.Response.StatusCode = StatusCodes.Status500InternalServerError;
                         c.Response.ContentType = "text/plain";
                         return c.Response.WriteAsync(c.Exception.ToString());
                     },
                     OnChallenge = context =>
                     {
                         context.HandleResponse();
-                        context.Response.StatusCode = 401;
+                        context.Response.StatusCode = StatusCodes.Status401Unauthorized;
                         context.Response.ContentType = "application/json";
                         var result = JsonConvert.SerializeObject("401 Not authorized");
                         return context.Response.WriteAsync(result);
                     },
                     OnForbidden = context =>
                     {
-                        context.Response.StatusCode = 403;
+                        context.Response.StatusCode = StatusCodes.Status403Forbidden;
                         context.Response.ContentType = "application/json";
                         var result = JsonConvert.SerializeObject("403 Not authorized");
                         return context.Response.WriteAsync(result);
