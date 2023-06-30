@@ -62,7 +62,6 @@ public class IdController : ControllerBase
 
 
     [HttpPost(nameof(Refresh))]
-    [Authorize]
     public async Task<ActionResult<TokenModel>> Refresh([FromBody] string refreshToken)
     {
         var result = await _authenticationService.RefreshAsync(refreshToken);
