@@ -30,7 +30,7 @@ public static class IdentityServiceExtensions
                 .AddDefaultTokenProviders();
 
         services.AddTransient<IAuthenticationService, AuthenticationService>();
-        services.AddScoped<IJwtTokenService, JwtTokenService>();
+        services.AddTransient<IJwtTokenService, JwtTokenService>();
 
         services.AddAuthentication(options =>
         {
@@ -49,6 +49,7 @@ public static class IdentityServiceExtensions
              ValidateLifetime = true,
              ValidateIssuerSigningKey = true,
              ClockSkew = TimeSpan.Zero,
+
              ValidIssuer = configuration["JwtSettings:Issuer"],
              ValidAudience = configuration["JwtSettings:Audience"],
              IssuerSigningKey = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(configuration["JwtSettings:Key"]))

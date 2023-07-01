@@ -8,5 +8,5 @@ public interface IAuthenticationService
     Task<RegistrationResponse> RegisterAsync(RegistrationRequest request);
     Task<bool> ChangePasswordAsync(string oldPassword, string newPassword);
     Task LogoutAsync();
-    Task<TokenModel> RefreshAsync(string refreshToken);
+    Task<TokenModel> RefreshAsync(TokenModel tokenModel);
 }

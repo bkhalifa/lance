@@ -31,14 +31,6 @@ namespace Wego.Identity.Service
             if (string.IsNullOrEmpty(user?.UserName) || string.IsNullOrEmpty(user?.Email)) throw new UserNotFoundException("User Token not found");
 
             var userClaims = await _userManager.GetClaimsAsync(user);
-            var roles = await _userManager.GetRolesAsync(user);
-
-            var roleClaims = new List<Claim>();
-
-            for (int i = 0; i < roles.Count; i++)
-            {
-                roleClaims.Add(new Claim("roles", roles[i]));
-            }
 
             var claims = new[]
             {
@@ -47,8 +39,7 @@ namespace Wego.Identity.Service
             new Claim(JwtRegisteredClaimNames.Email, user.Email),
             new Claim("uid", user.Id)
             }
-            .Union(userClaims)
-            .Union(roleClaims);
+            .Union(userClaims);
 
             var symmetricSecurityKey = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(_jwtSettings.Key));
             var symmetricSecurityRefreshKey = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(_jwtSettings.RefreshKey));
@@ -63,37 +54,7 @@ namespace Wego.Identity.Service
             };
             await _userManager.SetAuthenticationTokenAsync(user, _jwtSettings.Name, _jwtSettings.RefreshName, result.RefreshToken);
 
-            return result;
-        }
-
-        public async Task<TokenModel> RefreshTokenAsync(ApplicationUser user, string refreshToken)
-        {
-            if (string.IsNullOrEmpty(user?.UserName) || string.IsNullOrEmpty(user?.Email)) throw new UserNotFoundException("User Token not found");
-
-            var validationParameters = new TokenValidationParameters
-            {
-                ValidateIssuerSigningKey = true,
-                ValidateIssuer = true,
-                ValidateAudience = true,
-                ValidateLifetime = true,
-                ClockSkew = TimeSpan.Zero,
-                IssuerSigningKey = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(_jwtSettings.RefreshKey)),
-                ValidIssuer = _jwtSettings.Issuer,
-                ValidAudience = _jwtSettings.Audience,
-            };
-
-            JwtSecurityTokenHandler jwtSecurityTokenHandler = new();
-
-            try
-            {
-                jwtSecurityTokenHandler.ValidateToken(refreshToken, validationParameters, out var _);
-            }
-            catch (SecurityTokenSignatureKeyNotFoundException)
-            {
-                throw new TokenInvalidException("Refresh token invalid");
-            }
-
-            return await GenerateTokenAsync(user);
+            return result; 
         }
 
         private JwtSecurityToken GetSecurityToken(IEnumerable<Claim> claims, SymmetricSecurityKey symmetricSecurityKey)
@@ -106,5 +67,47 @@ namespace Wego.Identity.Service
                 signingCredentials: new SigningCredentials(symmetricSecurityKey, SecurityAlgorithms.HmacSha256));
         }
 
+        public ClaimsPrincipal? GetPrincipalFromExpiredToken(string? token)
+        {
+            var tokenValidationParameters = new TokenValidationParameters
+            {
+                ValidateAudience = false,
+                ValidateIssuer = false,
+                ValidateIssuerSigningKey = true,
+                IssuerSigningKey = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(_jwtSettings.Key)),
+                ValidateLifetime = false
+            };
+
+            var tokenHandler = new JwtSecurityTokenHandler();
+            try
+            {
+                var principal = tokenHandler.ValidateToken(token, tokenValidationParameters, out SecurityToken securityToken);
+                if (securityToken is not JwtSecurityToken jwtSecurityToken || !jwtSecurityToken.Header.Alg.Equals(SecurityAlgorithms.HmacSha256, StringComparison.InvariantCultureIgnoreCase))
+                    throw new SecurityTokenException("Invalid token");
+
+                return principal;
+            }
+            catch (Exception ex)
+            {
+
+                throw ex;
+            }
+           
+           
+
+        }
+
+        public static class TokenLifetimeValidator
+        {
+            public static bool Validate(
+                DateTime? notBefore,
+                DateTime? expires,
+                SecurityToken tokenToValidate,
+                TokenValidationParameters @param
+            )
+            {
+                return (expires != null && expires > DateTime.UtcNow);
+            }
+        }
     }
 }

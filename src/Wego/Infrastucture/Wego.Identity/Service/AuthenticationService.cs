@@ -1,5 +1,12 @@
 ﻿using Microsoft.AspNetCore.Identity;
+using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.Logging;
+using Microsoft.IdentityModel.Tokens;
+using System.IdentityModel.Tokens.Jwt;
+
+using System.Security.Claims;
+
+using System.Text;
 
 using Wego.Application.Contracts.Common;
 using Wego.Application.Contracts.Context;
@@ -18,13 +25,16 @@ public class AuthenticationService : IAuthenticationService
     private readonly ILogger<IAuthenticationService> _logger;
     private readonly IEmailSender _emailSender;
     private readonly ICurrentContext _currentContext;
+    private readonly IConfiguration _configuration;
 
     public AuthenticationService(UserManager<ApplicationUser> userManager,
         SignInManager<ApplicationUser> signInManager,
          IJwtTokenService jwtTokenService,
          ILogger<IAuthenticationService> logger,
          IEmailSender emailSender,
-         ICurrentContext currentContext)
+         ICurrentContext currentContext,
+         IConfiguration configuration
+         )
     {
         _userManager = userManager;
         _signInManager = signInManager;
@@ -32,6 +42,7 @@ public class AuthenticationService : IAuthenticationService
         _logger = logger;
         _emailSender = emailSender;
         _currentContext = currentContext;
+        _configuration = configuration;
     }
 
     public async Task<AuthenticationResponse> LoginAsync(AuthenticationRequest request)
@@ -124,14 +135,38 @@ public class AuthenticationService : IAuthenticationService
         await _userManager.UpdateSecurityStampAsync(user);
         await _userManager.RemoveAuthenticationTokenAsync(user, "JWT", "JWT Token");
     }
-    public async Task<TokenModel> RefreshAsync(string refreshToken)
+    public async Task<TokenModel> RefreshAsync(TokenModel tokenModel)
     {
-        if (string.IsNullOrEmpty(_currentContext.Identity?.Email)) throw new UserNotAuthentificatedException("User not Authentificated");
+        var principal = _jwtTokenService.GetPrincipalFromExpiredToken(tokenModel.AccessToken);
+        if (principal is null) throw new UserNotAuthentificatedException("User not Authentificated");
 
-        var user = await _userManager.FindByEmailAsync(_currentContext.Identity.Email);
+        var userName = principal.Claims.FirstOrDefault()?.Value;
+      
+        if(string.IsNullOrEmpty(userName)) throw new UserNotAuthentificatedException("User not Authentificated");
+
+        var user = await _userManager.FindByEmailAsync(userName);
         if (user == null) throw new UserNotFoundException($"Email '{_currentContext.Identity.Email}' not found");
 
-        return await _jwtTokenService.RefreshTokenAsync(user, refreshToken);
+        return await _jwtTokenService.GenerateTokenAsync(user);
+    }
+    public ClaimsPrincipal? GetPrincipalFromExpiredToken(string? token)
+    {
+        var tokenValidationParameters = new TokenValidationParameters
+        {
+            ValidateAudience = false,
+            ValidateIssuer = false,
+            ValidateIssuerSigningKey = true,
+            IssuerSigningKey = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(_configuration["JWT:Secret"])),
+            ValidateLifetime = false
+        };
+
+        var tokenHandler = new JwtSecurityTokenHandler();
+        var principal = tokenHandler.ValidateToken(token, tokenValidationParameters, out SecurityToken securityToken);
+        if (securityToken is not JwtSecurityToken jwtSecurityToken || !jwtSecurityToken.Header.Alg.Equals(SecurityAlgorithms.HmacSha256, StringComparison.InvariantCultureIgnoreCase))
+            throw new SecurityTokenException("Invalid token");
+
+        return principal;
+
     }
 
 }

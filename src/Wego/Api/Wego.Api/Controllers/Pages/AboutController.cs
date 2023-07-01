@@ -13,7 +13,7 @@ namespace Wego.Api.Controllers.Pages
     public class AboutController : ControllerBase
     {
         public readonly IMediator _mediator;
-        public AboutController(IMediator mediator)
+        public AboutController(IMediator mediator)   
         {
             _mediator = mediator;
         }
