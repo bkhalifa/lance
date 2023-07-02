@@ -123,11 +123,9 @@ public class AuthenticationService : IAuthenticationService
             throw new ValidationException(result.Errors.ToDictionary(x => x.Code, x => x.Description));
     }
 
-    public async Task LogoutAsync()
+    public async Task LogoutAsync(LogoutModel logoutModel)
     {
-        if (string.IsNullOrEmpty(_currentContext.Identity?.Email)) throw new UserNotAuthentificatedException("User not Authentificated");
-
-        var user = await _userManager.FindByEmailAsync(_currentContext.Identity.Email);
+        var user = await _userManager.FindByEmailAsync(logoutModel.Email);
 
         if (user == null) throw new UserNotFoundException($"Email '{_currentContext.Identity.Email}' not found");
 

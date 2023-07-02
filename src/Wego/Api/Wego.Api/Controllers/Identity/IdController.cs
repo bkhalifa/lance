@@ -49,18 +49,12 @@ public class IdController : ControllerBase
     }
 
 
-    [HttpDelete(nameof(Logout))]
+    [HttpPost(nameof(Logout))]
     [Authorize]
-    public async Task<ActionResult<AuthenticationResponse>> Logout()
+    public async Task<ActionResult<AuthenticationResponse>> Logout([FromBody] LogoutModel logoutModel)
     {
-        string rawUserId = HttpContext.User.FindFirstValue("id")!;
-       if(!Guid.TryParse(rawUserId, out Guid id))
-        {
-            return Unauthorized();
-        }
-
-        await _authenticationService.LogoutAsync();
-        return NoContent();
+        await _authenticationService.LogoutAsync(logoutModel);
+        return Ok();
     }
 
 
