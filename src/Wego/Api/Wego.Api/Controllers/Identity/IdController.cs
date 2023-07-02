@@ -1,4 +1,6 @@
 ﻿using Microsoft.AspNetCore.Authorization;
+using Microsoft.AspNetCore.Http;
+using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
 
 using System.Security.Claims;
@@ -6,6 +8,7 @@ using System.Security.Claims;
 using Wego.Application.Contracts.Context;
 using Wego.Application.Contracts.Identity;
 using Wego.Application.Models.Authentification;
+using Wego.Infrastructure.Context;
 
 namespace Wego.Api.Controllers.Identity;
 
@@ -15,8 +18,8 @@ namespace Wego.Api.Controllers.Identity;
 public class IdController : ControllerBase
 {
     private readonly IAuthenticationService _authenticationService;
-    private readonly ICurrentContext _currentContext;
-    public IdController(IAuthenticationService authenticationService, ICurrentContext currentContext)
+    private readonly IHttpContextAccessor _currentContext;
+    public IdController(IAuthenticationService authenticationService, IHttpContextAccessor currentContext)
     {
         _authenticationService = authenticationService;
         _currentContext = currentContext;
@@ -46,25 +49,19 @@ public class IdController : ControllerBase
     }
 
 
-    [HttpDelete(nameof(Logout))]
+    [HttpPost(nameof(Logout))]
     [Authorize]
-    public async Task<ActionResult<AuthenticationResponse>> Logout()
+    public async Task<ActionResult<AuthenticationResponse>> Logout([FromBody] LogoutModel logoutModel)
     {
-        string rawUserId = HttpContext.User.FindFirstValue("id")!;
-       if(!Guid.TryParse(rawUserId, out Guid id))
-        {
-            return Unauthorized();
-        }
-
-        await _authenticationService.LogoutAsync();
-        return NoContent();
+        await _authenticationService.LogoutAsync(logoutModel);
+        return Ok();
     }
 
 
     [HttpPost(nameof(Refresh))]
-    public async Task<ActionResult<TokenModel>> Refresh([FromBody] string refreshToken)
+    public async Task<ActionResult<TokenModel>> Refresh([FromBody] TokenModel tokenModel)
     {
-        var result = await _authenticationService.RefreshAsync(refreshToken);
+        var result = await _authenticationService.RefreshAsync(tokenModel);
         return Ok(result);
     }
 
