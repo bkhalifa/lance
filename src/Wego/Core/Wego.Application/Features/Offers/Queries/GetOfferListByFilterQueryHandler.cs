@@ -6,9 +6,9 @@ using Wego.Application.Features.Offers.Queries;
 
 namespace Wego.Application.Features.Jobs.Queries
 {
-    public record GetOfferListByFilterQuery(string Query, string Locations, string Skills, string JobLevels, string BusinessSkills,
-    string Categories, string ContractTypes, string WorkTypes, OrderByType OrderBy, int? PostedDays,
-    decimal? SalaryMin, decimal? DailyRateMin, string RemoteDays, int PageIndex = 1, int PageSize = 10) : IRequest<List<GetOfferListByFilterModel>>;
+    public record GetOfferListByFilterQuery(string? Query, string? Locations, string? Skills, string? JobLevels, string? BusinessSkills,
+    string? Categories, string? ContractTypes, string? WorkTypes, OrderByType? OrderBy, int? PostedDays,
+    decimal? SalaryMin, decimal? DailyRateMin, string? RemoteDays, int PageIndex = 1, int PageSize = 10) : IRequest<List<GetOfferListByFilterModel>>;
 
     public class GetOfferListByFilterQueryHandler : IRequestHandler<GetOfferListByFilterQuery, List<GetOfferListByFilterModel>>
     {
@@ -24,7 +24,7 @@ namespace Wego.Application.Features.Jobs.Queries
             var sqlParams = new List<SqlParameter>
             {
                 new SqlParameter("SearchText", CheckField(request.Query)),
-                new SqlParameter("OrderBy", CheckField(request.OrderBy.ToString())),
+                new SqlParameter("OrderBy", CheckField(request.OrderBy?.ToString())),
                 new SqlParameter("LocationCodes", CheckField(request.Locations)),
                 new SqlParameter("ContractTypeCodes",CheckField( request.ContractTypes)),
                 new SqlParameter("JobLevelCodes", CheckField(request.JobLevels)),

@@ -20,9 +20,9 @@ namespace Wego.Api.Controllers.Features
 
         [HttpPost(nameof(GetOfferListByFilter))]
         [ProducesResponseType(StatusCodes.Status200OK)]
-        public async Task<ActionResult<List<GetOfferListByFilterModel>>> GetOfferListByFilter([FromBody] GetOfferListByFilterQuery resuest)
+        public async Task<ActionResult<List<GetOfferListByFilterModel>>> GetOfferListByFilter([FromBody] GetOfferListByFilterQuery request)
         {
-            var dtos = await _mediator.Send(resuest);
+            var dtos = await _mediator.Send(request);
             return Ok(dtos);
         }
 

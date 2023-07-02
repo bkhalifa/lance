@@ -34,7 +34,6 @@ namespace Wego.Application.Features.Offers.Queries
         day,
         month,
         year,
-        task
     }
 
     public enum OrderByType
