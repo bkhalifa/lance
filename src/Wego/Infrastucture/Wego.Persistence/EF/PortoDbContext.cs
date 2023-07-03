@@ -1,13 +1,12 @@
-﻿
+﻿using System;
+using System.Collections.Generic;
 using Microsoft.EntityFrameworkCore;
-
 using Wego.Domain.Entities;
 
 namespace Wego.Persistence.EF;
 
 public partial class PortoDbContext : DbContext
 {
-
     public virtual DbSet<BusinessSkill> BusinessSkills { get; set; }
 
     public virtual DbSet<Category> Categories { get; set; }
@@ -19,8 +18,6 @@ public partial class PortoDbContext : DbContext
     public virtual DbSet<Country> Countries { get; set; }
 
     public virtual DbSet<Customer> Customers { get; set; }
-
-    public virtual DbSet<DocVisibility> DocVisibilities { get; set; }
 
     public virtual DbSet<Document> Documents { get; set; }
 
@@ -44,18 +41,17 @@ public partial class PortoDbContext : DbContext
 
     public virtual DbSet<Region> Regions { get; set; }
 
+    public virtual DbSet<Seniority> Seniorities { get; set; }
+
     public virtual DbSet<Skill> Skills { get; set; }
 
     public virtual DbSet<TrainShip> TrainShips { get; set; }
 
     public virtual DbSet<UserProfile> UserProfiles { get; set; }
 
-    public virtual DbSet<UserVisibility> UserVisibilities { get; set; }
-
     public virtual DbSet<WorkType> WorkTypes { get; set; }
 
     public virtual DbSet<ZipCode> ZipCodes { get; set; }
-
 
     protected override void OnModelCreating(ModelBuilder modelBuilder)
     {
@@ -87,16 +83,11 @@ public partial class PortoDbContext : DbContext
             entity.Property(e => e.Code).IsFixedLength();
         });
 
-        modelBuilder.Entity<DocVisibility>(entity =>
-        {
-            entity.HasKey(e => e.Id).HasName("PK__DocVisib__3214EC07263E13BE");
-
-            entity.HasOne(d => d.Doc).WithOne(p => p.DocVisibility).HasConstraintName("FK__DocVisibi__DocId__07E124C1");
-        });
-
         modelBuilder.Entity<Document>(entity =>
         {
-            entity.HasKey(e => e.Id).HasName("PK__Document__3214EC07E28C52AA");
+            entity.HasKey(e => e.Id).HasName("PK__Document__3214EC07E0ADAC08");
+
+            entity.Property(e => e.IsVisible).HasDefaultValueSql("((1))");
 
             entity.HasOne(d => d.UserProfile).WithOne(p => p.Document)
                 .OnDelete(DeleteBehavior.ClientSetNull)
@@ -105,11 +96,11 @@ public partial class PortoDbContext : DbContext
 
         modelBuilder.Entity<Experience>(entity =>
         {
-            entity.HasKey(e => e.Id).HasName("PK__Experien__3214EC0712A2554F");
+            entity.HasKey(e => e.Id).HasName("PK__Experien__3214EC0763B5279A");
 
             entity.HasOne(d => d.UserProfile).WithMany(p => p.Experiences)
                 .OnDelete(DeleteBehavior.ClientSetNull)
-                .HasConstraintName("FK__Experienc__UserP__08D548FA");
+                .HasConstraintName("FK__Experienc__UserP__4BCC3ABA");
         });
 
         modelBuilder.Entity<ExperienceYear>(entity =>
@@ -130,7 +121,7 @@ public partial class PortoDbContext : DbContext
 
             entity.HasOne(d => d.UserProfile).WithMany(p => p.Languages)
                 .OnDelete(DeleteBehavior.ClientSetNull)
-                .HasConstraintName("FK__Languages__UserP__09C96D33");
+                .HasConstraintName("FK__Languages__UserP__4CC05EF3");
         });
 
         modelBuilder.Entity<Offer>(entity =>
@@ -151,6 +142,11 @@ public partial class PortoDbContext : DbContext
         modelBuilder.Entity<Region>(entity =>
         {
             entity.HasOne(d => d.Country).WithMany(p => p.Regions).HasConstraintName("FK_Regions_Countries");
+        });
+
+        modelBuilder.Entity<Seniority>(entity =>
+        {
+            entity.Property(e => e.Id).ValueGeneratedNever();
         });
 
         modelBuilder.Entity<Skill>(entity =>
@@ -177,27 +173,20 @@ public partial class PortoDbContext : DbContext
 
         modelBuilder.Entity<TrainShip>(entity =>
         {
-            entity.HasKey(e => e.Id).HasName("PK__TrainShi__3214EC07EC1EEEC2");
+            entity.HasKey(e => e.Id).HasName("PK__TrainShi__3214EC079021B8A6");
 
             entity.HasOne(d => d.UserProfile).WithMany(p => p.TrainShips)
                 .OnDelete(DeleteBehavior.ClientSetNull)
-                .HasConstraintName("FK__TrainShip__UserP__0ABD916C");
+                .HasConstraintName("FK__TrainShip__UserP__4DB4832C");
         });
 
         modelBuilder.Entity<UserProfile>(entity =>
         {
-            entity.HasKey(e => e.Id).HasName("PK__UserProf__3214EC073DC57FDB");
+            entity.HasKey(e => e.Id).HasName("PK__UserProf__3214EC073BBD4B1F");
 
             entity.Property(e => e.CreationDate).HasDefaultValueSql("(getdate())");
             entity.Property(e => e.IsVisible).HasDefaultValueSql("((1))");
             entity.Property(e => e.UpdateDate).HasDefaultValueSql("(getdate())");
-        });
-
-        modelBuilder.Entity<UserVisibility>(entity =>
-        {
-            entity.HasKey(e => e.Id).HasName("PK__UserVisi__3213E83FC86C941F");
-
-            entity.HasOne(d => d.UserProfile).WithMany(p => p.UserVisibilities).HasConstraintName("FK__UserVisib__userP__0BB1B5A5");
         });
 
         modelBuilder.Entity<WorkType>(entity =>

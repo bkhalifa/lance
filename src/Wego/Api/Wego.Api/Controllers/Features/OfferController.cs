@@ -26,5 +26,13 @@ namespace Wego.Api.Controllers.Features
             return Ok(dtos);
         }
 
+        [HttpGet(nameof(GetOfferById))]
+        [ProducesResponseType(StatusCodes.Status200OK)]
+        public async Task<ActionResult<GetOfferByIdModel?>> GetOfferById([FromQuery] GetOfferByIdQuery request)
+        {
+            var dtos = await _mediator.Send(request);
+            return Ok(dtos);
+        }
+
     }
 }

@@ -6,18 +6,15 @@ using Microsoft.EntityFrameworkCore;
 
 namespace Wego.Domain.Entities;
 
-[Table("BusinessSkills", Schema = "config")]
-[Index("Code", Name = "NonClusteredIndex-20221014-011723", IsUnique = true)]
-public partial class BusinessSkill
+[Table("Seniorities", Schema = "config")]
+public partial class Seniority
 {
     [Key]
-    public int Id { get; set; }
+    public short Id { get; set; }
 
-    [StringLength(100)]
-    [Unicode(false)]
+    [StringLength(50)]
     public string? Code { get; set; }
 
-    [StringLength(100)]
-    [Unicode(false)]
+    [StringLength(50)]
     public string? Name { get; set; }
 }

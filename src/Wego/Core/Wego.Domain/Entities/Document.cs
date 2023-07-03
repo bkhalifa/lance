@@ -7,7 +7,7 @@ using Microsoft.EntityFrameworkCore;
 namespace Wego.Domain.Entities;
 
 [Table("Documents", Schema = "profile")]
-[Index("UserProfileId", Name = "UQ__Document__9E267F635CEF096B", IsUnique = true)]
+[Index("UserProfileId", Name = "UQ__Document__9E267F63FD55440F", IsUnique = true)]
 public partial class Document
 {
     [Key]
@@ -15,7 +15,8 @@ public partial class Document
 
     public long UserProfileId { get; set; }
 
-    [StringLength(100)]
+    [StringLength(50)]
+    [Unicode(false)]
     public string? ContentType { get; set; }
 
     [StringLength(250)]
@@ -24,8 +25,12 @@ public partial class Document
 
     public byte[]? FileData { get; set; }
 
-    [StringLength(100)]
+    [StringLength(50)]
+    [Unicode(false)]
     public string? Extension { get; set; }
+
+    [Required]
+    public bool? IsVisible { get; set; }
 
     [Column(TypeName = "datetime")]
     public DateTime CreationDate { get; set; }
@@ -36,8 +41,11 @@ public partial class Document
     [StringLength(450)]
     public string UserId { get; set; } = null!;
 
-    [InverseProperty("Doc")]
-    public virtual DocVisibility? DocVisibility { get; set; }
+    [StringLength(250)]
+    public string? FirstName { get; set; }
+
+    [StringLength(250)]
+    public string? LastName { get; set; }
 
     [ForeignKey("UserProfileId")]
     [InverseProperty("Document")]

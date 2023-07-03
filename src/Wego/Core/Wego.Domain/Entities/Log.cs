@@ -32,6 +32,9 @@ public partial class Log
     [StringLength(100)]
     public string? Application { get; set; }
 
+    [StringLength(200)]
+    public string? TraceId { get; set; }
+
     [StringLength(100)]
     [Unicode(false)]
     public string? Environment { get; set; }

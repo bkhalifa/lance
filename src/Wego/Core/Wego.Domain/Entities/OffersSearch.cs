@@ -16,7 +16,7 @@ public partial class OffersSearch
     public string? Title { get; set; }
 
     [StringLength(500)]
-    public string? ShortDescription { get; set; }
+    public string? Description { get; set; }
 
     [StringLength(100)]
     public string? CustomerName { get; set; }
@@ -43,35 +43,10 @@ public partial class OffersSearch
     public string? ContractTypeCode { get; set; }
 
     [StringLength(50)]
-    public string? ContractTypeName { get; set; }
-
-    [StringLength(100)]
-    public string? CategoryCode { get; set; }
-
-    [StringLength(100)]
-    public string? CatgeoryName { get; set; }
-
-    [StringLength(100)]
-    public string? BusinessSkillCode { get; set; }
-
-    [StringLength(100)]
-    public string? BusinessSkillName { get; set; }
-
-    [StringLength(100)]
-    public string? JobLevelCode { get; set; }
-
-    [StringLength(100)]
-    public string? JobLevelName { get; set; }
+    public string? SeniorityCode { get; set; }
 
     [StringLength(100)]
     public string? WorkTypeCode { get; set; }
-
-    [StringLength(100)]
-    public string? WorkTypeName { get; set; }
-
-    public short? RemoteDays { get; set; }
-
-    public int? ExperienceYear { get; set; }
 
     [StringLength(500)]
     public string? SkillCodes { get; set; }
@@ -79,9 +54,9 @@ public partial class OffersSearch
     [StringLength(500)]
     public string? SkillNames { get; set; }
 
-    [StringLength(100)]
-    public string? SearchKeys { get; set; }
-
     [Column(TypeName = "datetime")]
     public DateTime? CreatedDate { get; set; }
+
+    [Column(TypeName = "datetime")]
+    public DateTime? PublicationDate { get; set; }
 }

@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.ComponentModel.DataAnnotations;
 using System.ComponentModel.DataAnnotations.Schema;
 using Microsoft.EntityFrameworkCore;
+using Wego.Domain.Entities;
 
 namespace Wego.Domain.Entities;
 
@@ -41,6 +42,9 @@ public partial class Offer
 
     [StringLength(100)]
     public string? SearchPreference { get; set; }
+
+    [Column(TypeName = "datetime")]
+    public DateTime? StartDate { get; set; }
 
     [Column(TypeName = "datetime")]
     public DateTime? CreatedDate { get; set; }

@@ -6,9 +6,8 @@ using Wego.Application.Features.Offers.Queries;
 
 namespace Wego.Application.Features.Jobs.Queries
 {
-    public record GetOfferListByFilterQuery(string? Query, string? Locations, string? Skills, string? JobLevels, string? BusinessSkills,
-    string? Categories, string? ContractTypes, string? WorkTypes, OrderByType? OrderBy, int? PostedDays,
-    decimal? SalaryMin, decimal? DailyRateMin, string? RemoteDays, int PageIndex = 1, int PageSize = 10) : IRequest<List<GetOfferListByFilterModel>>;
+    public record GetOfferListByFilterQuery(string? Query, string? Locations, string? Skills, string? Seniorities, string? ContractTypes, string? WorkTypes, OrderByType? OrderBy,
+    decimal? SalaryMin, decimal? DailyRateMin, int PageIndex = 1, int PageSize = 10) : IRequest<List<GetOfferListByFilterModel>>;
 
     public class GetOfferListByFilterQueryHandler : IRequestHandler<GetOfferListByFilterQuery, List<GetOfferListByFilterModel>>
     {
@@ -24,16 +23,11 @@ namespace Wego.Application.Features.Jobs.Queries
             var sqlParams = new List<SqlParameter>
             {
                 new SqlParameter("SearchText", CheckField(request.Query)),
-                new SqlParameter("OrderBy", CheckField(request.OrderBy?.ToString())),
+                new SqlParameter("OrderBy", (int)request.OrderBy),
                 new SqlParameter("LocationCodes", CheckField(request.Locations)),
                 new SqlParameter("ContractTypeCodes",CheckField( request.ContractTypes)),
-                new SqlParameter("JobLevelCodes", CheckField(request.JobLevels)),
-                new SqlParameter("SkillCodes", CheckField(request.Skills)),
-                new SqlParameter("BusinessSkillCodes", CheckField(request.BusinessSkills)),
+                new SqlParameter("SeniorityCodes", CheckField(request.Seniorities)),
                 new SqlParameter("WorkTypeCodes", CheckField(request.WorkTypes)),
-                new SqlParameter("CategorYCodes", CheckField(request.Categories)),
-                new SqlParameter("RemoteDays", CheckField(request.RemoteDays)),
-                new SqlParameter("FilterDate", GetFilterDate(request.PostedDays)),
                 new SqlParameter("DailyRateMin", request.DailyRateMin),
                 new SqlParameter("SalaryMin", request.SalaryMin),
                 new SqlParameter("PageIndex", request.PageIndex),
