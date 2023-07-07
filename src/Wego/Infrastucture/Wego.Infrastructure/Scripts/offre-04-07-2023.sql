@@ -122,15 +122,15 @@ GO
 -- Create date: 01/09/2022
 -- Description:	Search Job offers 
 -- =============================================
-CREATE   PROCEDURE [dbo].[OfferSearchEngine]
+CREATE  PROCEDURE [dbo].[OfferSearchEngine]
 	@SearchText VARCHAR(250)= null,  -- Gloabl filter	
 	@LocationCodes VARCHAR(250)= null,
 	@ContractTypeCodes VARCHAR(250) = null,
 	@SkillCodes VARCHAR(500) = null,
 	@SeniorityCodes VARCHAR(500) = null,
+	@WorkTypeCodes VARCHAR(250) = null,
 	@DailyRateMin DECIMAL(18,0)= null,
 	@SalaryMin DECIMAL(18,0)= null,
-	@WorkTypeCodes VARCHAR(250) = null,
 	@PageIndex INT = 1,
 	@PageSize INT= 10,
 	@OrderBy  INT = 1
@@ -146,6 +146,10 @@ BEGIN
 	CREATE TABLE #tmpWorkTypeCodes (code VARCHAR(100))
 	INSERT INTO #tmpWorkTypeCodes 
 	SELECT VALUE FROM string_split(@WorkTypeCodes,'|')
+
+	CREATE TABLE #tmpSkillCodes (code VARCHAR(100))
+	INSERT INTO #tmpSkillCodes 
+	SELECT VALUE FROM string_split(@SkillCodes,'|')
 
 	CREATE TABLE #tmpWSeniorityCodes (code VARCHAR(100))
 	INSERT INTO #tmpWSeniorityCodes 
@@ -188,8 +192,8 @@ BEGIN
 			AND (@SkillCodes IS NULL OR b.value in (SELECT value FROM string_split(os.SkillCodes,'|')))	
 		    AND (
 				    (@DailyRateMin IS NULL AND @SalaryMin IS NULL) 
-				 OR (os.AmountUnit ='day' AND @DailyRateMin BETWEEN os.AmountMin AND os.AmountMax)
-				 OR (os.AmountUnit ='year' AND @SalaryMin BETWEEN os.AmountMin AND os.AmountMax)
+				 OR (os.ContractTypeCode ='freelance' AND @DailyRateMin <=os.AmountMax)
+				 OR (os.ContractTypeCode ='cdi' AND @SalaryMin <= os.AmountMax)
 				 )				
 		)
 		,CTE_RowCounts AS
@@ -201,5 +205,7 @@ BEGIN
 		FROM CTE_Results, CTE_RowCounts
 		ORDER BY RowNumber ASC OFFSET (@PageIndex-1)*@PageSize ROWS FETCH NEXT @PageSize ROWS ONLY
 END
+
+
 
 GO
