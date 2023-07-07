@@ -23,15 +23,16 @@ namespace Wego.Application.Features.Jobs.Queries
             var sqlParams = new List<SqlParameter>
             {
                 new SqlParameter("SearchText", CheckField(request.Query)),
-                new SqlParameter("OrderBy", (int)request.OrderBy),
                 new SqlParameter("LocationCodes", CheckField(request.Locations)),
                 new SqlParameter("ContractTypeCodes",CheckField( request.ContractTypes)),
+                new SqlParameter("@SkillCodes", CheckField(request.Skills)),
                 new SqlParameter("SeniorityCodes", CheckField(request.Seniorities)),
                 new SqlParameter("WorkTypeCodes", CheckField(request.WorkTypes)),
                 new SqlParameter("DailyRateMin", request.DailyRateMin),
                 new SqlParameter("SalaryMin", request.SalaryMin),
                 new SqlParameter("PageIndex", request.PageIndex),
                 new SqlParameter("PageSize", request.PageSize),
+                new SqlParameter("OrderBy", CheckField(request.OrderBy)),
             };
 
             return await _dataManager.GetListAsync<GetOfferListByFilterModel>("OfferSearchEngine", sqlParams, cancellationToken: cancellationToken);
@@ -68,6 +69,14 @@ namespace Wego.Application.Features.Jobs.Queries
                 return null;
             else return field;
         }
+
+        private static int? CheckField(OrderByType? field)
+        {
+            if (field.HasValue)
+                return (int)field;
+            else return null;
+        }
+
     }
 
 }
