@@ -8,6 +8,7 @@ namespace Wego.Infrastructure.Context
     {
         public bool IsAuthenticated { get; }
         public string? Email { get; }
+        public string? UserId { get; }
         public IEnumerable<string> Roles { get; } = new List<string>();
         public Dictionary<string, IEnumerable<string>> Claims { get; } = new();
 

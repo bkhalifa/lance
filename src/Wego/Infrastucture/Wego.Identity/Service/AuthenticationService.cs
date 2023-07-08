@@ -11,9 +11,11 @@ using System.Text;
 using Wego.Application.Contracts.Common;
 using Wego.Application.Contracts.Context;
 using Wego.Application.Contracts.Identity;
+using Wego.Application.Contracts.Persistence;
 using Wego.Application.Exceptions;
 using Wego.Application.Models.Authentification;
 using Wego.Application.Models.Mail;
+using Wego.Domain.Entities;
 
 namespace Wego.Identity.Service;
 
@@ -26,6 +28,7 @@ public class AuthenticationService : IAuthenticationService
     private readonly IEmailSender _emailSender;
     private readonly ICurrentContext _currentContext;
     private readonly IConfiguration _configuration;
+    private readonly IBaseRepository<UserProfile> _profileRepository;
 
     public AuthenticationService(UserManager<ApplicationUser> userManager,
         SignInManager<ApplicationUser> signInManager,
@@ -33,7 +36,8 @@ public class AuthenticationService : IAuthenticationService
          ILogger<IAuthenticationService> logger,
          IEmailSender emailSender,
          ICurrentContext currentContext,
-         IConfiguration configuration
+         IConfiguration configuration,
+         IBaseRepository<UserProfile> profileRepository
          )
     {
         _userManager = userManager;
@@ -43,6 +47,7 @@ public class AuthenticationService : IAuthenticationService
         _emailSender = emailSender;
         _currentContext = currentContext;
         _configuration = configuration;
+        _profileRepository = profileRepository;
     }
 
     public async Task<AuthenticationResponse> LoginAsync(AuthenticationRequest request)
@@ -76,6 +81,10 @@ public class AuthenticationService : IAuthenticationService
         if (existingUser != null)
             throw new UserAlreadyExistsException($"Email '{request.Email}' already exists.");
 
+        var profile = await _profileRepository.SingleOrDefaultAsync(x => x.Email == request.Email);
+        if (profile != null)
+            throw new UserAlreadyExistsException($"Email '{request.Email}' already exists.");
+
         var user = new ApplicationUser
         {
             UserName = request.Email,
@@ -92,7 +101,14 @@ public class AuthenticationService : IAuthenticationService
             {
                 await _emailSender.SendMailAsync(new Email(user.Email, "User Created", "New user created successfully!"));
                 _logger.LogInformation("User Created: {email}", user.Email);
-                return new RegistrationResponse() { UserId = user.Id, Email = user.Email };
+
+                var resultProfile = await _profileRepository.AddAsync(new UserProfile
+                {
+                    UserId = user.Id,
+                    Email = request.Email,
+                });
+
+                return new RegistrationResponse() { UserId = user.Id, Email = user.Email, ProfileId = resultProfile.Id };
             }
 
             throw new ValidationException(result.Errors.ToDictionary(x => x.Code, x => x.Description));
@@ -139,8 +155,8 @@ public class AuthenticationService : IAuthenticationService
         if (principal is null) throw new UserNotAuthentificatedException("User not Authentificated");
 
         var userName = principal.Claims.FirstOrDefault()?.Value;
-      
-        if(string.IsNullOrEmpty(userName)) throw new UserNotAuthentificatedException("User not Authentificated");
+
+        if (string.IsNullOrEmpty(userName)) throw new UserNotAuthentificatedException("User not Authentificated");
 
         var user = await _userManager.FindByEmailAsync(userName);
         if (user == null) throw new UserNotFoundException($"Email '{_currentContext.Identity.Email}' not found");

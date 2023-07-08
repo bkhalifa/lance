@@ -30,7 +30,7 @@ public class BaseRepository<T> : IBaseRepository<T> where T : class
 
     public async Task<IEnumerable<T>> GetAllAsync(int cacheDurationMinutes = 0, CancellationToken cancellationToken = default)
     {
-        var func = _dbContext.Set<T>().ToListAsync();
+        var func = _dbContext.Set<T>().AsNoTracking().ToListAsync();
         if (cacheDurationMinutes == 0)
             return await func;
         else
@@ -39,7 +39,7 @@ public class BaseRepository<T> : IBaseRepository<T> where T : class
 
     public async Task<IEnumerable<T>> FindAsync(Expression<Func<T, bool>> predicate, string? cacheKey = null, int cacheDurationMinutes = 0, CancellationToken cancellationToken = default)
     {
-        var func = _dbContext.Set<T>().Where(predicate).ToListAsync(); ;
+        var func = _dbContext.Set<T>().AsNoTracking().Where(predicate).ToListAsync(); ;
         if (cacheDurationMinutes == 0)
             return await func;
         else
@@ -48,7 +48,7 @@ public class BaseRepository<T> : IBaseRepository<T> where T : class
 
     public async Task<T?> SingleOrDefaultAsync(Expression<Func<T, bool>> predicate, string? cacheKey = null, int cacheDurationMinutes = 0, CancellationToken cancellationToken = default)
     {
-        var func = _dbContext.Set<T>().SingleOrDefaultAsync(predicate);
+        var func = _dbContext.Set<T>().AsNoTracking().SingleOrDefaultAsync(predicate);
         if (cacheDurationMinutes == 0)
             return await func;
         else
@@ -57,12 +57,12 @@ public class BaseRepository<T> : IBaseRepository<T> where T : class
 
     public async Task<bool> ContainsAsync(Expression<Func<T, bool>> predicate)
     {
-        return await _dbContext.Set<T>().AnyAsync(predicate);
+        return await _dbContext.Set<T>().AsNoTracking().AnyAsync(predicate);
     }
 
     public async Task<int> CountAsync(Expression<Func<T, bool>> predicate)
     {
-        return await _dbContext.Set<T>().Where(predicate).CountAsync();
+        return await _dbContext.Set<T>().AsNoTracking().CountAsync(predicate);
     }
 
     public async Task<T> AddAsync(T entity)

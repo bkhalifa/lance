@@ -209,3 +209,18 @@ END
 
 
 GO
+
+CREATE TABLE [dbo].[OfferProfileFavorite](
+	[ProfileId] [bigint] NOT NULL,
+	[OfferId] [bigint] NOT NULL,
+	[CreatedDate] [datetime] NOT NULL,
+ CONSTRAINT [PK_OfferUserFavorite] PRIMARY KEY CLUSTERED 
+(
+	[ProfileId] ASC,
+	[OfferId] ASC
+)WITH (PAD_INDEX = OFF, STATISTICS_NORECOMPUTE = OFF, IGNORE_DUP_KEY = OFF, ALLOW_ROW_LOCKS = ON, ALLOW_PAGE_LOCKS = ON, OPTIMIZE_FOR_SEQUENTIAL_KEY = OFF) ON [PRIMARY]
+) ON [PRIMARY]
+GO
+
+
+

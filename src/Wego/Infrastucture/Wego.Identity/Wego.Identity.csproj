@@ -27,6 +27,7 @@
 
   <ItemGroup>
     <ProjectReference Include="..\..\Core\Wego.Application\Wego.Application.csproj" />
+    <ProjectReference Include="..\Wego.Persistence\Wego.Persistence.csproj" />
   </ItemGroup>
 
 </Project>

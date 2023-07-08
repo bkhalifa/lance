@@ -37,6 +37,8 @@ public partial class PortoDbContext : DbContext
 
     public virtual DbSet<Offer> Offers { get; set; }
 
+    public virtual DbSet<OfferProfileFavorite> OfferProfileFavorites { get; set; }
+
     public virtual DbSet<OffersSearch> OffersSearches { get; set; }
 
     public virtual DbSet<Region> Regions { get; set; }
@@ -139,14 +141,14 @@ public partial class PortoDbContext : DbContext
             entity.HasOne(d => d.ZipCode).WithMany(p => p.Offers).HasConstraintName("FK_Offers_ZipCodes");
         });
 
+        modelBuilder.Entity<OfferProfileFavorite>(entity =>
+        {
+            entity.HasKey(e => new { e.ProfileId, e.OfferId }).HasName("PK_OfferUserFavorite");
+        });
+
         modelBuilder.Entity<Region>(entity =>
         {
             entity.HasOne(d => d.Country).WithMany(p => p.Regions).HasConstraintName("FK_Regions_Countries");
-        });
-
-        modelBuilder.Entity<Seniority>(entity =>
-        {
-            entity.Property(e => e.Id).ValueGeneratedNever();
         });
 
         modelBuilder.Entity<Skill>(entity =>

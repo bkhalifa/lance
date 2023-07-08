@@ -17,7 +17,7 @@ namespace Wego.Infrastructure.Logging
             if (_contextAccessor?.HttpContext?.Connection == null)
                 return;
             logEvent.AddPropertyIfAbsent(
-           propertyFactory.CreateProperty("IP", _contextAccessor.HttpContext.Connection.RemoteIpAddress, false));
+           propertyFactory.CreateProperty("IP", _contextAccessor.HttpContext?.Connection.RemoteIpAddress, false));
         }
     }
 
@@ -53,7 +53,7 @@ namespace Wego.Infrastructure.Logging
 
         public void Enrich(LogEvent logEvent, ILogEventPropertyFactory factory)
         {
-            if (!(_httpContextAccessor.HttpContext?.User.Identity.IsAuthenticated ?? false))
+            if (!(_httpContextAccessor.HttpContext?.User?.Identity?.IsAuthenticated ?? false))
                 return;
 
             // Access the name of the logged-in user

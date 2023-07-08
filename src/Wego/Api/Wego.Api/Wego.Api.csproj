@@ -27,4 +27,8 @@
     <ProjectReference Include="..\..\Infrastucture\Wego.Persistence\Wego.Persistence.csproj" />
   </ItemGroup>
 
+  <ItemGroup>
+    <Folder Include="Controllers\Profile\" />
+  </ItemGroup>
+
 </Project>
