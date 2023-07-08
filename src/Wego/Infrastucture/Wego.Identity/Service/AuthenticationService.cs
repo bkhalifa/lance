@@ -106,6 +106,7 @@ public class AuthenticationService : IAuthenticationService
                 {
                     UserId = user.Id,
                     Email = request.Email,
+                    UsId="test"
                 });
 
                 return new RegistrationResponse() { UserId = user.Id, Email = user.Email, ProfileId = resultProfile.Id };
