@@ -1,4 +1,5 @@
-﻿using Microsoft.AspNetCore.Identity;
+﻿using Microsoft.AspNetCore.Http;
+using Microsoft.AspNetCore.Identity;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.Logging;
 using Microsoft.IdentityModel.Tokens;
@@ -7,6 +8,7 @@ using System.IdentityModel.Tokens.Jwt;
 using System.Security.Claims;
 
 using System.Text;
+using System.Text.Encodings.Web;
 
 using Wego.Application.Contracts.Common;
 using Wego.Application.Contracts.Context;
@@ -16,7 +18,6 @@ using Wego.Application.Exceptions;
 using Wego.Application.Models.Authentification;
 using Wego.Application.Models.Mail;
 using Wego.Domain.Entities;
-
 namespace Wego.Identity.Service;
 
 public class AuthenticationService : IAuthenticationService
@@ -29,6 +30,7 @@ public class AuthenticationService : IAuthenticationService
     private readonly ICurrentContext _currentContext;
     private readonly IConfiguration _configuration;
     private readonly IBaseRepository<UserProfile> _profileRepository;
+    private readonly IHttpContextAccessor _httpContextAccessor;
 
     public AuthenticationService(UserManager<ApplicationUser> userManager,
         SignInManager<ApplicationUser> signInManager,
@@ -37,7 +39,8 @@ public class AuthenticationService : IAuthenticationService
          IEmailSender emailSender,
          ICurrentContext currentContext,
          IConfiguration configuration,
-         IBaseRepository<UserProfile> profileRepository
+         IBaseRepository<UserProfile> profileRepository,
+         IHttpContextAccessor httpContextAccessor
          )
     {
         _userManager = userManager;
@@ -48,6 +51,7 @@ public class AuthenticationService : IAuthenticationService
         _currentContext = currentContext;
         _configuration = configuration;
         _profileRepository = profileRepository;
+        _httpContextAccessor = httpContextAccessor;
     }
 
     public async Task<AuthenticationResponse> LoginAsync(AuthenticationRequest request)
@@ -69,6 +73,7 @@ public class AuthenticationService : IAuthenticationService
         {
             Id = user.Id,
             Token = jwtSecurityToken.AccessToken,
+            InitialUserName = GetInitials(request.Email),
             RefreshToken = jwtSecurityToken.RefreshToken,
             Email = user.Email!
         };
@@ -88,7 +93,8 @@ public class AuthenticationService : IAuthenticationService
         var user = new ApplicationUser
         {
             UserName = request.Email,
-            Email = request.Email
+            Email = request.Email,
+            
         };
 
         var existingEmail = await _userManager.FindByEmailAsync(user.Email);
@@ -96,20 +102,26 @@ public class AuthenticationService : IAuthenticationService
         if (existingEmail == null)
         {
             var result = await _userManager.CreateAsync(user, request.Password);
-
             if (result.Succeeded)
             {
-                await _emailSender.SendMailAsync(new Email(user.Email, "User Created", "New user created successfully!"));
+                var code = await _userManager.GenerateEmailConfirmationTokenAsync(user);
+                var callbackUrl = string.Format("{0}://{1}{2}", _httpContextAccessor.HttpContext.Request.Scheme,
+                    _httpContextAccessor.HttpContext.Request.Host, "/register-confirm?userId=" + user.Id + "&code=" + code);
+                await _emailSender.SendMailAsync(new Email(user.Email, "Confirm your Account",
+                    $"Please confirm your account by <a href='{HtmlEncoder.Default.Encode(callbackUrl)}'>click here</a>."));
                 _logger.LogInformation("User Created: {email}", user.Email);
 
                 var resultProfile = await _profileRepository.AddAsync(new UserProfile
                 {
                     UserId = user.Id,
                     Email = request.Email,
-                    UsId="test"
+                    UsId = (SplitMail(request.Email) + GetRandomId()).ToLower(),
+                    InitialUserName = GetInitials(request.Email),
+                    CreationDate = DateTime.UtcNow,
+                    UpdateDate = DateTime.UtcNow,
                 });
 
-                return new RegistrationResponse() { UserId = user.Id, Email = user.Email, ProfileId = resultProfile.Id };
+                return new RegistrationResponse() { UserId = user.Id, Email = user.Email, InitialUserName = resultProfile.InitialUserName,  ProfileId = resultProfile.Id };
             }
 
             throw new ValidationException(result.Errors.ToDictionary(x => x.Code, x => x.Description));
@@ -164,24 +176,40 @@ public class AuthenticationService : IAuthenticationService
 
         return await _jwtTokenService.GenerateTokenAsync(user);
     }
-    public ClaimsPrincipal? GetPrincipalFromExpiredToken(string? token)
+    private static string GetRandomId()
     {
-        var tokenValidationParameters = new TokenValidationParameters
+        StringBuilder builder = new StringBuilder();
+        Enumerable
+           .Range(65, 26)
+    .Select(e => ((char)e).ToString())
+    .Concat(Enumerable.Range(97, 26).Select(e => ((char)e).ToString()))
+    .Concat(Enumerable.Range(0, 10).Select(e => e.ToString()))
+    .OrderBy(e => Guid.NewGuid())
+    .Take(11)
+    .ToList().ForEach(e => builder.Append(e));
+        string id = builder.ToString();
+
+        return id;
+    }
+    private static string SplitMail(string adressMail)
+    {
+        var mail = adressMail.Split('@');
+        var result = string.Empty;
+        // Split authors separated by a comma followed by space  
+        string[] multiArray = mail[0].Split(new Char[] { ' ', ',', '.', '-', '\n', '\t' });
+
+        foreach (var item in multiArray)
         {
-            ValidateAudience = false,
-            ValidateIssuer = false,
-            ValidateIssuerSigningKey = true,
-            IssuerSigningKey = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(_configuration["JWT:Secret"])),
-            ValidateLifetime = false
-        };
-
-        var tokenHandler = new JwtSecurityTokenHandler();
-        var principal = tokenHandler.ValidateToken(token, tokenValidationParameters, out SecurityToken securityToken);
-        if (securityToken is not JwtSecurityToken jwtSecurityToken || !jwtSecurityToken.Header.Alg.Equals(SecurityAlgorithms.HmacSha256, StringComparison.InvariantCultureIgnoreCase))
-            throw new SecurityTokenException("Invalid token");
-
-        return principal;
-
+            if (item.Trim() != "")
+                result += item + "-";
+        }
+        return result;
     }
 
+      public static string GetInitials(string value)
+           => string.Concat(value
+              .Split(new[] { ' ' }, StringSplitOptions.RemoveEmptyEntries)
+              .Where(x => x.Length >= 1 && char.IsLetter(x[0]))
+              .Select(x => char.ToUpper(x[0])));
+    
 }

@@ -1,8 +1,7 @@
-﻿using System;
-using System.Collections.Generic;
+﻿using Microsoft.EntityFrameworkCore;
+
 using System.ComponentModel.DataAnnotations;
 using System.ComponentModel.DataAnnotations.Schema;
-using Microsoft.EntityFrameworkCore;
 
 namespace Wego.Domain.Entities;
 
@@ -21,6 +20,9 @@ public partial class UserProfile
 
     [StringLength(250)]
     public string? LastName { get; set; }
+
+    [StringLength(50)]
+    public string? InitialUserName { get; set; }
 
     [StringLength(250)]
     public string Email { get; set; } = null!;
