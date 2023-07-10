@@ -9,6 +9,13 @@
   </PropertyGroup>
 
   <ItemGroup>
+    <Compile Remove="Controllers\Profile\**" />
+    <Content Remove="Controllers\Profile\**" />
+    <EmbeddedResource Remove="Controllers\Profile\**" />
+    <None Remove="Controllers\Profile\**" />
+  </ItemGroup>
+
+  <ItemGroup>
     <PackageReference Include="Microsoft.AspNetCore.OpenApi" Version="7.0.5" />
     <PackageReference Include="Microsoft.EntityFrameworkCore.Design" Version="7.0.5">
       <PrivateAssets>all</PrivateAssets>
@@ -25,10 +32,6 @@
     <ProjectReference Include="..\..\Infrastucture\Wego.Identity\Wego.Identity.csproj" />
     <ProjectReference Include="..\..\Infrastucture\Wego.Infrastructure\Wego.Infrastructure.csproj" />
     <ProjectReference Include="..\..\Infrastucture\Wego.Persistence\Wego.Persistence.csproj" />
-  </ItemGroup>
-
-  <ItemGroup>
-    <Folder Include="Controllers\Profile\" />
   </ItemGroup>
 
 </Project>

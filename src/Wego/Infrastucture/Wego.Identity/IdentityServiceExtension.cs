@@ -25,11 +25,26 @@ public static class IdentityServiceExtensions
         services.AddDbContext<InetDbContext>(options => options.UseSqlServer(configuration.GetConnectionString("Inet"),
             b => b.MigrationsAssembly(typeof(InetDbContext).Assembly.FullName)));
 
-        services.AddIdentity<ApplicationUser, IdentityRole>()
-                .AddEntityFrameworkStores<InetDbContext>()
-                .AddDefaultTokenProviders();
+        services.AddIdentity<ApplicationUser, IdentityRole>(options =>
+           {
+               // Password settings  
+               options.Password.RequiredLength = 6;
+               options.Password.RequireLowercase = false;
+               options.Password.RequireUppercase = false;
+               options.Password.RequireNonAlphanumeric = false;
+               options.Password.RequireDigit = true;
+               // Lockout settings  
+               options.Lockout.MaxFailedAccessAttempts = 10;
+               options.Lockout.AllowedForNewUsers = false;
 
-        services.AddTransient<IAuthenticationService, AuthenticationService>();
+               // User settings  
+               options.User.RequireUniqueEmail = true;
+
+           })
+          .AddEntityFrameworkStores<InetDbContext>()
+          .AddDefaultTokenProviders();
+
+        services.AddScoped<IAuthenticationService, AuthenticationService>();
         services.AddTransient<IJwtTokenService, JwtTokenService>();
 
         services.AddAuthentication(options =>
@@ -40,20 +55,20 @@ public static class IdentityServiceExtensions
         })// Adding Jwt Bearer
          .AddJwtBearer(options =>
          {
-          options.SaveToken = true;
-          options.RequireHttpsMetadata = false;
-          options.TokenValidationParameters = new TokenValidationParameters()
-          {
-             ValidateIssuer = true,
-             ValidateAudience = true,
-             ValidateLifetime = true,
-             ValidateIssuerSigningKey = true,
-             ClockSkew = TimeSpan.Zero,
+             options.SaveToken = true;
+             options.RequireHttpsMetadata = false;
+             options.TokenValidationParameters = new TokenValidationParameters()
+             {
+                 ValidateIssuer = true,
+                 ValidateAudience = true,
+                 ValidateLifetime = true,
+                 ValidateIssuerSigningKey = true,
+                 ClockSkew = TimeSpan.Zero,
 
-             ValidIssuer = configuration["JwtSettings:Issuer"],
-             ValidAudience = configuration["JwtSettings:Audience"],
-             IssuerSigningKey = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(configuration["JwtSettings:Key"]))
-          };
-       });
+                 ValidIssuer = configuration["JwtSettings:Issuer"],
+                 ValidAudience = configuration["JwtSettings:Audience"],
+                 IssuerSigningKey = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(configuration["JwtSettings:Key"]))
+             };
+         });
     }
 }
