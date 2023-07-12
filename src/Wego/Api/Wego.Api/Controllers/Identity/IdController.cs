@@ -1,14 +1,8 @@
 ﻿using Microsoft.AspNetCore.Authorization;
-using Microsoft.AspNetCore.Http;
-using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
 
-using System.Security.Claims;
-
-using Wego.Application.Contracts.Context;
 using Wego.Application.Contracts.Identity;
 using Wego.Application.Models.Authentification;
-using Wego.Infrastructure.Context;
 
 namespace Wego.Api.Controllers.Identity;
 

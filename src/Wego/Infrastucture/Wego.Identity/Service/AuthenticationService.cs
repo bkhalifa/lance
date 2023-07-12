@@ -121,7 +121,7 @@ public class AuthenticationService : IAuthenticationService
                     UpdateDate = DateTime.UtcNow,
                 });
 
-                return new RegistrationResponse() { UserId = user.Id, Email = user.Email, InitialUserName = resultProfile.InitialUserName,  ProfileId = resultProfile.Id };
+                return new RegistrationResponse() { UserId = user.Id, Email = user.Email, ConfirmedMail = false, InitialUserName = resultProfile.InitialUserName,  ProfileId = resultProfile.Id };
             }
 
             throw new ValidationException(result.Errors.ToDictionary(x => x.Code, x => x.Description));
