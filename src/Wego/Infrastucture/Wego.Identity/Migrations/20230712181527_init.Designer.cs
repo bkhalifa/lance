@@ -12,8 +12,8 @@ using Wego.Identity;
 namespace Wego.Identity.Migrations
 {
     [DbContext(typeof(InetDbContext))]
-    [Migration("20230514222018_MyMigration")]
-    partial class MyMigration
+    [Migration("20230712181527_init")]
+    partial class init
     {
         /// <inheritdoc />
         protected override void BuildTargetModel(ModelBuilder modelBuilder)

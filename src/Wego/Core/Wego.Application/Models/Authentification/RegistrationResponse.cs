@@ -7,5 +7,7 @@
         public  bool ConfirmedMail { get; set; }
         public string InitialUserName { get; set; }
         public long ProfileId { get; set; }
+        public string Token { get; set; }
+        public string   RefreshToken { get; set; }
     }
 }

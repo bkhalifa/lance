@@ -9,4 +9,5 @@ public interface IAuthenticationService
     Task<bool> ChangePasswordAsync(string oldPassword, string newPassword);
     Task LogoutAsync(LogoutModel tokenModel);
     Task<TokenModel> RefreshAsync(TokenModel tokenModel);
+    Task<RegistrationResponse> ConfirmRegistration(ConfirmRegisterModel request);
 }

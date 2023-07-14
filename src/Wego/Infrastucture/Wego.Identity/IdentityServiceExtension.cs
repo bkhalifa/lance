@@ -37,8 +37,8 @@ public static class IdentityServiceExtensions
                options.Lockout.MaxFailedAccessAttempts = 10;
                options.Lockout.AllowedForNewUsers = false;
 
-               // User settings  
-               options.User.RequireUniqueEmail = true;
+               // Signin settings  
+               options.SignIn.RequireConfirmedEmail = true;
 
            })
           .AddEntityFrameworkStores<InetDbContext>()

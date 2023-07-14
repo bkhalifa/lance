@@ -24,23 +24,29 @@ public class IdController : ControllerBase
     [ProducesResponseType(StatusCodes.Status500InternalServerError)]
     [ProducesResponseType(StatusCodes.Status401Unauthorized)]
     public async Task<ActionResult<AuthenticationResponse>> Login([FromBody] AuthenticationRequest request)
-    {
-        return Ok(await _authenticationService.LoginAsync(request));
-    }
+     => Ok(await _authenticationService.LoginAsync(request));
+    
 
     [HttpPost(nameof(Register))]
-    public async Task<ActionResult<RegistrationResponse>> Register([FromBody] RegistrationRequest request)
-    {
-        return Ok(await _authenticationService.RegisterAsync(request));
-    }
+    public async Task<ActionResult<RegisterResponse>> Register([FromBody] RegistrationRequest request)
+    => Ok(await _authenticationService.RegisterAsync(request));
+
+    [HttpPost(nameof(RegisterConfirm))]
+    [ProducesResponseType(StatusCodes.Status200OK)]
+    [ProducesResponseType(StatusCodes.Status500InternalServerError)]
+    public async Task<ActionResult<TokenModel>> RegisterConfirm([FromBody] ConfirmRegisterModel request)
+    => Ok(await _authenticationService.ConfirmRegistration(request));
+
 
     [HttpPost(nameof(ChangePassword))]
     [Authorize]
     public async Task<ActionResult<AuthenticationResponse>> ChangePassword([FromBody] ResetPasswordRequest request)
-    {
-        await _authenticationService.ChangePasswordAsync(request.OldPassword, request.NewPassword);
-        return Ok();
-    }
+     => Ok(await _authenticationService.ChangePasswordAsync(request.OldPassword, request.NewPassword));
+
+
+    [HttpPost(nameof(Refresh))]
+    public async Task<ActionResult<TokenModel>> Refresh([FromBody] TokenModel tokenModel)
+       => Ok(await _authenticationService.RefreshAsync(tokenModel));
 
 
     [HttpPost(nameof(Logout))]
@@ -51,12 +57,5 @@ public class IdController : ControllerBase
         return Ok();
     }
 
-
-    [HttpPost(nameof(Refresh))]
-    public async Task<ActionResult<TokenModel>> Refresh([FromBody] TokenModel tokenModel)
-    {
-        var result = await _authenticationService.RefreshAsync(tokenModel);
-        return Ok(result);
-    }
 
 }

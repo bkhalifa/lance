@@ -1,6 +1,9 @@
 using Hellang.Middleware.ProblemDetails;
+
 using Microsoft.AspNetCore.Identity;
+
 using Serilog;
+
 using Wego.Api.Middleware;
 using Wego.Application;
 using Wego.Application.Models.Authentification;
@@ -18,12 +21,11 @@ Log.Logger = new LoggerConfiguration()
    .ReadFrom.Configuration(builder.Configuration).CreateBootstrapLogger();
 builder.Host.UseLogging(builder.Configuration);
 
-// Add services to the container.
 
 builder.Services.AddDistributedMemoryCache();
 builder.Services.AddResponseCompression(options => { options.EnableForHttps = true; });
 builder.Services.AddApplicationServices(builder.Configuration);
-builder.Services.AddInfrastructureServices();
+builder.Services.AddInfrastructureServices(builder.Configuration);
 builder.Services.AddPersistenceServices(builder.Configuration);
 builder.Services.AddIdentityServices(builder.Configuration);
 builder.Services.AddCustomProblemDetails(builder.Environment);

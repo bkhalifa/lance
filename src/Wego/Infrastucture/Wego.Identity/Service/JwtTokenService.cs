@@ -1,10 +1,11 @@
 ﻿using Microsoft.AspNetCore.Identity;
 using Microsoft.Extensions.Options;
 using Microsoft.IdentityModel.Tokens;
+
 using System.IdentityModel.Tokens.Jwt;
-using System.Net;
 using System.Security.Claims;
 using System.Text;
+
 using Wego.Application.Contracts.Identity;
 using Wego.Application.Exceptions;
 using Wego.Application.Models.Authentification;
@@ -54,7 +55,7 @@ namespace Wego.Identity.Service
             };
             await _userManager.SetAuthenticationTokenAsync(user, _jwtSettings.Name, _jwtSettings.RefreshName, result.RefreshToken);
 
-            return result; 
+            return result;
         }
 
         private JwtSecurityToken GetSecurityToken(IEnumerable<Claim> claims, SymmetricSecurityKey symmetricSecurityKey)
@@ -92,8 +93,8 @@ namespace Wego.Identity.Service
 
                 throw ex;
             }
-           
-           
+
+
 
         }
 

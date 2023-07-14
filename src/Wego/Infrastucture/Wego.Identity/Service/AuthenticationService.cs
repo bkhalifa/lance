@@ -1,11 +1,7 @@
 ﻿using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Identity;
-using Microsoft.Extensions.Configuration;
+using Microsoft.AspNetCore.WebUtilities;
 using Microsoft.Extensions.Logging;
-using Microsoft.IdentityModel.Tokens;
-using System.IdentityModel.Tokens.Jwt;
-
-using System.Security.Claims;
 
 using System.Text;
 using System.Text.Encodings.Web;
@@ -16,8 +12,11 @@ using Wego.Application.Contracts.Identity;
 using Wego.Application.Contracts.Persistence;
 using Wego.Application.Exceptions;
 using Wego.Application.Models.Authentification;
+using Wego.Application.Models.Common;
 using Wego.Application.Models.Mail;
 using Wego.Domain.Entities;
+using Wego.Identity.Helpers;
+
 namespace Wego.Identity.Service;
 
 public class AuthenticationService : IAuthenticationService
@@ -28,7 +27,7 @@ public class AuthenticationService : IAuthenticationService
     private readonly ILogger<IAuthenticationService> _logger;
     private readonly IEmailSender _emailSender;
     private readonly ICurrentContext _currentContext;
-    private readonly IConfiguration _configuration;
+    private readonly IWebSettings _webSettings;
     private readonly IBaseRepository<UserProfile> _profileRepository;
     private readonly IHttpContextAccessor _httpContextAccessor;
 
@@ -38,7 +37,7 @@ public class AuthenticationService : IAuthenticationService
          ILogger<IAuthenticationService> logger,
          IEmailSender emailSender,
          ICurrentContext currentContext,
-         IConfiguration configuration,
+         IWebSettings webSettings,
          IBaseRepository<UserProfile> profileRepository,
          IHttpContextAccessor httpContextAccessor
          )
@@ -49,7 +48,7 @@ public class AuthenticationService : IAuthenticationService
         _logger = logger;
         _emailSender = emailSender;
         _currentContext = currentContext;
-        _configuration = configuration;
+        _webSettings = webSettings;
         _profileRepository = profileRepository;
         _httpContextAccessor = httpContextAccessor;
     }
@@ -61,7 +60,7 @@ public class AuthenticationService : IAuthenticationService
         if (user is null)
             throw new CredentialInvalidException($"Credentials for '{request.Email} aren't valid'.");
 
-        var result = await _signInManager.PasswordSignInAsync(user.UserName!, request.Password, false, lockoutOnFailure: false);
+        var result = await _signInManager.PasswordSignInAsync(user.UserName!, request.Password, request.IsPersistent, lockoutOnFailure: false);
 
         if (!result.Succeeded)
             throw new CredentialInvalidException($"Credentials for '{request.Email} aren't valid'.");
@@ -73,7 +72,7 @@ public class AuthenticationService : IAuthenticationService
         {
             Id = user.Id,
             Token = jwtSecurityToken.AccessToken,
-            InitialUserName = GetInitials(request.Email),
+            InitialUserName = request.Email.GetInitials(),
             RefreshToken = jwtSecurityToken.RefreshToken,
             Email = user.Email!
         };
@@ -87,6 +86,7 @@ public class AuthenticationService : IAuthenticationService
             throw new UserAlreadyExistsException($"Email '{request.Email}' already exists.");
 
         var profile = await _profileRepository.SingleOrDefaultAsync(x => x.Email == request.Email);
+
         if (profile != null)
             throw new UserAlreadyExistsException($"Email '{request.Email}' already exists.");
 
@@ -94,7 +94,7 @@ public class AuthenticationService : IAuthenticationService
         {
             UserName = request.Email,
             Email = request.Email,
-            
+
         };
 
         var existingEmail = await _userManager.FindByEmailAsync(user.Email);
@@ -105,8 +105,8 @@ public class AuthenticationService : IAuthenticationService
             if (result.Succeeded)
             {
                 var code = await _userManager.GenerateEmailConfirmationTokenAsync(user);
-                var callbackUrl = string.Format("{0}://{1}{2}", _httpContextAccessor.HttpContext.Request.Scheme,
-                    _httpContextAccessor.HttpContext.Request.Host, "/register-confirm?userId=" + user.Id + "&code=" + code);
+                var callbackUrl = $"{_webSettings.Url}id/account-confirm/{WebEncoders.Base64UrlEncode(Encoding.UTF8.GetBytes(user.Id))}/{WebEncoders.Base64UrlEncode(Encoding.UTF8.GetBytes(code))}";
+
                 await _emailSender.SendMailAsync(new Email(user.Email, "Confirm your Account",
                     $"Please confirm your account by <a href='{HtmlEncoder.Default.Encode(callbackUrl)}'>click here</a>."));
                 _logger.LogInformation("User Created: {email}", user.Email);
@@ -115,20 +115,68 @@ public class AuthenticationService : IAuthenticationService
                 {
                     UserId = user.Id,
                     Email = request.Email,
-                    UsId = (SplitMail(request.Email) + GetRandomId()).ToLower(),
-                    InitialUserName = GetInitials(request.Email),
+                    UsId = String.Concat(request.Email.SplitMail(), IdentityHelpers.GetRandomId()),
+                    InitialUserName = request.Email.GetInitials(),
                     CreationDate = DateTime.UtcNow,
                     UpdateDate = DateTime.UtcNow,
                 });
 
-                return new RegistrationResponse() { UserId = user.Id, Email = user.Email, ConfirmedMail = false, InitialUserName = resultProfile.InitialUserName,  ProfileId = resultProfile.Id };
+                return new RegistrationResponse()
+                {
+                    Email = user.Email!,
+                    ConfirmedMail = false,
+                    InitialUserName = resultProfile.InitialUserName!
+                };
             }
 
             throw new ValidationException(result.Errors.ToDictionary(x => x.Code, x => x.Description));
         }
+
         else
             throw new UserAlreadyExistsException($"Email {request.Email} already exists.");
 
+    }
+
+    public async Task<RegistrationResponse> ConfirmRegistration(ConfirmRegisterModel request)
+    {
+        if (request is null)
+            ArgumentNullException.ThrowIfNull(nameof(request));
+
+        var encodedUserId =  Encoding.UTF8.GetString(WebEncoders.Base64UrlDecode(request?.UserId!));
+        var user = await _userManager.FindByIdAsync(encodedUserId);
+
+        if (user is null)
+            throw new UserNotFoundException($"Email '{_currentContext.Identity.Email}' not found");
+
+        if (user.EmailConfirmed)
+            throw new UserNotFoundException($"Email '{_currentContext.Identity.Email}'déja confirmé");
+
+        var encodedCode = Encoding.UTF8.GetString(WebEncoders.Base64UrlDecode(request?.Code!));
+
+        var result = await _userManager.ConfirmEmailAsync(user, encodedCode!).ConfigureAwait(false);
+
+        if (result.Succeeded)
+        {
+            var resultProfile = await _profileRepository.SingleOrDefaultAsync(x => x.UserId.Equals(encodedUserId)).ConfigureAwait(false);
+
+            if (resultProfile is null)
+                throw new UserNotFoundException($"Profile not found .");
+
+            var jwtSecurityToken = await _jwtTokenService.GenerateTokenAsync(user);
+
+            return new RegistrationResponse()
+            {
+                UserId = user.Id,
+                Email = user.Email!,
+                ConfirmedMail = true,
+                InitialUserName = resultProfile.InitialUserName!,
+                ProfileId = resultProfile.Id,
+                Token = jwtSecurityToken.AccessToken,
+                RefreshToken = jwtSecurityToken.RefreshToken,
+            };
+        }
+
+        throw new ValidationException(result.Errors.ToDictionary(x => x.Code, x => x.Description));
     }
     public async Task<bool> ChangePasswordAsync(string oldPassword, string newPassword)
     {
@@ -139,7 +187,7 @@ public class AuthenticationService : IAuthenticationService
 
         if (user == null) throw new UserNotFoundException($"Email '{_currentContext.Identity.Email}' not found");
 
-        if (_userManager.PasswordHasher.VerifyHashedPassword(user, user.PasswordHash, newPassword) == PasswordVerificationResult.Success)
+        if (_userManager.PasswordHasher.VerifyHashedPassword(user, user.PasswordHash!, newPassword) == PasswordVerificationResult.Success)
             throw new PasswordsEqualsException("Password are equals");
 
         var result = await _userManager.ChangePasswordAsync(user, oldPassword, newPassword);
@@ -151,7 +199,6 @@ public class AuthenticationService : IAuthenticationService
         else
             throw new ValidationException(result.Errors.ToDictionary(x => x.Code, x => x.Description));
     }
-
     public async Task LogoutAsync(LogoutModel logoutModel)
     {
         var user = await _userManager.FindByEmailAsync(logoutModel.Email);
@@ -176,40 +223,5 @@ public class AuthenticationService : IAuthenticationService
 
         return await _jwtTokenService.GenerateTokenAsync(user);
     }
-    private static string GetRandomId()
-    {
-        StringBuilder builder = new StringBuilder();
-        Enumerable
-           .Range(65, 26)
-    .Select(e => ((char)e).ToString())
-    .Concat(Enumerable.Range(97, 26).Select(e => ((char)e).ToString()))
-    .Concat(Enumerable.Range(0, 10).Select(e => e.ToString()))
-    .OrderBy(e => Guid.NewGuid())
-    .Take(11)
-    .ToList().ForEach(e => builder.Append(e));
-        string id = builder.ToString();
 
-        return id;
-    }
-    private static string SplitMail(string adressMail)
-    {
-        var mail = adressMail.Split('@');
-        var result = string.Empty;
-        // Split authors separated by a comma followed by space  
-        string[] multiArray = mail[0].Split(new Char[] { ' ', ',', '.', '-', '\n', '\t' });
-
-        foreach (var item in multiArray)
-        {
-            if (item.Trim() != "")
-                result += item + "-";
-        }
-        return result;
-    }
-
-      public static string GetInitials(string value)
-           => string.Concat(value
-              .Split(new[] { ' ' }, StringSplitOptions.RemoveEmptyEntries)
-              .Where(x => x.Length >= 1 && char.IsLetter(x[0]))
-              .Select(x => char.ToUpper(x[0])));
-    
 }
