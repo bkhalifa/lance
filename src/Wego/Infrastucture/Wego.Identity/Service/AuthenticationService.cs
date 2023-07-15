@@ -1,6 +1,4 @@
-﻿using Microsoft.AspNetCore.Http;
-using Microsoft.AspNetCore.Http.HttpResults;
-using Microsoft.AspNetCore.Identity;
+﻿using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.WebUtilities;
 using Microsoft.Extensions.Logging;
@@ -14,14 +12,9 @@ using Wego.Application.Contracts.Identity;
 using Wego.Application.Contracts.Persistence;
 using Wego.Application.Exceptions;
 using Wego.Application.Models.Authentification;
-using Wego.Application.Models.Common;
 using Wego.Application.Models.Mail;
 using Wego.Domain.Entities;
 using Wego.Identity.Helpers;
-
-using YamlDotNet.Core.Tokens;
-
-using static Org.BouncyCastle.Crypto.Engines.SM2Engine;
 
 namespace Wego.Identity.Service;
 
@@ -33,9 +26,7 @@ public class AuthenticationService : IAuthenticationService
     private readonly ILogger<IAuthenticationService> _logger;
     private readonly IEmailSender _emailSender;
     private readonly ICurrentContext _currentContext;
-    private readonly IWebSettings _webSettings;
     private readonly IBaseRepository<UserProfile> _profileRepository;
-    private readonly IHttpContextAccessor _httpContextAccessor;
 
     public AuthenticationService(UserManager<ApplicationUser> userManager,
         SignInManager<ApplicationUser> signInManager,
@@ -43,9 +34,7 @@ public class AuthenticationService : IAuthenticationService
          ILogger<IAuthenticationService> logger,
          IEmailSender emailSender,
          ICurrentContext currentContext,
-         IWebSettings webSettings,
-         IBaseRepository<UserProfile> profileRepository,
-         IHttpContextAccessor httpContextAccessor
+         IBaseRepository<UserProfile> profileRepository
          )
     {
         _userManager = userManager;
@@ -54,13 +43,14 @@ public class AuthenticationService : IAuthenticationService
         _logger = logger;
         _emailSender = emailSender;
         _currentContext = currentContext;
-        _webSettings = webSettings;
         _profileRepository = profileRepository;
-        _httpContextAccessor = httpContextAccessor;
     }
 
     public async Task<AuthenticationResponse> LoginAsync(AuthenticationRequest request)
     {
+        if (request is null)
+            ArgumentNullException.ThrowIfNull(nameof(request));
+
         var user = await _userManager.FindByEmailAsync(request.Email);
 
         if (user is null)
@@ -85,6 +75,9 @@ public class AuthenticationService : IAuthenticationService
     }
     public async Task<RegistrationResponse> RegisterAsync(RegistrationRequest request)
     {
+        if (request is null)
+            ArgumentNullException.ThrowIfNull(nameof(request));
+
         var existingUser = await _userManager.FindByNameAsync(request.Email);
 
         if (existingUser != null)
@@ -110,7 +103,7 @@ public class AuthenticationService : IAuthenticationService
             if (result.Succeeded)
             {
                 var code = await _userManager.GenerateEmailConfirmationTokenAsync(user);
-       
+
                 var param = new Dictionary<string, string>
                 {
                     {"id",  WebEncoders.Base64UrlEncode(Encoding.UTF8.GetBytes(user.Id)) },
@@ -153,7 +146,7 @@ public class AuthenticationService : IAuthenticationService
         if (request is null)
             ArgumentNullException.ThrowIfNull(nameof(request));
 
-        var encodedUserId =  Encoding.UTF8.GetString(WebEncoders.Base64UrlDecode(request?.UserId!));
+        var encodedUserId = Encoding.UTF8.GetString(WebEncoders.Base64UrlDecode(request?.UserId!));
         var user = await _userManager.FindByIdAsync(encodedUserId);
 
         if (user is null)
@@ -205,14 +198,14 @@ public class AuthenticationService : IAuthenticationService
             ArgumentNullException.ThrowIfNull(nameof(forgotPassword));
 
         var user = await _userManager.FindByEmailAsync(forgotPassword?.Email!);
-      
+
         if (user == null)
             throw new UserNotFoundException($"Email '{_currentContext.Identity.Email}' not found");
 
         var token = await _userManager.GeneratePasswordResetTokenAsync(user);
         var param = new Dictionary<string, string?>
         {
-          {"token", token },
+          {"token",WebEncoders.Base64UrlEncode(Encoding.UTF8.GetBytes(token))},
           {"email", forgotPassword!.Email! }
         };
         var callback = QueryHelpers.AddQueryString(forgotPassword.ClientURI!, param);
@@ -220,6 +213,47 @@ public class AuthenticationService : IAuthenticationService
                    $"Please confirm your account by <a href='{HtmlEncoder.Default.Encode(callback)}'>click here</a>."));
 
         return true;
+
+    }
+    public async Task<RegistrationResponse> ResetRegistration(ResetPasswordModel request)
+    {
+        if (request is null)
+            ArgumentNullException.ThrowIfNull(nameof(request));
+
+        var user = await _userManager.FindByEmailAsync(request.Email);
+
+        if (user == null)
+            throw new UserNotFoundException($"user not found .");
+
+        var encodedCode = Encoding.UTF8.GetString(WebEncoders.Base64UrlDecode(request.Token!));
+
+        var result = await _userManager.ResetPasswordAsync(user, encodedCode, request.Password);
+        if (result.Succeeded)
+        {
+            await _emailSender.SendMailAsync(new Email(user.Email!, "Reset Password Ok",
+           $"Reset Password are Ok !"));
+
+            var resultProfile = await _profileRepository.SingleOrDefaultAsync(x => x.Email.Equals(request.Email)).ConfigureAwait(false);
+
+            if (resultProfile is null)
+                throw new UserNotFoundException($"Profile not found .");
+
+            var jwtSecurityToken = await _jwtTokenService.GenerateTokenAsync(user);
+
+            return new RegistrationResponse()
+            {
+                UserId = user.Id,
+                Email = user.Email!,
+                ConfirmedMail = true,
+                InitialUserName = resultProfile.InitialUserName!,
+                ProfileId = resultProfile.Id,
+                Token = jwtSecurityToken.AccessToken,
+                RefreshToken = jwtSecurityToken.RefreshToken,
+            };
+
+        }
+
+        return default!;
 
     }
     public async Task<TokenModel> RefreshAsync(TokenModel tokenModel)

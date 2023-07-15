@@ -38,6 +38,13 @@ public class IdController : ControllerBase
     => Ok(await _authenticationService.ConfirmRegistration(request));
 
 
+    [HttpPost(nameof(Reset))]
+    [ProducesResponseType(StatusCodes.Status200OK)]
+    [ProducesResponseType(StatusCodes.Status500InternalServerError)]
+    public async Task<ActionResult<TokenModel>> Reset([FromBody] ResetPasswordModel request)
+    => Ok(await _authenticationService.ResetRegistration(request));
+
+
     [HttpPost(nameof(Logout))]
     [Authorize]
     public async Task<ActionResult<AuthenticationResponse>> Logout([FromBody] LogoutModel logoutModel)

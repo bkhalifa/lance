@@ -12,4 +12,5 @@ public interface IAuthenticationService
     Task<TokenModel> RefreshAsync(TokenModel tokenModel);
     Task<RegistrationResponse> ConfirmRegistration(ConfirmRegisterModel request);
     Task<bool> ForgotPassword([FromBody] ForgotPasswordModel forgotPassword);
+    Task<RegistrationResponse> ResetRegistration(ResetPasswordModel request);
 }
