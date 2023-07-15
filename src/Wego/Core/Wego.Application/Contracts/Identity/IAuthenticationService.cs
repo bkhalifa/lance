@@ -1,4 +1,6 @@
-﻿using Wego.Application.Models.Authentification;
+﻿using Microsoft.AspNetCore.Mvc;
+
+using Wego.Application.Models.Authentification;
 
 namespace Wego.Application.Contracts.Identity;
 
@@ -10,4 +12,5 @@ public interface IAuthenticationService
     Task LogoutAsync(LogoutModel tokenModel);
     Task<TokenModel> RefreshAsync(TokenModel tokenModel);
     Task<RegistrationResponse> ConfirmRegistration(ConfirmRegisterModel request);
+    Task<bool> ForgotPassword([FromBody] ForgotPasswordModel forgotPassword);
 }

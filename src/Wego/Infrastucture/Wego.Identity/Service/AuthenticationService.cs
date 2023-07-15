@@ -1,5 +1,7 @@
 ﻿using Microsoft.AspNetCore.Http;
+using Microsoft.AspNetCore.Http.HttpResults;
 using Microsoft.AspNetCore.Identity;
+using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.WebUtilities;
 using Microsoft.Extensions.Logging;
 
@@ -208,6 +210,29 @@ public class AuthenticationService : IAuthenticationService
         await _signInManager.SignOutAsync();
         await _userManager.UpdateSecurityStampAsync(user);
         await _userManager.RemoveAuthenticationTokenAsync(user, "JWT", "JWT Token");
+    }
+    public async Task<bool> ForgotPassword([FromBody] ForgotPasswordModel forgotPassword)
+    {
+        if (forgotPassword is null)
+            ArgumentNullException.ThrowIfNull(nameof(forgotPassword));
+
+        var user = await _userManager.FindByEmailAsync(forgotPassword?.Email!);
+      
+        if (user == null)
+            throw new UserNotFoundException($"Email '{_currentContext.Identity.Email}' not found");
+
+        var token = await _userManager.GeneratePasswordResetTokenAsync(user);
+        var param = new Dictionary<string, string?>
+        {
+          {"token", token },
+          {"email", forgotPassword!.Email! }
+        };
+        var callback = QueryHelpers.AddQueryString(forgotPassword.ClientURI!, param);
+        await _emailSender.SendMailAsync(new Email(user.Email!, "Reset password token",
+                   $"Please confirm your account by <a href='{HtmlEncoder.Default.Encode(callback)}'>click here</a>."));
+
+        return true;
+
     }
     public async Task<TokenModel> RefreshAsync(TokenModel tokenModel)
     {
