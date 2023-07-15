@@ -38,12 +38,6 @@ public class IdController : ControllerBase
     => Ok(await _authenticationService.ConfirmRegistration(request));
 
 
-    [HttpPost(nameof(ChangePassword))]
-    [Authorize]
-    public async Task<ActionResult<AuthenticationResponse>> ChangePassword([FromBody] ResetPasswordRequest request)
-     => Ok(await _authenticationService.ChangePasswordAsync(request.OldPassword, request.NewPassword));
-
-
     [HttpPost(nameof(Logout))]
     [Authorize]
     public async Task<ActionResult<AuthenticationResponse>> Logout([FromBody] LogoutModel logoutModel)

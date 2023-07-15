@@ -19,6 +19,10 @@ using Wego.Application.Models.Mail;
 using Wego.Domain.Entities;
 using Wego.Identity.Helpers;
 
+using YamlDotNet.Core.Tokens;
+
+using static Org.BouncyCastle.Crypto.Engines.SM2Engine;
+
 namespace Wego.Identity.Service;
 
 public class AuthenticationService : IAuthenticationService
@@ -79,7 +83,6 @@ public class AuthenticationService : IAuthenticationService
             Email = user.Email!
         };
     }
-
     public async Task<RegistrationResponse> RegisterAsync(RegistrationRequest request)
     {
         var existingUser = await _userManager.FindByNameAsync(request.Email);
@@ -107,10 +110,17 @@ public class AuthenticationService : IAuthenticationService
             if (result.Succeeded)
             {
                 var code = await _userManager.GenerateEmailConfirmationTokenAsync(user);
-                var callbackUrl = $"{_webSettings.Url}id/account-confirm/{WebEncoders.Base64UrlEncode(Encoding.UTF8.GetBytes(user.Id))}/{WebEncoders.Base64UrlEncode(Encoding.UTF8.GetBytes(code))}";
+       
+                var param = new Dictionary<string, string>
+                {
+                    {"id",  WebEncoders.Base64UrlEncode(Encoding.UTF8.GetBytes(user.Id)) },
+                    {"code",  WebEncoders.Base64UrlEncode(Encoding.UTF8.GetBytes(code)) },
+                };
+                var callback = QueryHelpers.AddQueryString(request.ClientURI!, param);
 
                 await _emailSender.SendMailAsync(new Email(user.Email, "Confirm your Account",
-                    $"Please confirm your account by <a href='{HtmlEncoder.Default.Encode(callbackUrl)}'>click here</a>."));
+                    $"Please confirm your account by <a href='{HtmlEncoder.Default.Encode(callback)}'>click here</a>."));
+
                 _logger.LogInformation("User Created: {email}", user.Email);
 
                 var resultProfile = await _profileRepository.AddAsync(new UserProfile
@@ -138,7 +148,6 @@ public class AuthenticationService : IAuthenticationService
             throw new UserAlreadyExistsException($"Email {request.Email} already exists.");
 
     }
-
     public async Task<RegistrationResponse> ConfirmRegistration(ConfirmRegisterModel request)
     {
         if (request is null)
@@ -179,27 +188,6 @@ public class AuthenticationService : IAuthenticationService
         }
 
         throw new ValidationException(result.Errors.ToDictionary(x => x.Code, x => x.Description));
-    }
-    public async Task<bool> ChangePasswordAsync(string oldPassword, string newPassword)
-    {
-        if (string.IsNullOrEmpty(_currentContext.Identity?.Email)) throw new UserNotAuthentificatedException("User not Authentificated");
-
-
-        var user = await _userManager.FindByEmailAsync(_currentContext.Identity.Email);
-
-        if (user == null) throw new UserNotFoundException($"Email '{_currentContext.Identity.Email}' not found");
-
-        if (_userManager.PasswordHasher.VerifyHashedPassword(user, user.PasswordHash!, newPassword) == PasswordVerificationResult.Success)
-            throw new PasswordsEqualsException("Password are equals");
-
-        var result = await _userManager.ChangePasswordAsync(user, oldPassword, newPassword);
-        if (result.Succeeded)
-        {
-            await _emailSender.SendMailAsync(new Email(_currentContext.Identity.Email, "Change Password", "Password updated successfully!"));
-            return true;
-        }
-        else
-            throw new ValidationException(result.Errors.ToDictionary(x => x.Code, x => x.Description));
     }
     public async Task LogoutAsync(LogoutModel logoutModel)
     {
