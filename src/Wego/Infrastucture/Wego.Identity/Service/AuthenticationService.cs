@@ -78,14 +78,14 @@ public class AuthenticationService : IAuthenticationService
         if (request is null)
             ArgumentNullException.ThrowIfNull(nameof(request));
 
-        var existingUser = await _userManager.FindByNameAsync(request.Email);
+        var existingUser = await _userManager.FindByNameAsync(request!.Email);
 
-        if (existingUser != null)
+        if (existingUser is not null)
             throw new UserAlreadyExistsException($"Email '{request.Email}' already exists.");
 
         var profile = await _profileRepository.SingleOrDefaultAsync(x => x.Email == request.Email);
 
-        if (profile != null)
+        if (profile is not null)
             throw new UserAlreadyExistsException($"Email '{request.Email}' already exists.");
 
         var user = new ApplicationUser
@@ -95,12 +95,9 @@ public class AuthenticationService : IAuthenticationService
 
         };
 
-        var existingEmail = await _userManager.FindByEmailAsync(user.Email);
-
-        if (existingEmail == null)
-        {
-            var result = await _userManager.CreateAsync(user, request.Password);
-            if (result.Succeeded)
+        var result = await _userManager.CreateAsync(user, request.Password);
+        
+        if (result.Succeeded)
             {
                 var code = await _userManager.GenerateEmailConfirmationTokenAsync(user);
 
@@ -134,11 +131,8 @@ public class AuthenticationService : IAuthenticationService
                 };
             }
 
-            throw new ValidationException(result.Errors.ToDictionary(x => x.Code, x => x.Description));
-        }
-
-        else
-            throw new UserAlreadyExistsException($"Email {request.Email} already exists.");
+        throw new ValidationException(result.Errors.ToDictionary(x => x.Code, x => x.Description));
+   
 
     }
     public async Task<RegistrationResponse> ConfirmRegistration(ConfirmRegisterModel request)
@@ -230,6 +224,12 @@ public class AuthenticationService : IAuthenticationService
         var result = await _userManager.ResetPasswordAsync(user, encodedCode, request.Password);
         if (result.Succeeded)
         {
+            if(user.EmailConfirmed == false)
+            {
+                var code = await _userManager.GenerateEmailConfirmationTokenAsync(user);
+                await _userManager.ConfirmEmailAsync(user, code);
+            }
+
             await _emailSender.SendMailAsync(new Email(user.Email!, "Reset Password Ok",
            $"Reset Password are Ok !"));
 
