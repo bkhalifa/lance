@@ -1,5 +1,5 @@
-﻿using Microsoft.AspNetCore.Http;
-using Microsoft.AspNetCore.Identity;
+﻿using Microsoft.AspNetCore.Identity;
+using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.WebUtilities;
 using Microsoft.Extensions.Logging;
 
@@ -12,7 +12,6 @@ using Wego.Application.Contracts.Identity;
 using Wego.Application.Contracts.Persistence;
 using Wego.Application.Exceptions;
 using Wego.Application.Models.Authentification;
-using Wego.Application.Models.Common;
 using Wego.Application.Models.Mail;
 using Wego.Domain.Entities;
 using Wego.Identity.Helpers;
@@ -27,9 +26,7 @@ public class AuthenticationService : IAuthenticationService
     private readonly ILogger<IAuthenticationService> _logger;
     private readonly IEmailSender _emailSender;
     private readonly ICurrentContext _currentContext;
-    private readonly IWebSettings _webSettings;
     private readonly IBaseRepository<UserProfile> _profileRepository;
-    private readonly IHttpContextAccessor _httpContextAccessor;
 
     public AuthenticationService(UserManager<ApplicationUser> userManager,
         SignInManager<ApplicationUser> signInManager,
@@ -37,9 +34,7 @@ public class AuthenticationService : IAuthenticationService
          ILogger<IAuthenticationService> logger,
          IEmailSender emailSender,
          ICurrentContext currentContext,
-         IWebSettings webSettings,
-         IBaseRepository<UserProfile> profileRepository,
-         IHttpContextAccessor httpContextAccessor
+         IBaseRepository<UserProfile> profileRepository
          )
     {
         _userManager = userManager;
@@ -48,13 +43,14 @@ public class AuthenticationService : IAuthenticationService
         _logger = logger;
         _emailSender = emailSender;
         _currentContext = currentContext;
-        _webSettings = webSettings;
         _profileRepository = profileRepository;
-        _httpContextAccessor = httpContextAccessor;
     }
 
     public async Task<AuthenticationResponse> LoginAsync(AuthenticationRequest request)
     {
+        if (request is null)
+            ArgumentNullException.ThrowIfNull(nameof(request));
+
         var user = await _userManager.FindByEmailAsync(request.Email);
 
         if (user is null)
@@ -77,17 +73,19 @@ public class AuthenticationService : IAuthenticationService
             Email = user.Email!
         };
     }
-
     public async Task<RegistrationResponse> RegisterAsync(RegistrationRequest request)
     {
-        var existingUser = await _userManager.FindByNameAsync(request.Email);
+        if (request is null)
+            ArgumentNullException.ThrowIfNull(nameof(request));
 
-        if (existingUser != null)
+        var existingUser = await _userManager.FindByNameAsync(request!.Email);
+
+        if (existingUser is not null)
             throw new UserAlreadyExistsException($"Email '{request.Email}' already exists.");
 
         var profile = await _profileRepository.SingleOrDefaultAsync(x => x.Email == request.Email);
 
-        if (profile != null)
+        if (profile is not null)
             throw new UserAlreadyExistsException($"Email '{request.Email}' already exists.");
 
         var user = new ApplicationUser
@@ -97,18 +95,22 @@ public class AuthenticationService : IAuthenticationService
 
         };
 
-        var existingEmail = await _userManager.FindByEmailAsync(user.Email);
-
-        if (existingEmail == null)
-        {
-            var result = await _userManager.CreateAsync(user, request.Password);
-            if (result.Succeeded)
+        var result = await _userManager.CreateAsync(user, request.Password);
+        
+        if (result.Succeeded)
             {
                 var code = await _userManager.GenerateEmailConfirmationTokenAsync(user);
-                var callbackUrl = $"{_webSettings.Url}id/account-confirm/{WebEncoders.Base64UrlEncode(Encoding.UTF8.GetBytes(user.Id))}/{WebEncoders.Base64UrlEncode(Encoding.UTF8.GetBytes(code))}";
+
+                var param = new Dictionary<string, string>
+                {
+                    {"id",  WebEncoders.Base64UrlEncode(Encoding.UTF8.GetBytes(user.Id)) },
+                    {"code",  WebEncoders.Base64UrlEncode(Encoding.UTF8.GetBytes(code)) },
+                };
+                var callback = QueryHelpers.AddQueryString(request.ClientURI!, param);
 
                 await _emailSender.SendMailAsync(new Email(user.Email, "Confirm your Account",
-                    $"Please confirm your account by <a href='{HtmlEncoder.Default.Encode(callbackUrl)}'>click here</a>."));
+                    $"Please confirm your account by <a href='{HtmlEncoder.Default.Encode(callback)}'>click here</a>."));
+
                 _logger.LogInformation("User Created: {email}", user.Email);
 
                 var resultProfile = await _profileRepository.AddAsync(new UserProfile
@@ -129,20 +131,16 @@ public class AuthenticationService : IAuthenticationService
                 };
             }
 
-            throw new ValidationException(result.Errors.ToDictionary(x => x.Code, x => x.Description));
-        }
-
-        else
-            throw new UserAlreadyExistsException($"Email {request.Email} already exists.");
+        throw new ValidationException(result.Errors.ToDictionary(x => x.Code, x => x.Description));
+   
 
     }
-
     public async Task<RegistrationResponse> ConfirmRegistration(ConfirmRegisterModel request)
     {
         if (request is null)
             ArgumentNullException.ThrowIfNull(nameof(request));
 
-        var encodedUserId =  Encoding.UTF8.GetString(WebEncoders.Base64UrlDecode(request?.UserId!));
+        var encodedUserId = Encoding.UTF8.GetString(WebEncoders.Base64UrlDecode(request?.UserId!));
         var user = await _userManager.FindByIdAsync(encodedUserId);
 
         if (user is null)
@@ -178,27 +176,6 @@ public class AuthenticationService : IAuthenticationService
 
         throw new ValidationException(result.Errors.ToDictionary(x => x.Code, x => x.Description));
     }
-    public async Task<bool> ChangePasswordAsync(string oldPassword, string newPassword)
-    {
-        if (string.IsNullOrEmpty(_currentContext.Identity?.Email)) throw new UserNotAuthentificatedException("User not Authentificated");
-
-
-        var user = await _userManager.FindByEmailAsync(_currentContext.Identity.Email);
-
-        if (user == null) throw new UserNotFoundException($"Email '{_currentContext.Identity.Email}' not found");
-
-        if (_userManager.PasswordHasher.VerifyHashedPassword(user, user.PasswordHash!, newPassword) == PasswordVerificationResult.Success)
-            throw new PasswordsEqualsException("Password are equals");
-
-        var result = await _userManager.ChangePasswordAsync(user, oldPassword, newPassword);
-        if (result.Succeeded)
-        {
-            await _emailSender.SendMailAsync(new Email(_currentContext.Identity.Email, "Change Password", "Password updated successfully!"));
-            return true;
-        }
-        else
-            throw new ValidationException(result.Errors.ToDictionary(x => x.Code, x => x.Description));
-    }
     public async Task LogoutAsync(LogoutModel logoutModel)
     {
         var user = await _userManager.FindByEmailAsync(logoutModel.Email);
@@ -208,6 +185,76 @@ public class AuthenticationService : IAuthenticationService
         await _signInManager.SignOutAsync();
         await _userManager.UpdateSecurityStampAsync(user);
         await _userManager.RemoveAuthenticationTokenAsync(user, "JWT", "JWT Token");
+    }
+    public async Task<bool> ForgotPassword([FromBody] ForgotPasswordModel forgotPassword)
+    {
+        if (forgotPassword is null)
+            ArgumentNullException.ThrowIfNull(nameof(forgotPassword));
+
+        var user = await _userManager.FindByEmailAsync(forgotPassword?.Email!);
+
+        if (user == null)
+            throw new UserNotFoundException($"Email '{_currentContext.Identity.Email}' not found");
+
+        var token = await _userManager.GeneratePasswordResetTokenAsync(user);
+        var param = new Dictionary<string, string?>
+        {
+          {"token",WebEncoders.Base64UrlEncode(Encoding.UTF8.GetBytes(token))},
+          {"email", forgotPassword!.Email! }
+        };
+        var callback = QueryHelpers.AddQueryString(forgotPassword.ClientURI!, param);
+        await _emailSender.SendMailAsync(new Email(user.Email!, "Reset password token",
+                   $"Please confirm your account by <a href='{HtmlEncoder.Default.Encode(callback)}'>click here</a>."));
+
+        return true;
+
+    }
+    public async Task<RegistrationResponse> ResetRegistration(ResetPasswordModel request)
+    {
+        if (request is null)
+            ArgumentNullException.ThrowIfNull(nameof(request));
+
+        var user = await _userManager.FindByEmailAsync(request.Email);
+
+        if (user == null)
+            throw new UserNotFoundException($"user not found .");
+
+        var encodedCode = Encoding.UTF8.GetString(WebEncoders.Base64UrlDecode(request.Token!));
+
+        var result = await _userManager.ResetPasswordAsync(user, encodedCode, request.Password);
+        if (result.Succeeded)
+        {
+            if(user.EmailConfirmed == false)
+            {
+                var code = await _userManager.GenerateEmailConfirmationTokenAsync(user);
+                await _userManager.ConfirmEmailAsync(user, code);
+            }
+
+            await _emailSender.SendMailAsync(new Email(user.Email!, "Reset Password Ok",
+           $"Reset Password are Ok !"));
+
+            var resultProfile = await _profileRepository.SingleOrDefaultAsync(x => x.Email.Equals(request.Email)).ConfigureAwait(false);
+
+            if (resultProfile is null)
+                throw new UserNotFoundException($"Profile not found .");
+
+            var jwtSecurityToken = await _jwtTokenService.GenerateTokenAsync(user);
+
+            return new RegistrationResponse()
+            {
+                UserId = user.Id,
+                Email = user.Email!,
+                ConfirmedMail = true,
+                InitialUserName = resultProfile.InitialUserName!,
+                ProfileId = resultProfile.Id,
+                Token = jwtSecurityToken.AccessToken,
+                RefreshToken = jwtSecurityToken.RefreshToken,
+            };
+
+        }
+
+        return default!;
+
     }
     public async Task<TokenModel> RefreshAsync(TokenModel tokenModel)
     {

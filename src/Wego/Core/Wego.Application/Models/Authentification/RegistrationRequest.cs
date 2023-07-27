@@ -1,6 +1,4 @@
-﻿using Microsoft.VisualBasic;
-
-using System.ComponentModel.DataAnnotations;
+﻿using System.ComponentModel.DataAnnotations;
 
 namespace Wego.Application.Models.Authentification;
 
@@ -22,4 +20,5 @@ public class RegistrationRequest
     [Display(Name = "Confirm password")]
     [Compare("Password", ErrorMessage = "The password and confirmation password do not match.")]
     public string ConfirmPassword { get; set; }
+    public string ClientURI { get; set; }
 }

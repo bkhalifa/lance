@@ -25,7 +25,7 @@ public class IdController : ControllerBase
     [ProducesResponseType(StatusCodes.Status401Unauthorized)]
     public async Task<ActionResult<AuthenticationResponse>> Login([FromBody] AuthenticationRequest request)
      => Ok(await _authenticationService.LoginAsync(request));
-    
+
 
     [HttpPost(nameof(Register))]
     public async Task<ActionResult<RegisterResponse>> Register([FromBody] RegistrationRequest request)
@@ -38,15 +38,11 @@ public class IdController : ControllerBase
     => Ok(await _authenticationService.ConfirmRegistration(request));
 
 
-    [HttpPost(nameof(ChangePassword))]
-    [Authorize]
-    public async Task<ActionResult<AuthenticationResponse>> ChangePassword([FromBody] ResetPasswordRequest request)
-     => Ok(await _authenticationService.ChangePasswordAsync(request.OldPassword, request.NewPassword));
-
-
-    [HttpPost(nameof(Refresh))]
-    public async Task<ActionResult<TokenModel>> Refresh([FromBody] TokenModel tokenModel)
-       => Ok(await _authenticationService.RefreshAsync(tokenModel));
+    [HttpPost(nameof(Reset))]
+    [ProducesResponseType(StatusCodes.Status200OK)]
+    [ProducesResponseType(StatusCodes.Status500InternalServerError)]
+    public async Task<ActionResult<TokenModel>> Reset([FromBody] ResetPasswordModel request)
+    => Ok(await _authenticationService.ResetRegistration(request));
 
 
     [HttpPost(nameof(Logout))]
@@ -56,6 +52,19 @@ public class IdController : ControllerBase
         await _authenticationService.LogoutAsync(logoutModel);
         return Ok();
     }
+
+    [HttpPost(nameof(Refresh))]
+    public async Task<ActionResult<TokenModel>> Refresh([FromBody] TokenModel tokenModel)
+     => Ok(await _authenticationService.RefreshAsync(tokenModel));
+
+
+    [HttpPost(nameof(Forgot))]
+    [ProducesResponseType(StatusCodes.Status200OK)]
+    [ProducesResponseType(StatusCodes.Status400BadRequest)]
+    [ProducesResponseType(StatusCodes.Status500InternalServerError)]
+    public async Task<ActionResult<bool>> Forgot([FromBody] ForgotPasswordModel request)
+       => Ok(await _authenticationService.ForgotPassword(request));
+
 
 
 }

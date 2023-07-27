@@ -43,6 +43,8 @@ public static class IdentityServiceExtensions
            })
           .AddEntityFrameworkStores<InetDbContext>()
           .AddDefaultTokenProviders();
+        services.Configure<DataProtectionTokenProviderOptions>(opt =>
+      opt.TokenLifespan = TimeSpan.FromHours(2));
 
         services.AddScoped<IAuthenticationService, AuthenticationService>();
         services.AddTransient<IJwtTokenService, JwtTokenService>();
