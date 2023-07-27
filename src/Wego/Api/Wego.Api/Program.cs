@@ -3,8 +3,6 @@ using Hellang.Middleware.ProblemDetails;
 using Microsoft.AspNetCore.Identity;
 
 using Serilog;
-
-using Wego.Api.Middleware;
 using Wego.Application;
 using Wego.Application.Models.Authentification;
 using Wego.Identity;
@@ -36,7 +34,7 @@ builder.Services.AddCustomHealthCheck(builder.Configuration)
 builder.Services.AddControllers();
 builder.Services.AddEndpointsApiExplorer();
 builder.Services.AddSwaggerGen();
-builder.Services.AddSwagger();
+builder.Services.AddSwagger("Web api");
 builder.Services.AddCors(options =>
 {
     options.AddPolicy("Open", builder => builder.AllowAnyOrigin().AllowAnyHeader().AllowAnyMethod());

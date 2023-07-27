@@ -2,7 +2,6 @@
 
   <PropertyGroup>
     <TargetFramework>net7.0</TargetFramework>
-    <Nullable>enable</Nullable>
     <ImplicitUsings>enable</ImplicitUsings>
     <Configurations>Debug;Release;Prod;Production</Configurations>
     <AspNetCoreHostingModel>OutOfProcess</AspNetCoreHostingModel>
