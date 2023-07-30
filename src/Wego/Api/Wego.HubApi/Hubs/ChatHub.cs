@@ -1,12 +1,7 @@
-﻿using k8s.KubeConfigModels;
-using Microsoft.AspNetCore.SignalR;
-using System;
-using System.Threading.Tasks;
+﻿using Microsoft.AspNetCore.SignalR;
+
 using Wego.Application.Contracts.Common;
-using Wego.Application.Features.Chat;
 using Wego.Application.Models.Chat;
-using Wego.Application.Models.Common;
-using Wego.Domain.Entities;
 
 namespace Wego.HubApi.Hubs
 {
@@ -44,8 +39,8 @@ namespace Wego.HubApi.Hubs
         public async Task CreateDirectChat(MessageModel message)
         {
             var toConnectionId = await _chatService.GetConnectionIdByProfileId(message.ProfileToId);
-            if(toConnectionId is not null)
-            await Clients.Client(toConnectionId).SendAsync("OpenPrivateChat", message);
+            if (toConnectionId is not null)
+                await Clients.Client(toConnectionId).SendAsync("OpenPrivateChat", message);
             await _chatService.SaveMesssage(message);
         }
 
@@ -76,6 +71,6 @@ namespace Wego.HubApi.Hubs
             await Groups.RemoveFromGroupAsync(toConnectionId, privateGroupName);
         }
 
-      
+
     }
 }
