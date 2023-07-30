@@ -1,12 +1,6 @@
-﻿using k8s.KubeConfigModels;
-using Microsoft.AspNetCore.SignalR;
-using System;
-using System.Threading.Tasks;
-using Wego.Application.Contracts.Common;
-using Wego.Application.Features.Chat;
-using Wego.Application.Models.Chat;
-using Wego.Application.Models.Common;
-using Wego.Domain.Entities;
+﻿using Microsoft.AspNetCore.SignalR;
+using Wego.HubApi.Models;
+using Wego.HubApi.Services;
 
 namespace Wego.HubApi.Hubs
 {
@@ -36,12 +30,12 @@ namespace Wego.HubApi.Hubs
             await _chatService.AddUserConnectionId(profileId, Context.ConnectionId);
         }
 
-        public async Task ReceiveMessage(MessageModel message)
+        public async Task ReceiveMessage(ChatMessageModel message)
         {
             await Clients.Group(GroupName).SendAsync("NewMessage", message);
         }
 
-        public async Task CreateDirectChat(MessageModel message)
+        public async Task CreateDirectChat(ChatMessageModel message)
         {
             var toConnectionId = await _chatService.GetConnectionIdByProfileId(message.ProfileToId);
             if(toConnectionId is not null)
@@ -49,7 +43,7 @@ namespace Wego.HubApi.Hubs
             await _chatService.SaveMesssage(message);
         }
 
-        public async Task CreatePrivateChat(MessageModel message)
+        public async Task CreatePrivateChat(ChatMessageModel message)
         {
             string privateGroupName = _chatService.GetPrivateGroupName(message.ProfileFromId, message.ProfileToId);
             await Groups.AddToGroupAsync(Context.ConnectionId, privateGroupName);
@@ -60,7 +54,7 @@ namespace Wego.HubApi.Hubs
             await Clients.Client(toConnectionId).SendAsync("OpenPrivateChat", message);
         }
 
-        public async Task RecivePrivateMessage(MessageModel message)
+        public async Task RecivePrivateMessage(ChatMessageModel message)
         {
             string privateGroupName = _chatService.GetPrivateGroupName(message.ProfileFromId, message.ProfileToId);
             await Clients.Group(privateGroupName).SendAsync("NewPrivateMessage", message);

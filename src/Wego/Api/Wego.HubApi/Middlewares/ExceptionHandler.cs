@@ -2,9 +2,8 @@
 
 using System.Net;
 
-using Wego.Application.Exceptions;
 
-namespace Wego.Api.Middleware;
+namespace Wego.HubApi.Middlewares;
 
 public class ExceptionHandlerMiddleware
 {
@@ -34,24 +33,7 @@ public class ExceptionHandlerMiddleware
         context.Response.ContentType = "application/json";
 
         var result = string.Empty;
-
-        switch (exception)
-        {
-            case ValidationException validationException:
-                httpStatusCode = HttpStatusCode.BadRequest;
-                result = JsonConvert.SerializeObject(validationException.ValdationErrors);
-                break;
-            case BadRequestException badRequestException:
-                httpStatusCode = HttpStatusCode.BadRequest;
-                result = badRequestException.Message;
-                break;
-            case NotFoundException notFoundException:
-                httpStatusCode = HttpStatusCode.NotFound;
-                break;
-            case Exception ex:
-                httpStatusCode = HttpStatusCode.BadRequest;
-                break;
-        }
+        httpStatusCode = HttpStatusCode.BadRequest;
 
         context.Response.StatusCode = (int)httpStatusCode;
 

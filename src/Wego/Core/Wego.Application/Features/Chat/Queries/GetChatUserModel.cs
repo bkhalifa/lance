@@ -5,9 +5,9 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 
-namespace Wego.Application.Models.Chat
+namespace Wego.Application.Features.Chat.Queries
 {
-    public class CandidateModel
+    public class GetChatUserModel
     {
         public long Id { get; set; }
 

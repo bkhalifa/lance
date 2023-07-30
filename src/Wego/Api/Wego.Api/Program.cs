@@ -43,11 +43,11 @@ builder.Services.AddCors(options =>
 
 var app = builder.Build();
 
-if (app.Environment.IsDevelopment())
-{
-    app.UseSwagger();
-    app.UseSwaggerUI();
-}
+//if (app.Environment.IsDevelopment())
+//{
+//    app.UseSwagger();
+//    app.UseSwaggerUI();
+//}
 
 app.UseSerilogRequestLogging();
 app.UseHttpsRedirection();
@@ -62,11 +62,12 @@ app.UseSwaggerUI(c =>
 });
 
 app.UseResponseCompression();
-
+app.UseSecureHttpHeader();
 app.UseCors("Open");
 app.UseAuthorization();
 app.MapControllers();
 app.UseCustomHealthCheck();
+//app.UseSecureHttpHeader();
 
 using (var scope = app.Services.CreateScope())
 {
