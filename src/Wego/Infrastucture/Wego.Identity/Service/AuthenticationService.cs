@@ -133,7 +133,7 @@ public class AuthenticationService : IAuthenticationService
             await _candidateRepository.AddAsync(new Candidate
             {
                 CandidateEmail = request.Email,
-                CandidateName = request.Email.SplitMail(),
+                CandidateName = request.Email.Substring(0,request.Email.IndexOf("@")),
                 IsConnected = false,
                 ProfileId = resultProfile.Id,
             });
