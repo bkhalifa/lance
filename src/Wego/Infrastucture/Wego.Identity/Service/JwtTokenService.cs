@@ -38,7 +38,7 @@ namespace Wego.Identity.Service
             new Claim(JwtRegisteredClaimNames.Sub, user.UserName),
             new Claim(JwtRegisteredClaimNames.Jti, Guid.NewGuid().ToString()),
             new Claim(JwtRegisteredClaimNames.Email, user.Email),
-            new Claim("uid", user.Id)
+            new Claim("uid", user.Id),
             }
             .Union(userClaims);
 

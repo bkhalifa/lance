@@ -7,6 +7,7 @@ using Wego.Application.Behaviours;
 using Wego.Application.Contracts;
 using Wego.Application.Contracts.Common;
 using Wego.Application.Features;
+using Wego.Application.Features.Chat;
 using Wego.Application.Features.Common;
 using Wego.Application.Models.Mail;
 
@@ -20,6 +21,7 @@ public static class ApplicationServiceRegistration
         services.AddTransient(typeof(IPipelineBehavior<,>), typeof(UnhandledExceptionBehaviour<,>));
         services.AddTransient<ILoggedInUserService, LoggedInUserService>();
         services.AddScoped<IEmailSender, EmailSender>();
+        services.AddScoped<IChatService, ChatService>();
         services.Configure<EmailSettings>(configuration.GetSection(nameof(EmailSettings)));
         return services;
     }

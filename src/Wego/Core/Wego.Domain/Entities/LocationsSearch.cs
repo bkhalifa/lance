@@ -16,21 +16,23 @@ public partial class LocationsSearch
 
     [StringLength(10)]
     [Unicode(false)]
-    public string? ZipCode { get; set; }
+    public string ZipCode { get; set; }
 
+    [Required]
     [StringLength(50)]
     [Unicode(false)]
-    public string Code { get; set; } = null!;
+    public string Code { get; set; }
 
+    [Required]
     [StringLength(50)]
     [Unicode(false)]
-    public string Name { get; set; } = null!;
+    public string Name { get; set; }
 
     public short LocationType { get; set; }
 
     [StringLength(50)]
     [Unicode(false)]
-    public string? ParentName { get; set; }
+    public string ParentName { get; set; }
 
     public bool? IsPriority { get; set; }
 

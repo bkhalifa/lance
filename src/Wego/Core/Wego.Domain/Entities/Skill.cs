@@ -13,10 +13,10 @@ public partial class Skill
     public long Id { get; set; }
 
     [StringLength(100)]
-    public string? Name { get; set; }
+    public string Name { get; set; }
 
     [StringLength(100)]
-    public string? Code { get; set; }
+    public string Code { get; set; }
 
     [ForeignKey("SkillId")]
     [InverseProperty("Skills")]

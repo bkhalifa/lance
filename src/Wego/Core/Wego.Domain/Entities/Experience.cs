@@ -13,13 +13,13 @@ public partial class Experience
     public long Id { get; set; }
 
     [StringLength(450)]
-    public string? Subject { get; set; }
+    public string Subject { get; set; }
 
     [StringLength(250)]
-    public string? Role { get; set; }
+    public string Role { get; set; }
 
     [StringLength(250)]
-    public string? CompanyName { get; set; }
+    public string CompanyName { get; set; }
 
     [Column(TypeName = "datetime")]
     public DateTime? StartDate { get; set; }
@@ -29,21 +29,22 @@ public partial class Experience
 
     public long UserProfileId { get; set; }
 
-    public string? Skills { get; set; }
+    public string Skills { get; set; }
 
     public int StartYear { get; set; }
 
     public int? EndYear { get; set; }
 
+    [Required]
     [StringLength(20)]
     [Unicode(false)]
-    public string StartMounth { get; set; } = null!;
+    public string StartMounth { get; set; }
 
     [StringLength(20)]
     [Unicode(false)]
-    public string? EndMounth { get; set; }
+    public string EndMounth { get; set; }
 
     [ForeignKey("UserProfileId")]
     [InverseProperty("Experiences")]
-    public virtual UserProfile UserProfile { get; set; } = null!;
+    public virtual UserProfile UserProfile { get; set; }
 }

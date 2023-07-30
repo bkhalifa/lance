@@ -1,7 +1,6 @@
 using Hellang.Middleware.ProblemDetails;
 
 using Serilog;
-
 using Wego.Api.Middleware;
 using Wego.Application;
 using Wego.Identity;
@@ -15,9 +14,9 @@ var builder = WebApplication.CreateBuilder(args);
 
 Log.Logger = new LoggerConfiguration()
    .ReadFrom.Configuration(builder.Configuration).CreateBootstrapLogger();
-builder.Host.UseLogging(builder.Configuration);
+builder.Host.UseLogging(builder.Configuration,"WegoApi");
 
-
+builder.Services.AddHttpContextAccessor();
 builder.Services.AddDistributedMemoryCache();
 builder.Services.AddResponseCompression(options => { options.EnableForHttps = true; });
 builder.Services.AddApplicationServices(builder.Configuration);
@@ -66,11 +65,10 @@ app.UseAuthentication();
 app.UseSwagger();
 app.UseSwaggerUI(c =>
 {
-    c.SwaggerEndpoint("../swagger/v1/swagger.json", "Wego API");
+    c.SwaggerEndpoint("../swagger/v1/swagger.json", "Wego Api");
 });
 
 app.UseResponseCompression();
-app.UseSerilogRequestLogging();
 
 
 app.UseAuthorization();

@@ -13,13 +13,13 @@ public partial class OffersSearch
     public long Id { get; set; }
 
     [StringLength(100)]
-    public string? Title { get; set; }
+    public string Title { get; set; }
 
     [StringLength(500)]
-    public string? Description { get; set; }
+    public string Description { get; set; }
 
     [StringLength(100)]
-    public string? CustomerName { get; set; }
+    public string CustomerName { get; set; }
 
     [Column(TypeName = "decimal(18, 0)")]
     public decimal? AmountMin { get; set; }
@@ -29,30 +29,30 @@ public partial class OffersSearch
 
     [StringLength(5)]
     [Unicode(false)]
-    public string? AmountUnit { get; set; }
+    public string AmountUnit { get; set; }
 
     public int? Duration { get; set; }
 
     [StringLength(100)]
-    public string? LocationCode { get; set; }
+    public string LocationCode { get; set; }
 
     [StringLength(50)]
-    public string? LocationName { get; set; }
+    public string LocationName { get; set; }
 
     [StringLength(50)]
-    public string? ContractTypeCode { get; set; }
+    public string ContractTypeCode { get; set; }
 
     [StringLength(50)]
-    public string? SeniorityCode { get; set; }
+    public string SeniorityCode { get; set; }
 
     [StringLength(100)]
-    public string? WorkTypeCode { get; set; }
+    public string WorkTypeCode { get; set; }
 
     [StringLength(500)]
-    public string? SkillCodes { get; set; }
+    public string SkillCodes { get; set; }
 
     [StringLength(500)]
-    public string? SkillNames { get; set; }
+    public string SkillNames { get; set; }
 
     [Column(TypeName = "datetime")]
     public DateTime? CreatedDate { get; set; }

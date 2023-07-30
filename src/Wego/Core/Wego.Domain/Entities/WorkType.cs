@@ -13,10 +13,10 @@ public partial class WorkType
     public long Id { get; set; }
 
     [StringLength(50)]
-    public string? Name { get; set; }
+    public string Name { get; set; }
 
     [StringLength(50)]
-    public string? Code { get; set; }
+    public string Code { get; set; }
 
     [InverseProperty("WorkType")]
     public virtual ICollection<Offer> Offers { get; set; } = new List<Offer>();

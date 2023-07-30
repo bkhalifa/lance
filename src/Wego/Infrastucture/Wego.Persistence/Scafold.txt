@@ -1,1 +1,1 @@
-﻿Scaffold-DbContext "Data Source=.\sqlexpress;Initial Catalog=porto;Trusted_Connection=True;TrustServerCertificate=True" Microsoft.EntityFrameworkCore.SqlServer -Project Wego.Doamin -StartupProject Wego.Api -OutputDir Entities -ContextDir EF -Context PortoDbContext -force -DataAnnotations
+﻿Scaffold-DbContext "Data Source=.\sqlexpress;Initial Catalog=porto;Trusted_Connection=True;TrustServerCertificate=True" Microsoft.EntityFrameworkCore.SqlServer -Project Wego.Domain -StartupProject Wego.Api -OutputDir Entities -ContextDir EF -Context PortoDbContext -force -DataAnnotations

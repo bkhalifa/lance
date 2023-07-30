@@ -24,10 +24,10 @@ namespace Wego.Application.Features.OfferProfile.Commands
 
         public async Task<Unit> Handle(AddOfferFavoriteCommand command, CancellationToken cancellationToken)
         {
-            var profile = await _userProfile.SingleOrDefaultAsync(x => x.Email == _currentContext.Identity.Email);
+            var profile = await _userProfile.FirstOrDefaultAsync(x => x.Email == _currentContext.Identity.Email);
             if (profile == null) throw new UserNotFoundException($"Email '{_currentContext.Identity.Email}' not found");
 
-            var favorite = await _favoriteRepository.SingleOrDefaultAsync(x => x.OfferId == command.OfferId && x.ProfileId == profile.Id);
+            var favorite = await _favoriteRepository.FirstOrDefaultAsync(x => x.OfferId == command.OfferId && x.ProfileId == profile.Id);
 
             if (favorite == null)
                 await _favoriteRepository.AddAsync(new OfferProfileFavorite

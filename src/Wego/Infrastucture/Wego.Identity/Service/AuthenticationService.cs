@@ -27,6 +27,7 @@ public class AuthenticationService : IAuthenticationService
     private readonly IEmailSender _emailSender;
     private readonly ICurrentContext _currentContext;
     private readonly IBaseRepository<UserProfile> _profileRepository;
+    private readonly IBaseRepository<Candidate> _candidateRepository;
 
     public AuthenticationService(UserManager<ApplicationUser> userManager,
         SignInManager<ApplicationUser> signInManager,
@@ -34,7 +35,8 @@ public class AuthenticationService : IAuthenticationService
          ILogger<IAuthenticationService> logger,
          IEmailSender emailSender,
          ICurrentContext currentContext,
-         IBaseRepository<UserProfile> profileRepository
+         IBaseRepository<UserProfile> profileRepository,
+         IBaseRepository<Candidate> candidateRepository
          )
     {
         _userManager = userManager;
@@ -44,6 +46,7 @@ public class AuthenticationService : IAuthenticationService
         _emailSender = emailSender;
         _currentContext = currentContext;
         _profileRepository = profileRepository;
+        _candidateRepository = candidateRepository;
     }
 
     public async Task<AuthenticationResponse> LoginAsync(AuthenticationRequest request)
@@ -61,12 +64,16 @@ public class AuthenticationService : IAuthenticationService
         if (!result.Succeeded)
             throw new CredentialInvalidException($"Credentials for '{request.Email} aren't valid'.");
 
+        var profile = await _profileRepository.FirstOrDefaultAsync(x => x.Email == request.Email).ConfigureAwait(false);
+        if (profile is null)
+            throw new UserNotFoundException($"User profile not found for '{request.Email}.");
 
         var jwtSecurityToken = await _jwtTokenService.GenerateTokenAsync(user);
 
         return new AuthenticationResponse
         {
             Id = user.Id,
+            ProfileId = profile.Id,
             Token = jwtSecurityToken.AccessToken,
             InitialUserName = request.Email.GetInitials(),
             RefreshToken = jwtSecurityToken.RefreshToken,
@@ -83,7 +90,7 @@ public class AuthenticationService : IAuthenticationService
         if (existingUser is not null)
             throw new UserAlreadyExistsException($"Email '{request.Email}' already exists.");
 
-        var profile = await _profileRepository.SingleOrDefaultAsync(x => x.Email == request.Email);
+        var profile = await _profileRepository.FirstOrDefaultAsync(x => x.Email == request.Email);
 
         if (profile is not null)
             throw new UserAlreadyExistsException($"Email '{request.Email}' already exists.");
@@ -96,43 +103,51 @@ public class AuthenticationService : IAuthenticationService
         };
 
         var result = await _userManager.CreateAsync(user, request.Password);
-        
-        if (result.Succeeded)
-            {
-                var code = await _userManager.GenerateEmailConfirmationTokenAsync(user);
 
-                var param = new Dictionary<string, string>
+        if (result.Succeeded)
+        {
+            var code = await _userManager.GenerateEmailConfirmationTokenAsync(user);
+
+            var param = new Dictionary<string, string>
                 {
                     {"id",  WebEncoders.Base64UrlEncode(Encoding.UTF8.GetBytes(user.Id)) },
                     {"code",  WebEncoders.Base64UrlEncode(Encoding.UTF8.GetBytes(code)) },
                 };
-                var callback = QueryHelpers.AddQueryString(request.ClientURI!, param);
+            var callback = QueryHelpers.AddQueryString(request.ClientURI!, param);
 
-                await _emailSender.SendMailAsync(new Email(user.Email, "Confirm your Account",
-                    $"Please confirm your account by <a href='{HtmlEncoder.Default.Encode(callback)}'>click here</a>."));
+            await _emailSender.SendMailAsync(new Email(user.Email, "Confirm your Account",
+                $"Please confirm your account by <a href='{HtmlEncoder.Default.Encode(callback)}'>click here</a>."));
 
-                _logger.LogInformation("User Created: {email}", user.Email);
+            _logger.LogInformation("User Created: {email}", user.Email);
 
-                var resultProfile = await _profileRepository.AddAsync(new UserProfile
-                {
-                    UserId = user.Id,
-                    Email = request.Email,
-                    UsId = String.Concat(request.Email.SplitMail(), IdentityHelpers.GetRandomId()),
-                    InitialUserName = request.Email.GetInitials(),
-                    CreationDate = DateTime.UtcNow,
-                    UpdateDate = DateTime.UtcNow,
-                });
+            var resultProfile = await _profileRepository.AddAsync(new UserProfile
+            {
+                UserId = user.Id,
+                Email = request.Email,
+                UsId = string.Concat(request.Email.SplitMail(), IdentityHelpers.GetRandomId()),
+                InitialUserName = request.Email.GetInitials(),
+                CreationDate = DateTime.UtcNow,
+                UpdateDate = DateTime.UtcNow,
+            });
 
-                return new RegistrationResponse()
-                {
-                    Email = user.Email!,
-                    ConfirmedMail = false,
-                    InitialUserName = resultProfile.InitialUserName!
-                };
-            }
+            await _candidateRepository.AddAsync(new Candidate
+            {
+                CandidateEmail = request.Email,
+                CandidateName = request.Email.Substring(0,request.Email.IndexOf("@")),
+                IsConnected = false,
+                ProfileId = resultProfile.Id,
+            });
+
+            return new RegistrationResponse()
+            {
+                Email = user.Email!,
+                ConfirmedMail = false,
+                InitialUserName = resultProfile.InitialUserName!
+            };
+        }
 
         throw new ValidationException(result.Errors.ToDictionary(x => x.Code, x => x.Description));
-   
+
 
     }
     public async Task<RegistrationResponse> ConfirmRegistration(ConfirmRegisterModel request)
@@ -155,7 +170,7 @@ public class AuthenticationService : IAuthenticationService
 
         if (result.Succeeded)
         {
-            var resultProfile = await _profileRepository.SingleOrDefaultAsync(x => x.UserId.Equals(encodedUserId)).ConfigureAwait(false);
+            var resultProfile = await _profileRepository.FirstOrDefaultAsync(x => x.UserId.Equals(encodedUserId)).ConfigureAwait(false);
 
             if (resultProfile is null)
                 throw new UserNotFoundException($"Profile not found .");
@@ -224,7 +239,7 @@ public class AuthenticationService : IAuthenticationService
         var result = await _userManager.ResetPasswordAsync(user, encodedCode, request.Password);
         if (result.Succeeded)
         {
-            if(user.EmailConfirmed == false)
+            if (user.EmailConfirmed == false)
             {
                 var code = await _userManager.GenerateEmailConfirmationTokenAsync(user);
                 await _userManager.ConfirmEmailAsync(user, code);
@@ -233,7 +248,7 @@ public class AuthenticationService : IAuthenticationService
             await _emailSender.SendMailAsync(new Email(user.Email!, "Reset Password Ok",
            $"Reset Password are Ok !"));
 
-            var resultProfile = await _profileRepository.SingleOrDefaultAsync(x => x.Email.Equals(request.Email)).ConfigureAwait(false);
+            var resultProfile = await _profileRepository.FirstOrDefaultAsync(x => x.Email.Equals(request.Email)).ConfigureAwait(false);
 
             if (resultProfile is null)
                 throw new UserNotFoundException($"Profile not found .");
@@ -267,6 +282,10 @@ public class AuthenticationService : IAuthenticationService
 
         var user = await _userManager.FindByEmailAsync(userName);
         if (user == null) throw new UserNotFoundException($"Email '{_currentContext.Identity.Email}' not found");
+
+        var profile = await _profileRepository.FirstOrDefaultAsync(x => x.Email == user.Email).ConfigureAwait(false);
+        if (profile is null)
+            throw new UserNotFoundException($"User profile not found for '{user.Email}.");
 
         return await _jwtTokenService.GenerateTokenAsync(user);
     }
