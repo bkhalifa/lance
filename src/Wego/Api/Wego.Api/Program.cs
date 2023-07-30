@@ -1,6 +1,9 @@
 using Hellang.Middleware.ProblemDetails;
 
 using Serilog;
+
+using System.Threading.RateLimiting;
+
 using Wego.Api.Middleware;
 using Wego.Application;
 using Wego.Identity;
@@ -11,7 +14,37 @@ using Wego.Persistence;
 using Wego.Persistence.EF;
 
 var builder = WebApplication.CreateBuilder(args);
+builder.Services.AddRateLimiter(options =>
+{
+    options.GlobalLimiter = PartitionedRateLimiter.Create<HttpContext, string>(httpContext =>
+        RateLimitPartition.GetFixedWindowLimiter(
+            partitionKey: httpContext.User.Identity?.Name ?? httpContext.Request.Headers.Host.ToString(),
+            factory: partition => new FixedWindowRateLimiterOptions
+            {
+                AutoReplenishment = true,
+                PermitLimit = 600,
+                QueueLimit = 0,
+                Window = TimeSpan.FromMinutes(1),
+            }));
+    options.RejectionStatusCode = 429;
+    options.OnRejected = async (context, token) =>
+    {
+        context.HttpContext.Response.StatusCode = 429;
+        if (context.Lease.TryGetMetadata(MetadataName.RetryAfter, out var retryAfter))
+        {
+            await context.HttpContext.Response.WriteAsync(
+                $"Too many requests. Please try again after {retryAfter.TotalMinutes} minute(s). " +
+                $"...", cancellationToken: token);
+        }
+        else
+        {
+            await context.HttpContext.Response.WriteAsync(
+                "Too many requests. Please try again later. " +
+                "...", cancellationToken: token);
+        }
+    };
 
+});
 Log.Logger = new LoggerConfiguration()
    .ReadFrom.Configuration(builder.Configuration).CreateBootstrapLogger();
 builder.Host.UseLogging(builder.Configuration,"WegoApi");
@@ -61,6 +94,7 @@ app.UseCors("_tekoPolicy");
 
 app.UseProblemDetails();
 app.UseRouting();
+app.UseRateLimiter();
 app.UseAuthentication();
 app.UseSwagger();
 app.UseSwaggerUI(c =>
