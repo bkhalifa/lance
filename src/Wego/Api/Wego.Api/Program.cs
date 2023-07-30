@@ -31,7 +31,7 @@ builder.Services.AddCustomHealthCheck(builder.Configuration)
 builder.Services.AddControllers();
 builder.Services.AddEndpointsApiExplorer();
 builder.Services.AddSwaggerGen();
-builder.Services.AddSwagger();
+builder.Services.AddSwagger("WegoApi");
 
 builder.Services.AddCors(options =>
 {
