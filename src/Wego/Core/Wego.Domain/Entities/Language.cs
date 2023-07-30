@@ -13,14 +13,14 @@ public partial class Language
     public long Id { get; set; }
 
     [StringLength(100)]
-    public string? Laguage { get; set; }
+    public string Laguage { get; set; }
 
     [StringLength(50)]
-    public string? Level { get; set; }
+    public string Level { get; set; }
 
     public long UserProfileId { get; set; }
 
     [ForeignKey("UserProfileId")]
     [InverseProperty("Languages")]
-    public virtual UserProfile UserProfile { get; set; } = null!;
+    public virtual UserProfile UserProfile { get; set; }
 }

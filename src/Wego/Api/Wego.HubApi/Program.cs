@@ -1,12 +1,9 @@
 using Hellang.Middleware.ProblemDetails;
 
-using Microsoft.AspNetCore.Identity;
 
 using Serilog;
 using Wego.Application;
-using Wego.Application.Models.Authentification;
-using Wego.Identity;
-using Wego.Identity.Seed;
+using Wego.HubApi.Hubs;
 using Wego.Infrastructure.Extensions;
 using Wego.Infrastructure.HealthCheck;
 using Wego.Infrastructure.Logging;
@@ -17,24 +14,21 @@ var builder = WebApplication.CreateBuilder(args);
 
 Log.Logger = new LoggerConfiguration()
    .ReadFrom.Configuration(builder.Configuration).CreateBootstrapLogger();
-builder.Host.UseLogging(builder.Configuration,"WegoApi");
+builder.Host.UseLogging(builder.Configuration,"NotificationHub");
 
-builder.Services.AddHttpContextAccessor();
 builder.Services.AddDistributedMemoryCache();
 builder.Services.AddResponseCompression(options => { options.EnableForHttps = true; });
 builder.Services.AddApplicationServices(builder.Configuration);
 builder.Services.AddInfrastructureServices(builder.Configuration);
 builder.Services.AddPersistenceServices(builder.Configuration);
-builder.Services.AddIdentityServices(builder.Configuration);
 builder.Services.AddCustomProblemDetails(builder.Environment);
-builder.Services.AddCustomHealthCheck(builder.Configuration)
-    .AddDbContextCheck<InetDbContext>()
-    .AddDbContextCheck<PortoDbContext>();
 
+builder.Services.AddHttpContextAccessor();
 builder.Services.AddControllers();
+builder.Services.AddSignalR();
 builder.Services.AddEndpointsApiExplorer();
 builder.Services.AddSwaggerGen();
-builder.Services.AddSwagger("WegoApi");
+builder.Services.AddSwagger("Notification hub");
 builder.Services.AddCors(options =>
 {
     options.AddPolicy("Open", builder => builder.AllowAnyOrigin().AllowAnyHeader().AllowAnyMethod());
@@ -52,34 +46,16 @@ app.UseSerilogRequestLogging();
 app.UseHttpsRedirection();
 app.UseProblemDetails();
 app.UseRouting();
-app.UseAuthentication();
 app.UseSwagger();
 app.UseSwaggerUI(c =>
 {
-    c.SwaggerEndpoint("../swagger/v1/swagger.json", "Wego Api");
+    c.SwaggerEndpoint("../swagger/v1/swagger.json", "Notification Hub");
 });
 
 app.UseResponseCompression();
 
 app.UseCors("Open");
-app.UseAuthorization();
 app.MapControllers();
-app.UseCustomHealthCheck();
-
-using (var scope = app.Services.CreateScope())
-{
-    var services = scope.ServiceProvider;
-    var loggerFactory = services.GetRequiredService<ILoggerFactory>();
-    try
-    {
-        var userManager = services.GetRequiredService<UserManager<ApplicationUser>>();
-        await UserCreator.SeedAsync(userManager);
-        Log.Information("Application Starting");
-    }
-    catch (Exception ex)
-    {
-        Log.Warning(ex, "An error occured while starting the application");
-    }
-}
+app.MapHub<ChatHub>("/hubs/chat");
 
 app.Run();

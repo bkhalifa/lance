@@ -13,10 +13,10 @@ public partial class TrainShip
     public long Id { get; set; }
 
     [StringLength(100)]
-    public string? Title { get; set; }
+    public string Title { get; set; }
 
     [StringLength(100)]
-    public string? Diploma { get; set; }
+    public string Diploma { get; set; }
 
     public int? Year { get; set; }
 
@@ -24,5 +24,5 @@ public partial class TrainShip
 
     [ForeignKey("UserProfileId")]
     [InverseProperty("TrainShips")]
-    public virtual UserProfile UserProfile { get; set; } = null!;
+    public virtual UserProfile UserProfile { get; set; }
 }

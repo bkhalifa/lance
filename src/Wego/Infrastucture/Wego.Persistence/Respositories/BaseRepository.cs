@@ -19,7 +19,7 @@ public class BaseRepository<T> : IBaseRepository<T> where T : class
     }
 
 
-    public async Task<T?> GetAsync(object? id, int cacheDurationMinutes = 0, CancellationToken cancellationToken = default)
+    public async Task<T> GetAsync(object id, int cacheDurationMinutes = 0, CancellationToken cancellationToken = default)
     {
         var func = _dbContext.Set<T>().FindAsync(id);
         if (cacheDurationMinutes == 0)
@@ -37,7 +37,7 @@ public class BaseRepository<T> : IBaseRepository<T> where T : class
             return await _cache.GetAsync<IEnumerable<T>>($"{nameof(T)}s", async () => await func, cacheDurationMinutes, cancellationToken);
     }
 
-    public async Task<IEnumerable<T>> FindAsync(Expression<Func<T, bool>> predicate, string? cacheKey = null, int cacheDurationMinutes = 0, CancellationToken cancellationToken = default)
+    public async Task<IEnumerable<T>> FindAsync(Expression<Func<T, bool>> predicate, string cacheKey = null, int cacheDurationMinutes = 0, CancellationToken cancellationToken = default)
     {
         var func = _dbContext.Set<T>().AsNoTracking().Where(predicate).ToListAsync(); ;
         if (cacheDurationMinutes == 0)
@@ -46,9 +46,9 @@ public class BaseRepository<T> : IBaseRepository<T> where T : class
             return await _cache.GetAsync<IEnumerable<T>>(cacheKey, async () => await func, cacheDurationMinutes, cancellationToken);
     }
 
-    public async Task<T?> SingleOrDefaultAsync(Expression<Func<T, bool>> predicate, string? cacheKey = null, int cacheDurationMinutes = 0, CancellationToken cancellationToken = default)
+    public async Task<T> FirstOrDefaultAsync(Expression<Func<T, bool>> predicate, string cacheKey = null, int cacheDurationMinutes = 0, CancellationToken cancellationToken = default)
     {
-        var func = _dbContext.Set<T>().AsNoTracking().SingleOrDefaultAsync(predicate);
+        var func = _dbContext.Set<T>().AsNoTracking().FirstOrDefaultAsync(predicate);
         if (cacheDurationMinutes == 0)
             return await func;
         else

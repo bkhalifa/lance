@@ -13,10 +13,10 @@ public partial class Region
     public int Id { get; set; }
 
     [StringLength(50)]
-    public string? Code { get; set; }
+    public string Code { get; set; }
 
     [StringLength(50)]
-    public string? Name { get; set; }
+    public string Name { get; set; }
 
     public int? CountryId { get; set; }
 
@@ -25,5 +25,5 @@ public partial class Region
 
     [ForeignKey("CountryId")]
     [InverseProperty("Regions")]
-    public virtual Country? Country { get; set; }
+    public virtual Country Country { get; set; }
 }

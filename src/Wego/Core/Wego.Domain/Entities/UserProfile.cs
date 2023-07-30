@@ -1,7 +1,8 @@
-﻿using Microsoft.EntityFrameworkCore;
-
+﻿using System;
+using System.Collections.Generic;
 using System.ComponentModel.DataAnnotations;
 using System.ComponentModel.DataAnnotations.Schema;
+using Microsoft.EntityFrameworkCore;
 
 namespace Wego.Domain.Entities;
 
@@ -12,23 +13,22 @@ public partial class UserProfile
     [Key]
     public long Id { get; set; }
 
+    [Required]
     [StringLength(450)]
-    public string UserId { get; set; } = null!;
+    public string UserId { get; set; }
 
     [StringLength(250)]
-    public string? FirstName { get; set; }
+    public string FirstName { get; set; }
 
     [StringLength(250)]
-    public string? LastName { get; set; }
+    public string LastName { get; set; }
 
-    [StringLength(50)]
-    public string? InitialUserName { get; set; }
+    [Required]
+    [StringLength(250)]
+    public string Email { get; set; }
 
     [StringLength(250)]
-    public string Email { get; set; } = null!;
-
-    [StringLength(250)]
-    public string? Adress { get; set; }
+    public string Adress { get; set; }
 
     public int? PhoneNumber { get; set; }
 
@@ -44,46 +44,50 @@ public partial class UserProfile
     public DateTime UpdateDate { get; set; }
 
     [StringLength(100)]
-    public string? UsId { get; set; }
+    public string UsId { get; set; }
 
     [StringLength(100)]
     [Unicode(false)]
-    public string? Country { get; set; }
+    public string Country { get; set; }
 
     [StringLength(100)]
     [Unicode(false)]
-    public string? Region { get; set; }
+    public string Region { get; set; }
 
     [StringLength(100)]
     [Unicode(false)]
-    public string? City { get; set; }
+    public string City { get; set; }
 
     [StringLength(100)]
     [Unicode(false)]
-    public string? Position { get; set; }
+    public string Position { get; set; }
 
-    public string? Skills { get; set; }
+    public string Skills { get; set; }
 
-    public string? Comment { get; set; }
+    public string Comment { get; set; }
 
     [StringLength(100)]
     [Unicode(false)]
-    public string? Category { get; set; }
+    public string Category { get; set; }
 
     [StringLength(50)]
     [Unicode(false)]
-    public string? ContractType { get; set; }
+    public string ContractType { get; set; }
 
     [StringLength(50)]
     [Unicode(false)]
-    public string? CategoryType { get; set; }
+    public string CategoryType { get; set; }
 
-    public byte[]? Picture { get; set; }
+    public byte[] Picture { get; set; }
 
     public int Completion { get; set; }
 
+    [StringLength(50)]
+    [Unicode(false)]
+    public string InitialUserName { get; set; }
+
     [InverseProperty("UserProfile")]
-    public virtual Document? Document { get; set; }
+    public virtual Document Document { get; set; }
 
     [InverseProperty("UserProfile")]
     public virtual ICollection<Experience> Experiences { get; set; } = new List<Experience>();

@@ -19,7 +19,7 @@ namespace Wego.Application.Features.Offers.Queries
 
         public async Task<GetOfferByIdModel?> Handle(GetOfferByIdQuery request, CancellationToken cancellationToken)
         {
-            var result = await _repository.SingleOrDefaultAsync((x) => x.Id == request.Id, cancellationToken: cancellationToken);
+            var result = await _repository.FirstOrDefaultAsync((x) => x.Id == request.Id, cancellationToken: cancellationToken);
             return result?.MapTo<GetOfferByIdModel>();
         }
     }

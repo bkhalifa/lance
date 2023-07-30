@@ -12,7 +12,8 @@ public partial class FrancoCountry
 {
     public int Id { get; set; }
 
+    [Required]
     [StringLength(50)]
     [Unicode(false)]
-    public string Name { get; set; } = null!;
+    public string Name { get; set; }
 }

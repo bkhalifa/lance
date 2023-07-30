@@ -1,16 +1,20 @@
-﻿using Microsoft.AspNetCore.SignalR;
+﻿using k8s.KubeConfigModels;
+using Microsoft.AspNetCore.SignalR;
 using System;
 using System.Threading.Tasks;
+using Wego.Application.Contracts.Common;
 using Wego.Application.Features.Chat;
+using Wego.Application.Models.Chat;
 using Wego.Application.Models.Common;
+using Wego.Domain.Entities;
 
-namespace Wego.Api.Hubs
+namespace Wego.HubApi.Hubs
 {
     public class ChatHub : Hub
     {
         const string GroupName = "TekosJob";
-        private readonly ChatService _chatService;
-        public ChatHub(ChatService chatService)
+        private readonly IChatService _chatService;
+        public ChatHub(IChatService chatService)
         {
             _chatService = chatService;
         }
@@ -24,17 +28,12 @@ namespace Wego.Api.Hubs
         public override async Task OnDisconnectedAsync(Exception exception)
         {
             await Groups.RemoveFromGroupAsync(Context.ConnectionId, GroupName);
-            var user = _chatService.GetUserByConnectionId(Context.ConnectionId);
-            _chatService.RemoveUserFromList(user);
-            await DisplayOnlineUsers();
-
             await base.OnDisconnectedAsync(exception);
         }
 
-        public async Task AddUserConnectionId(string name)
+        public async Task AddUserConnectionId(int profileId)
         {
-            _chatService.AddUserConnectinId(name, Context.ConnectionId);
-            await DisplayOnlineUsers();
+            await _chatService.AddUserConnectionId(profileId, Context.ConnectionId);
         }
 
         public async Task ReceiveMessage(MessageModel message)
@@ -42,11 +41,19 @@ namespace Wego.Api.Hubs
             await Clients.Group(GroupName).SendAsync("NewMessage", message);
         }
 
+        public async Task CreateDirectChat(MessageModel message)
+        {
+            var toConnectionId = await _chatService.GetConnectionIdByProfileId(message.ProfileToId);
+            if(toConnectionId is not null)
+            await Clients.Client(toConnectionId).SendAsync("OpenPrivateChat", message);
+            await _chatService.SaveMesssage(message);
+        }
+
         public async Task CreatePrivateChat(MessageModel message)
         {
-            string privateGroupName = GetPrivateGroupName(message.From, message.To);
+            string privateGroupName = _chatService.GetPrivateGroupName(message.ProfileFromId, message.ProfileToId);
             await Groups.AddToGroupAsync(Context.ConnectionId, privateGroupName);
-            var toConnectionId = _chatService.GetConnectionIdByUser(message.To);
+            var toConnectionId = await _chatService.GetConnectionIdByProfileId(message.ProfileToId);
             await Groups.AddToGroupAsync(toConnectionId, privateGroupName);
 
             // opening private chatbox for the other end user
@@ -55,31 +62,20 @@ namespace Wego.Api.Hubs
 
         public async Task RecivePrivateMessage(MessageModel message)
         {
-            string privateGroupName = GetPrivateGroupName(message.From, message.To);
+            string privateGroupName = _chatService.GetPrivateGroupName(message.ProfileFromId, message.ProfileToId);
             await Clients.Group(privateGroupName).SendAsync("NewPrivateMessage", message);
         }
 
-        public async Task RemovePrivateChat(string from, string to)
+        public async Task RemovePrivateChat(int from, int to)
         {
-            string privateGroupName = GetPrivateGroupName(from, to);
+            string privateGroupName = _chatService.GetPrivateGroupName(from, to);
             await Clients.Group(privateGroupName).SendAsync("CloseProivateChat");
 
             await Groups.RemoveFromGroupAsync(Context.ConnectionId, privateGroupName);
-            var toConnectionId = _chatService.GetConnectionIdByUser(to);
+            var toConnectionId = await _chatService.GetConnectionIdByProfileId(to);
             await Groups.RemoveFromGroupAsync(toConnectionId, privateGroupName);
         }
 
-        private async Task DisplayOnlineUsers()
-        {
-            var onlineUsers = _chatService.GetOnlineUsers();
-            await Clients.Groups(GroupName).SendAsync("OnlineUsers", onlineUsers);
-        }
-
-        private string GetPrivateGroupName(string from, string to)
-        {
-            // from: john, to: david  "david-john"
-            var stringCompare = string.CompareOrdinal(from, to) < 0;
-            return stringCompare ? $"{from}-{to}" : $"{to}-{from}";
-        }
+      
     }
 }

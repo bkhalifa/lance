@@ -21,7 +21,7 @@ public static class ApplicationServiceRegistration
         services.AddTransient(typeof(IPipelineBehavior<,>), typeof(UnhandledExceptionBehaviour<,>));
         services.AddTransient<ILoggedInUserService, LoggedInUserService>();
         services.AddScoped<IEmailSender, EmailSender>();
-        services.AddSingleton<ChatService>();
+        services.AddScoped<IChatService, ChatService>();
         services.Configure<EmailSettings>(configuration.GetSection(nameof(EmailSettings)));
         return services;
     }

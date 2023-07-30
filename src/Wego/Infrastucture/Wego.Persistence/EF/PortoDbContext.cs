@@ -4,10 +4,11 @@ using Microsoft.EntityFrameworkCore;
 using Wego.Domain.Entities;
 
 namespace Wego.Persistence.EF;
-
 public partial class PortoDbContext : DbContext
 {
     public virtual DbSet<BusinessSkill> BusinessSkills { get; set; }
+
+    public virtual DbSet<Candidate> Candidates { get; set; }
 
     public virtual DbSet<Category> Categories { get; set; }
 
@@ -35,11 +36,15 @@ public partial class PortoDbContext : DbContext
 
     public virtual DbSet<Log> Logs { get; set; }
 
+    public virtual DbSet<Message> Messages { get; set; }
+
     public virtual DbSet<Offer> Offers { get; set; }
 
     public virtual DbSet<OfferProfileFavorite> OfferProfileFavorites { get; set; }
 
     public virtual DbSet<OffersSearch> OffersSearches { get; set; }
+
+    public virtual DbSet<Recruiter> Recruiters { get; set; }
 
     public virtual DbSet<Region> Regions { get; set; }
 
@@ -57,6 +62,13 @@ public partial class PortoDbContext : DbContext
 
     protected override void OnModelCreating(ModelBuilder modelBuilder)
     {
+        modelBuilder.Entity<Candidate>(entity =>
+        {
+            entity.HasKey(e => e.ProfileId).HasName("PK_Candidates_1");
+
+            entity.Property(e => e.ProfileId).ValueGeneratedNever();
+        });
+
         modelBuilder.Entity<City>(entity =>
         {
             entity.Property(e => e.Id).ValueGeneratedOnAdd();
@@ -144,6 +156,13 @@ public partial class PortoDbContext : DbContext
         modelBuilder.Entity<OfferProfileFavorite>(entity =>
         {
             entity.HasKey(e => new { e.ProfileId, e.OfferId }).HasName("PK_OfferUserFavorite");
+        });
+
+        modelBuilder.Entity<Recruiter>(entity =>
+        {
+            entity.HasKey(e => e.ProfileId).HasName("PK_Recruiters_1");
+
+            entity.Property(e => e.ProfileId).ValueGeneratedNever();
         });
 
         modelBuilder.Entity<Region>(entity =>

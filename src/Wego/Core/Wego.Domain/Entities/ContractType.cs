@@ -13,10 +13,10 @@ public partial class ContractType
     public long Id { get; set; }
 
     [StringLength(50)]
-    public string? Name { get; set; }
+    public string Name { get; set; }
 
     [StringLength(10)]
-    public string? Code { get; set; }
+    public string Code { get; set; }
 
     [InverseProperty("CatgeoryNavigation")]
     public virtual ICollection<Offer> Offers { get; set; } = new List<Offer>();

@@ -13,8 +13,8 @@ public partial class Seniority
     public short Id { get; set; }
 
     [StringLength(50)]
-    public string? Code { get; set; }
+    public string Code { get; set; }
 
     [StringLength(50)]
-    public string? Name { get; set; }
+    public string Name { get; set; }
 }

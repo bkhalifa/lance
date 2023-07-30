@@ -17,17 +17,17 @@ public partial class Document
 
     [StringLength(50)]
     [Unicode(false)]
-    public string? ContentType { get; set; }
+    public string ContentType { get; set; }
 
     [StringLength(250)]
     [Unicode(false)]
-    public string? DocName { get; set; }
+    public string DocName { get; set; }
 
-    public byte[]? FileData { get; set; }
+    public byte[] FileData { get; set; }
 
     [StringLength(50)]
     [Unicode(false)]
-    public string? Extension { get; set; }
+    public string Extension { get; set; }
 
     [Required]
     public bool? IsVisible { get; set; }
@@ -38,16 +38,17 @@ public partial class Document
     [Column(TypeName = "datetime")]
     public DateTime UpdateDate { get; set; }
 
+    [Required]
     [StringLength(450)]
-    public string UserId { get; set; } = null!;
+    public string UserId { get; set; }
 
     [StringLength(250)]
-    public string? FirstName { get; set; }
+    public string FirstName { get; set; }
 
     [StringLength(250)]
-    public string? LastName { get; set; }
+    public string LastName { get; set; }
 
     [ForeignKey("UserProfileId")]
     [InverseProperty("Document")]
-    public virtual UserProfile UserProfile { get; set; } = null!;
+    public virtual UserProfile UserProfile { get; set; }
 }

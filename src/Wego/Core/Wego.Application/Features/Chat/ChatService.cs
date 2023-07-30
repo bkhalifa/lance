@@ -1,78 +1,69 @@
-﻿using Microsoft.EntityFrameworkCore.Metadata.Internal;
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
+﻿
+using Wego.Application.Contracts.Common;
+using Wego.Application.Contracts.Persistence;
+using Wego.Application.Exceptions;
+using Wego.Application.Extensions;
+using Wego.Application.Models.Chat;
+using Wego.Domain.Entities;
 
 namespace Wego.Application.Features.Chat
 {
-    public class ChatService
+    public class ChatService : IChatService
     {
-        private static readonly Dictionary<string, string> Users = new Dictionary<string, string>();
 
-
-        public bool AddUserToList(string userToAdd)
+        private readonly IBaseRepository<Candidate> _candidateRepository;
+        private readonly IBaseRepository<Message> _messageRepository;
+        public ChatService(IBaseRepository<Candidate> candidateRepository, IBaseRepository<Message> messageRepository)
         {
-            lock (Users)
-            {
-                foreach (var user in Users)
-                {
-                    if (user.Key.ToLower() == userToAdd.ToLower())
-                    {
-                        return false;
-                    }
-                }
-
-                Users.Add(userToAdd, null);
-                return true;
-            }
+            _candidateRepository = candidateRepository;
+            _messageRepository= messageRepository;
         }
 
-        public void AddUserConnectinId(string user, string connectionId)
+
+        public async Task AddUserConnectionId(int profielId, string connectionId)
         {
-            lock (Users)
-            {
-                if (Users.ContainsKey(user))
-                {
-                    Users[user] = connectionId;
-                }
-            }
+            var user = await _candidateRepository.FirstOrDefaultAsync(x => x.ProfileId == profielId);
+            if (user == null) throw new UserNotFoundException(profielId.ToString());
+
+            user.ConnectionId = connectionId;
+            await _candidateRepository.UpdateAsync(user);
+
         }
 
-        public string GetUserByConnectionId(string connectionId)
+        public async Task<string> GetConnectionIdByProfileId(int profileId)
         {
-            lock (Users)
-            {
-                return Users.Where(x => x.Value == connectionId).Select(x => x.Key).FirstOrDefault();
-            }
+            var result = await _candidateRepository.FirstOrDefaultAsync(x=> x.ProfileId == profileId);
+            return result.ConnectionId;
         }
 
-        public string GetConnectionIdByUser(string user)
+        public async Task SaveMesssage(MessageModel message)      
         {
-            lock (Users)
-            {
-                return Users.Where(x => x.Key == user).Select(x => x.Value).FirstOrDefault();
-            }
+            var param = message.MapTo<Message>();
+            param.CreationDate = DateTime.UtcNow;
+            param.Code = GetPrivateGroupName(message.ProfileFromId, message.ProfileToId);
+            await _messageRepository.AddAsync(param);
         }
 
-        public void RemoveUserFromList(string user)
+
+        public async Task<List<CandidateModel>> GetOnlineUsers()
         {
-            lock (Users)
-            {
-                if (Users.ContainsKey(user))
-                {
-                    Users.Remove(user);
-                }
-            }
+            var result = await _candidateRepository.GetAllAsync();
+
+            return result.MapTo<List<CandidateModel>>();
         }
 
-        public string[] GetOnlineUsers()
+        public async Task<List<MessageModel>> GetMessageByProfileId(int profileFromId, int profileToId)
         {
-            lock (Users)
-            {
-                return Users.OrderBy(x => x.Key).Select(x => x.Key).ToArray();
-            }
+            var code = GetPrivateGroupName(profileFromId, profileToId);
+            var result = await _messageRepository.FindAsync(x=> x.Code == code);
+
+            return result.MapTo<List<MessageModel>>();
+        }
+
+        public string GetPrivateGroupName(int profileFromId, int profileToId)
+        {
+            // from: john, to: david  "david-john"
+            return profileFromId >= profileToId ? $"{profileFromId}-{profileToId}" : $"{profileToId}-{profileFromId}";
         }
     }
 }

@@ -25,7 +25,7 @@ namespace Wego.Application.Features.OfferProfile.Queries
 
         public async Task<List<GetOfferFavoriteModel>> Handle(GetOfferFavoriteListQuery request, CancellationToken cancellationToken)
         {
-            var profile = await _userProfile.SingleOrDefaultAsync(x => x.Email == _currentContext.Identity.Email);
+            var profile = await _userProfile.FirstOrDefaultAsync(x => x.Email == _currentContext.Identity.Email);
             if (profile == null) throw new UserNotFoundException($"Email '{_currentContext.Identity.Email}' not found");
          
             var result = await _favoriteRepository.FindAsync(x=> x.ProfileId == profile.Id,"Offerfavorite"+ profile.Id, CacheDuration.OneDay, cancellationToken);
