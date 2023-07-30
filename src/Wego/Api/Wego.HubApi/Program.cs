@@ -34,6 +34,7 @@ app.UseSwagger();
 app.UseSwaggerUI();
 //}
 
+app.UseExceptionHandler();
 app.UseSerilogRequestLogging();
 app.UseHttpsRedirection();
 app.UseRouting();

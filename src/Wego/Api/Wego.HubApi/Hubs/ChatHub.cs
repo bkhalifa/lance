@@ -38,8 +38,8 @@ namespace Wego.HubApi.Hubs
         public async Task CreateDirectChat(ChatMessageModel message)
         {
             var toConnectionId = await _chatService.GetConnectionIdByProfileId(message.ProfileToId);
-            if(toConnectionId is not null)
-            await Clients.Client(toConnectionId).SendAsync("OpenPrivateChat", message);
+            if (toConnectionId is not null)
+                await Clients.Client(toConnectionId).SendAsync("OpenPrivateChat", message);
             await _chatService.SaveMesssage(message);
         }
 
@@ -70,6 +70,6 @@ namespace Wego.HubApi.Hubs
             await Groups.RemoveFromGroupAsync(toConnectionId, privateGroupName);
         }
 
-      
+
     }
 }

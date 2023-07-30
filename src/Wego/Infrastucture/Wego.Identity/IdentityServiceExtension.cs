@@ -33,8 +33,9 @@ public static class IdentityServiceExtensions
                options.Password.RequireUppercase = false;
                options.Password.RequireNonAlphanumeric = false;
                options.Password.RequireDigit = true;
+
                // Lockout settings  
-               options.Lockout.MaxFailedAccessAttempts = 10;
+               options.Lockout.MaxFailedAccessAttempts = 5;
                options.Lockout.AllowedForNewUsers = false;
 
                // Signin settings  
