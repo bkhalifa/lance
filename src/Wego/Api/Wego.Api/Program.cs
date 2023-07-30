@@ -1,14 +1,10 @@
 using Hellang.Middleware.ProblemDetails;
 
-using Microsoft.AspNetCore.Identity;
-
 using Serilog;
 
 using Wego.Api.Middleware;
 using Wego.Application;
-using Wego.Application.Models.Authentification;
 using Wego.Identity;
-using Wego.Identity.Seed;
 using Wego.Infrastructure.Extensions;
 using Wego.Infrastructure.HealthCheck;
 using Wego.Infrastructure.Logging;
@@ -37,9 +33,19 @@ builder.Services.AddControllers();
 builder.Services.AddEndpointsApiExplorer();
 builder.Services.AddSwaggerGen();
 builder.Services.AddSwagger();
+
 builder.Services.AddCors(options =>
 {
-    options.AddPolicy("Open", builder => builder.AllowAnyOrigin().AllowAnyHeader().AllowAnyMethod());
+    options.AddPolicy(name: "_tekoPolicy",
+                      policy =>
+                      {
+                          policy.WithOrigins("http://localhost:4200",
+                                              "http://www.tekojob.com")
+                                              .AllowAnyHeader()
+                                              .AllowAnyMethod()
+                                              .SetIsOriginAllowed(origin => true) // allow any origin
+                                              .AllowCredentials(); // allow credentials
+                      });
 });
 
 var app = builder.Build();
@@ -52,7 +58,8 @@ if (app.Environment.IsDevelopment())
 
 app.UseSerilogRequestLogging();
 app.UseHttpsRedirection();
-app.UseAntiXssMiddleware();
+app.UseCors("_tekoPolicy");
+
 app.UseProblemDetails();
 app.UseRouting();
 app.UseAuthentication();
@@ -65,25 +72,9 @@ app.UseSwaggerUI(c =>
 app.UseResponseCompression();
 app.UseSerilogRequestLogging();
 
-app.UseCors("Open");
+
 app.UseAuthorization();
 app.MapControllers();
 app.UseCustomHealthCheck();
-
-using (var scope = app.Services.CreateScope())
-{
-    var services = scope.ServiceProvider;
-    var loggerFactory = services.GetRequiredService<ILoggerFactory>();
-    try
-    {
-        var userManager = services.GetRequiredService<UserManager<ApplicationUser>>();
-        await UserCreator.SeedAsync(userManager);
-        Log.Information("Application Starting");
-    }
-    catch (Exception ex)
-    {
-        Log.Warning(ex, "An error occured while starting the application");
-    }
-}
 
 app.Run();
