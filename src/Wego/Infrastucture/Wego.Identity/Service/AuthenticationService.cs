@@ -27,6 +27,7 @@ public class AuthenticationService : IAuthenticationService
     private readonly IEmailSender _emailSender;
     private readonly ICurrentContext _currentContext;
     private readonly IBaseRepository<UserProfile> _profileRepository;
+    private readonly IBaseRepository<Candidate> _candidateRepository;
 
     public AuthenticationService(UserManager<ApplicationUser> userManager,
         SignInManager<ApplicationUser> signInManager,
@@ -34,7 +35,8 @@ public class AuthenticationService : IAuthenticationService
          ILogger<IAuthenticationService> logger,
          IEmailSender emailSender,
          ICurrentContext currentContext,
-         IBaseRepository<UserProfile> profileRepository
+         IBaseRepository<UserProfile> profileRepository,
+         IBaseRepository<Candidate> candidateRepository
          )
     {
         _userManager = userManager;
@@ -44,6 +46,7 @@ public class AuthenticationService : IAuthenticationService
         _emailSender = emailSender;
         _currentContext = currentContext;
         _profileRepository = profileRepository;
+        _candidateRepository = candidateRepository;
     }
 
     public async Task<AuthenticationResponse> LoginAsync(AuthenticationRequest request)
@@ -100,43 +103,51 @@ public class AuthenticationService : IAuthenticationService
         };
 
         var result = await _userManager.CreateAsync(user, request.Password);
-        
-        if (result.Succeeded)
-            {
-                var code = await _userManager.GenerateEmailConfirmationTokenAsync(user);
 
-                var param = new Dictionary<string, string>
+        if (result.Succeeded)
+        {
+            var code = await _userManager.GenerateEmailConfirmationTokenAsync(user);
+
+            var param = new Dictionary<string, string>
                 {
                     {"id",  WebEncoders.Base64UrlEncode(Encoding.UTF8.GetBytes(user.Id)) },
                     {"code",  WebEncoders.Base64UrlEncode(Encoding.UTF8.GetBytes(code)) },
                 };
-                var callback = QueryHelpers.AddQueryString(request.ClientURI!, param);
+            var callback = QueryHelpers.AddQueryString(request.ClientURI!, param);
 
-                await _emailSender.SendMailAsync(new Email(user.Email, "Confirm your Account",
-                    $"Please confirm your account by <a href='{HtmlEncoder.Default.Encode(callback)}'>click here</a>."));
+            await _emailSender.SendMailAsync(new Email(user.Email, "Confirm your Account",
+                $"Please confirm your account by <a href='{HtmlEncoder.Default.Encode(callback)}'>click here</a>."));
 
-                _logger.LogInformation("User Created: {email}", user.Email);
+            _logger.LogInformation("User Created: {email}", user.Email);
 
-                var resultProfile = await _profileRepository.AddAsync(new UserProfile
-                {
-                    UserId = user.Id,
-                    Email = request.Email,
-                    UsId = String.Concat(request.Email.SplitMail(), IdentityHelpers.GetRandomId()),
-                    InitialUserName = request.Email.GetInitials(),
-                    CreationDate = DateTime.UtcNow,
-                    UpdateDate = DateTime.UtcNow,
-                });
+            var resultProfile = await _profileRepository.AddAsync(new UserProfile
+            {
+                UserId = user.Id,
+                Email = request.Email,
+                UsId = string.Concat(request.Email.SplitMail(), IdentityHelpers.GetRandomId()),
+                InitialUserName = request.Email.GetInitials(),
+                CreationDate = DateTime.UtcNow,
+                UpdateDate = DateTime.UtcNow,
+            });
 
-                return new RegistrationResponse()
-                {
-                    Email = user.Email!,
-                    ConfirmedMail = false,
-                    InitialUserName = resultProfile.InitialUserName!
-                };
-            }
+            await _candidateRepository.AddAsync(new Candidate
+            {
+                CandidateEmail = request.Email,
+                CandidateName = request.Email.SplitMail(),
+                IsConnected = false,
+                ProfileId = resultProfile.Id,
+            });
+
+            return new RegistrationResponse()
+            {
+                Email = user.Email!,
+                ConfirmedMail = false,
+                InitialUserName = resultProfile.InitialUserName!
+            };
+        }
 
         throw new ValidationException(result.Errors.ToDictionary(x => x.Code, x => x.Description));
-   
+
 
     }
     public async Task<RegistrationResponse> ConfirmRegistration(ConfirmRegisterModel request)
@@ -228,7 +239,7 @@ public class AuthenticationService : IAuthenticationService
         var result = await _userManager.ResetPasswordAsync(user, encodedCode, request.Password);
         if (result.Succeeded)
         {
-            if(user.EmailConfirmed == false)
+            if (user.EmailConfirmed == false)
             {
                 var code = await _userManager.GenerateEmailConfirmationTokenAsync(user);
                 await _userManager.ConfirmEmailAsync(user, code);

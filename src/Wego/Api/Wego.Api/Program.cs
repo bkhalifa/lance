@@ -3,6 +3,7 @@ using Hellang.Middleware.ProblemDetails;
 using Microsoft.AspNetCore.Identity;
 
 using Serilog;
+using Wego.Api.Middleware;
 using Wego.Application;
 using Wego.Application.Models.Authentification;
 using Wego.Identity;
