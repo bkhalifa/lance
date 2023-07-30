@@ -1,8 +1,6 @@
-﻿
-using Microsoft.AspNetCore.Authorization;
-using Microsoft.AspNetCore.Mvc;
+﻿using Microsoft.AspNetCore.Mvc;
+
 using Wego.Application.Contracts.Common;
-using Wego.Application.Features.Categories.Queries;
 using Wego.Application.Models.Chat;
 
 namespace Wego.Api.Controllers.Pages
@@ -13,7 +11,7 @@ namespace Wego.Api.Controllers.Pages
     public class ChatController : ControllerBase
     {
         public readonly IChatService _chatService;
-        public ChatController(IChatService chatService)   
+        public ChatController(IChatService chatService)
         {
             _chatService = chatService;
         }
