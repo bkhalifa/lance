@@ -50,6 +50,7 @@ if (app.Environment.IsDevelopment())
 
 app.UseSerilogRequestLogging();
 app.UseHttpsRedirection();
+app.UseAntiXssMiddleware();
 app.UseProblemDetails();
 app.UseRouting();
 app.UseAuthentication();
