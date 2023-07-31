@@ -7,14 +7,13 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 
-namespace Wego.Application.Models.Chat
+namespace Wego.Application.Features.Chat.Queries
 {
-    public class MessageModel
+    public class GetChatMessageModel
     {
         public long Id { get; set; }
         public string Code { get; set; }
         public int ProfileFromId { get; set; }
-
         public int ProfileToId { get; set; }
 
         public string MsgContent { get; set; }

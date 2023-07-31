@@ -82,11 +82,11 @@ builder.Services.AddCors(options =>
 
 var app = builder.Build();
 
-if (app.Environment.IsDevelopment())
-{
-    app.UseSwagger();
-    app.UseSwaggerUI();
-}
+//if (app.Environment.IsDevelopment())
+//{
+//    app.UseSwagger();
+//    app.UseSwaggerUI();
+//}
 
 app.UseSerilogRequestLogging();
 app.UseHttpsRedirection();
@@ -108,5 +108,6 @@ app.UseResponseCompression();
 app.UseAuthorization();
 app.MapControllers();
 app.UseCustomHealthCheck();
+app.UseSecureHttpHeader();
 
 app.Run();

@@ -13,6 +13,7 @@
   </ItemGroup>
 
   <ItemGroup>
+    <Folder Include="Features\Chat\Commands\" />
     <Folder Include="Features\Profile\Queries\" />
   </ItemGroup>
 
