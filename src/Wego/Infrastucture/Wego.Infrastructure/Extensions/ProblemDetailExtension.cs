@@ -35,6 +35,7 @@ namespace Wego.Infrastructure.Extensions
                 setup.Map<ValidationException>(e => e.ToBaseProblemDetails(HttpStatusCode.BadRequest));
                 setup.Map<UserNotFoundException>(e => e.ToBaseProblemDetails(HttpStatusCode.Conflict));
                 setup.Map<CredentialInvalidException>(e => e.ToBaseProblemDetails(HttpStatusCode.Conflict));
+                setup.Map<LockedOutException>(e => e.ToBaseProblemDetails(HttpStatusCode.Conflict));
                 setup.Map<UserAlreadyExistsException>(e => e.ToBaseProblemDetails(HttpStatusCode.Conflict));
                 setup.Map<EmailNotFoundException>(e => e.ToBaseProblemDetails(HttpStatusCode.Conflict));
                 setup.Map<PasswordsEqualsException>(e => e.ToBaseProblemDetails(HttpStatusCode.Conflict));

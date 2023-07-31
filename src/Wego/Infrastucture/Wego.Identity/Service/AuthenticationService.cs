@@ -3,6 +3,7 @@ using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.WebUtilities;
 using Microsoft.Extensions.Logging;
 
+using System.Security.Policy;
 using System.Text;
 using System.Text.Encodings.Web;
 
@@ -59,7 +60,13 @@ public class AuthenticationService : IAuthenticationService
         if (user is null)
             throw new CredentialInvalidException($"Credentials for '{request.Email} aren't valid'.");
 
-        var result = await _signInManager.PasswordSignInAsync(user.UserName!, request.Password, request.IsPersistent, lockoutOnFailure: false);
+        var result = await _signInManager.PasswordSignInAsync(user.UserName!, request.Password, request.IsPersistent, true);
+        if (result.IsLockedOut)
+        {
+           await _emailSender.SendMailAsync(new Email(user.Email!, "Account is locked out",
+                       $"Your account is locked out. Kindly wait for 10 minutes and try again ."));
+            throw new LockedOutException($"account is locked out => '{request.Email} '.");
+        }
 
         if (!result.Succeeded)
             throw new CredentialInvalidException($"Credentials for '{request.Email} aren't valid'.");
@@ -147,9 +154,8 @@ public class AuthenticationService : IAuthenticationService
         }
 
         throw new ValidationException(result.Errors.ToDictionary(x => x.Code, x => x.Description));
-
-
     }
+
     public async Task<RegistrationResponse> ConfirmRegistration(ConfirmRegisterModel request)
     {
         if (request is null)

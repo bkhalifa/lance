@@ -1,15 +1,10 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
-
-namespace Wego.Application.Exceptions
+﻿namespace Wego.Application.Exceptions
 {
     public static class ExceptionCodes
     {
         public const string InternalError = "internal_error";
         public const string ValidationError = "validation_error";
+        public const string LockoutUser = "lockout_user";
 
 
         public const string CredentialInvalid = "credential_invalid";
