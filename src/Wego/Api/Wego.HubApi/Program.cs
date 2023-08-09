@@ -2,6 +2,7 @@ using Microsoft.EntityFrameworkCore;
 using Serilog;
 using Wego.HubApi.Extensions;
 using Wego.HubApi.Hubs;
+using Wego.HubApi.Middlewares;
 using Wego.HubApi.Persistence;
 using Wego.HubApi.Services;
 
@@ -34,7 +35,7 @@ app.UseSwagger();
 app.UseSwaggerUI();
 //}
 
-app.UseExceptionHandler();
+app.UseCustomExceptionHandler();
 app.UseSerilogRequestLogging();
 app.UseHttpsRedirection();
 app.UseRouting();
