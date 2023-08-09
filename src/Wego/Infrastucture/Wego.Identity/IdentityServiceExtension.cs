@@ -35,8 +35,9 @@ public static class IdentityServiceExtensions
                options.Password.RequireDigit = true;
 
                // Lockout settings  
-               options.Lockout.MaxFailedAccessAttempts = 5;
-               options.Lockout.AllowedForNewUsers = false;
+               options.Lockout.AllowedForNewUsers = true;
+               options.Lockout.DefaultLockoutTimeSpan = TimeSpan.FromMinutes(10);
+               options.Lockout.MaxFailedAccessAttempts = 3;
 
                // Signin settings  
                options.SignIn.RequireConfirmedEmail = true;
