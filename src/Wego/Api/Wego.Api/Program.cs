@@ -4,7 +4,6 @@ using Serilog;
 
 using System.Threading.RateLimiting;
 
-using Wego.Api.Middleware;
 using Wego.Application;
 using Wego.Identity;
 using Wego.Infrastructure.Extensions;
@@ -47,7 +46,7 @@ builder.Services.AddRateLimiter(options =>
 });
 Log.Logger = new LoggerConfiguration()
    .ReadFrom.Configuration(builder.Configuration).CreateBootstrapLogger();
-builder.Host.UseLogging(builder.Configuration,"WegoApi");
+builder.Host.UseLogging(builder.Configuration, "WegoApi");
 
 builder.Services.AddHttpContextAccessor();
 builder.Services.AddDistributedMemoryCache();

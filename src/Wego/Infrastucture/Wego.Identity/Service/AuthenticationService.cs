@@ -58,7 +58,7 @@ public class AuthenticationService : IAuthenticationService
         var user = await _userManager.FindByEmailAsync(request.Email);
 
         if (user is null)
-            throw new CredentialInvalidException($"Credentials for '{request.Email} aren't valid'.");
+            throw new UserNotFoundException($"User not found '{request.Email} not found'.");
 
         var result = await _signInManager.PasswordSignInAsync(user.UserName!, request.Password, request.IsPersistent, true);
         if (result.IsLockedOut)
