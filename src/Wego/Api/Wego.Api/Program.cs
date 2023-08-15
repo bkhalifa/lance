@@ -10,6 +10,7 @@ using Wego.Infrastructure.Extensions;
 using Wego.Infrastructure.HealthCheck;
 using Wego.Infrastructure.Logging;
 using Wego.Persistence;
+
 using Wego.Persistence.EF;
 
 var builder = WebApplication.CreateBuilder(args);
@@ -59,6 +60,7 @@ builder.Services.AddCustomProblemDetails(builder.Environment);
 builder.Services.AddCustomHealthCheck(builder.Configuration)
     .AddDbContextCheck<InetDbContext>()
     .AddDbContextCheck<PortoDbContext>();
+builder.Services.AddDapperPersistenceServices();
 
 builder.Services.AddControllers();
 builder.Services.AddEndpointsApiExplorer();
@@ -81,11 +83,11 @@ builder.Services.AddCors(options =>
 
 var app = builder.Build();
 
-//if (app.Environment.IsDevelopment())
-//{
-//    app.UseSwagger();
-//    app.UseSwaggerUI();
-//}
+if (app.Environment.IsDevelopment())
+{
+    app.UseSwagger();
+    app.UseSwaggerUI();
+}
 
 app.UseSerilogRequestLogging();
 app.UseHttpsRedirection();

@@ -1,10 +1,7 @@
 ﻿using MediatR;
 
-using Wego.Application.Contracts.Persistence;
 using Wego.Application.Extensions;
-using Wego.Application.Models.Common;
-using Wego.Domain.Entities;
-
+using Wego.Application.IRepository;
 
 namespace Wego.Application.Features.Categories.Queries
 {
@@ -12,18 +9,16 @@ namespace Wego.Application.Features.Categories.Queries
 
     public class GetCategoriesListQueryHandler : IRequestHandler<GetCategoriesListQuery, List<GetCategoriesModel>>
     {
-        private readonly IBaseRepository<Category> _categoryRepository;
+        private readonly ICategoryRepository _categoryRepository;
 
 
-        public GetCategoriesListQueryHandler(IBaseRepository<Category> categoryRepository)
+        public GetCategoriesListQueryHandler(ICategoryRepository categoryRepository)
         {
             _categoryRepository = categoryRepository;
         }
 
         public async Task<List<GetCategoriesModel>> Handle(GetCategoriesListQuery request, CancellationToken cancellationToken)
-        {
-            var allCategories = (await _categoryRepository.GetAllAsync(CacheDuration.OneHour)).OrderBy(x => x.Name).ToList();
-            return allCategories.MapTo<List<GetCategoriesModel>>();
-        }
+         => (await _categoryRepository.GetAllAsync()).ToList();
+        
     }
 }
