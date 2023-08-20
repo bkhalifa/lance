@@ -9,7 +9,7 @@ using System.Text;
 using Wego.Application.Contracts.Identity;
 using Wego.Application.Exceptions;
 using Wego.Application.Models.Authentification;
-
+using Wego.Identity.Helpers;
 
 namespace Wego.Identity.Service
 {
@@ -52,6 +52,8 @@ namespace Wego.Identity.Service
             {
                 AccessToken = new JwtSecurityTokenHandler().WriteToken(jwtSecurityToken),
                 RefreshToken = new JwtSecurityTokenHandler().WriteToken(jwtSecurityRefreshToken),
+                Email = user.Email,
+                InitialUserName = user.Email.GetInitials(),
             };
             await _userManager.SetAuthenticationTokenAsync(user, _jwtSettings.Name, _jwtSettings.RefreshName, result.RefreshToken);
 
