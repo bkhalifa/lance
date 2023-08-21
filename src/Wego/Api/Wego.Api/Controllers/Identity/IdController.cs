@@ -28,7 +28,7 @@ public class IdController : ControllerBase
 
 
     [HttpPost(nameof(Register))]
-    public async Task<ActionResult<RegisterResponse>> Register([FromBody] RegistrationRequest request)
+    public async Task<ActionResult<RegistrationResponse>> Register([FromBody] RegistrationRequest request)
     => Ok(await _authenticationService.RegisterAsync(request));
 
     [HttpPost(nameof(RegisterConfirm))]

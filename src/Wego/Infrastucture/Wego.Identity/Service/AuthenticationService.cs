@@ -117,8 +117,8 @@ public class AuthenticationService : IAuthenticationService
 
             var param = new Dictionary<string, string>
                 {
-                    {"id",  WebEncoders.Base64UrlEncode(Encoding.UTF8.GetBytes(user.Id)) },
-                    {"code",  WebEncoders.Base64UrlEncode(Encoding.UTF8.GetBytes(code)) },
+                    {"id",    IdentityHelpers.Base64Encode(user.Id) },
+                    {"code",  IdentityHelpers.Base64Encode(code) },
                 };
             var callback = QueryHelpers.AddQueryString(request.ClientURI!, param);
 
@@ -161,7 +161,7 @@ public class AuthenticationService : IAuthenticationService
         if (request is null)
             ArgumentNullException.ThrowIfNull(nameof(request));
 
-        var encodedUserId = Encoding.UTF8.GetString(WebEncoders.Base64UrlDecode(request?.UserId!));
+        var encodedUserId = IdentityHelpers.Base64Decode(request.UserId);
         var user = await _userManager.FindByIdAsync(encodedUserId);
 
         if (user is null)
@@ -191,8 +191,7 @@ public class AuthenticationService : IAuthenticationService
                 InitialUserName = resultProfile.InitialUserName!,
                 ProfileId = resultProfile.Id,
                 Token = jwtSecurityToken.AccessToken,
-                RefreshToken = jwtSecurityToken.RefreshToken,
-                WelcomeUrl = "id/welcome"
+                RefreshToken = jwtSecurityToken.RefreshToken
             };
         }
 
