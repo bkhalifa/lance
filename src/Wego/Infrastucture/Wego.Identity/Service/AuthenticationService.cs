@@ -192,6 +192,7 @@ public class AuthenticationService : IAuthenticationService
                 ProfileId = resultProfile.Id,
                 Token = jwtSecurityToken.AccessToken,
                 RefreshToken = jwtSecurityToken.RefreshToken,
+                WelcomeUrl = "id/welcome"
             };
         }
 
