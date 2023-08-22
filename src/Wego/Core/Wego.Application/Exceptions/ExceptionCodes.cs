@@ -14,5 +14,8 @@
         public const string UserNotAuthentificated = "user_not_authentificated";
         public const string UserNotFound = "user_not_found";
         public const string TokenInvalid = "token_invalid";
+        public const string CaptchaException = "captcha_exception";
+
+
     }
 }

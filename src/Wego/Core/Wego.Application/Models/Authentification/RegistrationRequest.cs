@@ -21,4 +21,5 @@ public class RegistrationRequest
     [Compare("Password", ErrorMessage = "The password and confirmation password do not match.")]
     public string ConfirmPassword { get; set; }
     public string ClientURI { get; set; }
+    public string Token { get; set; }
 }

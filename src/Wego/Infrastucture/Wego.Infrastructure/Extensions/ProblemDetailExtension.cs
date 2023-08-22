@@ -41,6 +41,7 @@ namespace Wego.Infrastructure.Extensions
                 setup.Map<PasswordsEqualsException>(e => e.ToBaseProblemDetails(HttpStatusCode.Conflict));
                 setup.Map<UserNotAuthentificatedException>(e => e.ToBaseProblemDetails(HttpStatusCode.Conflict));
                 setup.Map<ValidationException>(e => e.ToBaseProblemDetails(HttpStatusCode.BadRequest));
+                setup.Map<CaptchaException>(e => e.ToBaseProblemDetails(HttpStatusCode.Conflict));
                 setup.Map<Exception>(e => e.ToBaseProblemDetails());
             });
 
