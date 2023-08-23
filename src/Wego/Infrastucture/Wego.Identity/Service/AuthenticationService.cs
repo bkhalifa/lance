@@ -10,7 +10,6 @@ using System.Text.Encodings.Web;
 using Wego.Application.Contracts.Common;
 using Wego.Application.Contracts.Context;
 using Wego.Application.Contracts.Identity;
-using Wego.Application.Contracts.Infrastructure.Captcha;
 using Wego.Application.Contracts.Persistence;
 using Wego.Application.Exceptions;
 using Wego.Application.Models.Authentification;
@@ -30,7 +29,6 @@ public class AuthenticationService : IAuthenticationService
     private readonly ICurrentContext _currentContext;
     private readonly IBaseRepository<UserProfile> _profileRepository;
     private readonly IBaseRepository<Candidate> _candidateRepository;
-    private readonly IGoogleCapthaService _googleCaptchaService;
 
     public AuthenticationService(UserManager<ApplicationUser> userManager,
         SignInManager<ApplicationUser> signInManager,
@@ -39,8 +37,7 @@ public class AuthenticationService : IAuthenticationService
          IEmailSender emailSender,
          ICurrentContext currentContext,
          IBaseRepository<UserProfile> profileRepository,
-         IBaseRepository<Candidate> candidateRepository,
-         IGoogleCapthaService googleCaptchaService
+         IBaseRepository<Candidate> candidateRepository
          )
     {
         _userManager = userManager;
@@ -51,7 +48,6 @@ public class AuthenticationService : IAuthenticationService
         _currentContext = currentContext;
         _profileRepository = profileRepository;
         _candidateRepository = candidateRepository;
-        _googleCaptchaService = googleCaptchaService;
     }
 
     public async Task<AuthenticationResponse> LoginAsync(AuthenticationRequest request)
@@ -95,11 +91,6 @@ public class AuthenticationService : IAuthenticationService
     {
         if (request is null)
             ArgumentNullException.ThrowIfNull(nameof(request));
-
-        var captchaResult = await _googleCaptchaService.VerifiyToken(request.Token);
-
-        //if (!captchaResult)
-        //    throw new CaptchaException($"Captcha Exception {captchaResult}"); 
 
         var existingUser = await _userManager.FindByNameAsync(request!.Email);
 
