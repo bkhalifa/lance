@@ -2,10 +2,14 @@ using Hellang.Middleware.ProblemDetails;
 
 using Serilog;
 
+using System.Configuration;
 using System.Threading.RateLimiting;
 
 using Wego.Application;
+using Wego.Application.Contracts.Captcha;
+using Wego.Application.Response;
 using Wego.Identity;
+using Wego.Infrastructure.Captcha;
 using Wego.Infrastructure.Extensions;
 using Wego.Infrastructure.HealthCheck;
 using Wego.Infrastructure.Logging;
@@ -55,6 +59,7 @@ builder.Services.AddResponseCompression(options => { options.EnableForHttps = tr
 builder.Services.AddApplicationServices(builder.Configuration);
 builder.Services.AddInfrastructureServices(builder.Configuration);
 builder.Services.AddPersistenceServices(builder.Configuration);
+builder.Services.AddGoogleServices(builder.Configuration);
 builder.Services.AddIdentityServices(builder.Configuration);
 builder.Services.AddCustomProblemDetails(builder.Environment);
 builder.Services.AddCustomHealthCheck(builder.Configuration)

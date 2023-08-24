@@ -3,10 +3,10 @@ using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.WebUtilities;
 using Microsoft.Extensions.Logging;
 
-using System.Security.Policy;
 using System.Text;
 using System.Text.Encodings.Web;
 
+using Wego.Application.Contracts.Captcha;
 using Wego.Application.Contracts.Common;
 using Wego.Application.Contracts.Context;
 using Wego.Application.Contracts.Identity;
@@ -29,6 +29,7 @@ public class AuthenticationService : IAuthenticationService
     private readonly ICurrentContext _currentContext;
     private readonly IBaseRepository<UserProfile> _profileRepository;
     private readonly IBaseRepository<Candidate> _candidateRepository;
+    private readonly IGoogleCapthaService _googleCaptchaService;
 
     public AuthenticationService(UserManager<ApplicationUser> userManager,
         SignInManager<ApplicationUser> signInManager,
@@ -37,7 +38,8 @@ public class AuthenticationService : IAuthenticationService
          IEmailSender emailSender,
          ICurrentContext currentContext,
          IBaseRepository<UserProfile> profileRepository,
-         IBaseRepository<Candidate> candidateRepository
+         IBaseRepository<Candidate> candidateRepository,
+         IGoogleCapthaService googleCaptchaService
          )
     {
         _userManager = userManager;
@@ -48,6 +50,7 @@ public class AuthenticationService : IAuthenticationService
         _currentContext = currentContext;
         _profileRepository = profileRepository;
         _candidateRepository = candidateRepository;
+        _googleCaptchaService = googleCaptchaService;
     }
 
     public async Task<AuthenticationResponse> LoginAsync(AuthenticationRequest request)
@@ -63,8 +66,8 @@ public class AuthenticationService : IAuthenticationService
         var result = await _signInManager.PasswordSignInAsync(user.UserName!, request.Password, request.IsPersistent, true);
         if (result.IsLockedOut)
         {
-           await _emailSender.SendMailAsync(new Email(user.Email!, "Account is locked out",
-                       $"Your account is locked out. Kindly wait for 10 minutes and try again ."));
+            await _emailSender.SendMailAsync(new Email(user.Email!, "Account is locked out",
+                        $"Your account is locked out. Kindly wait for 10 minutes and try again ."));
             throw new LockedOutException($"account is locked out => '{request.Email} '.");
         }
 
@@ -91,6 +94,10 @@ public class AuthenticationService : IAuthenticationService
     {
         if (request is null)
             ArgumentNullException.ThrowIfNull(nameof(request));
+        var captchaResult = await _googleCaptchaService.VerifiyToken(request.Token);
+
+        if (!captchaResult)
+            throw new GoogleCaptchaException($"captcha '{request}' exception.");
 
         var existingUser = await _userManager.FindByNameAsync(request!.Email);
 
@@ -140,7 +147,7 @@ public class AuthenticationService : IAuthenticationService
             await _candidateRepository.AddAsync(new Candidate
             {
                 CandidateEmail = request.Email,
-                CandidateName = request.Email.Substring(0,request.Email.IndexOf("@")),
+                CandidateName = request.Email.Substring(0, request.Email.IndexOf("@")),
                 IsConnected = false,
                 ProfileId = resultProfile.Id,
             });
