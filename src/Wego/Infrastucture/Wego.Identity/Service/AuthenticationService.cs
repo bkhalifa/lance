@@ -219,6 +219,11 @@ public class AuthenticationService : IAuthenticationService
         if (forgotPassword is null)
             ArgumentNullException.ThrowIfNull(nameof(forgotPassword));
 
+        var captchaResult = await _googleCaptchaService.VerifiyToken(forgotPassword.Token);
+
+        if (!captchaResult)
+            throw new GoogleCaptchaException($"captcha '{captchaResult}' exception.");
+
         var user = await _userManager.FindByEmailAsync(forgotPassword?.Email!);
 
         if (user == null)
@@ -241,6 +246,11 @@ public class AuthenticationService : IAuthenticationService
     {
         if (request is null)
             ArgumentNullException.ThrowIfNull(nameof(request));
+
+        var captchaResult = await _googleCaptchaService.VerifiyToken(request.TokenCaptcha);
+
+        if (!captchaResult)
+            throw new GoogleCaptchaException($"captcha '{request}' exception.");
 
         var user = await _userManager.FindByEmailAsync(request.Email);
 
