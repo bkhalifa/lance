@@ -2,14 +2,10 @@ using Hellang.Middleware.ProblemDetails;
 
 using Serilog;
 
-using System.Configuration;
 using System.Threading.RateLimiting;
 
 using Wego.Application;
-using Wego.Application.Contracts.Captcha;
-using Wego.Application.Response;
 using Wego.Identity;
-using Wego.Infrastructure.Captcha;
 using Wego.Infrastructure.Extensions;
 using Wego.Infrastructure.HealthCheck;
 using Wego.Infrastructure.Logging;
@@ -18,6 +14,11 @@ using Wego.Persistence;
 using Wego.Persistence.EF;
 
 var builder = WebApplication.CreateBuilder(args);
+builder.Services.AddResponseCompression(options =>
+{
+    options.EnableForHttps = true;
+});
+
 builder.Services.AddRateLimiter(options =>
 {
     options.GlobalLimiter = PartitionedRateLimiter.Create<HttpContext, string>(httpContext =>
@@ -87,6 +88,8 @@ builder.Services.AddCors(options =>
 });
 
 var app = builder.Build();
+
+app.UseResponseCompression();
 
 if (app.Environment.IsDevelopment())
 {
