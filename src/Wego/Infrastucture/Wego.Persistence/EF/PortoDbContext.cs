@@ -1,11 +1,11 @@
-﻿using System;
-using System.Collections.Generic;
-using Microsoft.EntityFrameworkCore;
+﻿using Microsoft.EntityFrameworkCore;
+
 using Wego.Domain.Entities;
 
 namespace Wego.Persistence.EF;
 public partial class PortoDbContext : DbContext
 {
+
     public virtual DbSet<BusinessSkill> BusinessSkills { get; set; }
 
     public virtual DbSet<Candidate> Candidates { get; set; }
@@ -20,6 +20,8 @@ public partial class PortoDbContext : DbContext
 
     public virtual DbSet<Customer> Customers { get; set; }
 
+    public virtual DbSet<DocVisibility> DocVisibilities { get; set; }
+
     public virtual DbSet<Document> Documents { get; set; }
 
     public virtual DbSet<Experience> Experiences { get; set; }
@@ -27,6 +29,8 @@ public partial class PortoDbContext : DbContext
     public virtual DbSet<ExperienceYear> ExperienceYears { get; set; }
 
     public virtual DbSet<FrancoCountry> FrancoCountries { get; set; }
+
+    public virtual DbSet<ImageProfile> ImageProfiles { get; set; }
 
     public virtual DbSet<JobLevel> JobLevels { get; set; }
 
@@ -56,9 +60,15 @@ public partial class PortoDbContext : DbContext
 
     public virtual DbSet<UserProfile> UserProfiles { get; set; }
 
+    public virtual DbSet<UserVisibility> UserVisibilities { get; set; }
+
     public virtual DbSet<WorkType> WorkTypes { get; set; }
 
     public virtual DbSet<ZipCode> ZipCodes { get; set; }
+
+    protected override void OnConfiguring(DbContextOptionsBuilder optionsBuilder)
+#warning To protect potentially sensitive information in your connection string, you should move it out of source code. You can avoid scaffolding the connection string by using the Name= syntax to read it from configuration - see https://go.microsoft.com/fwlink/?linkid=2131148. For more guidance on storing connection strings, see http://go.microsoft.com/fwlink/?LinkId=723263.
+        => optionsBuilder.UseSqlServer("Data Source=.\\sqlexpress;Initial Catalog=porto;Trusted_Connection=True;TrustServerCertificate=True");
 
     protected override void OnModelCreating(ModelBuilder modelBuilder)
     {
@@ -97,11 +107,16 @@ public partial class PortoDbContext : DbContext
             entity.Property(e => e.Code).IsFixedLength();
         });
 
+        modelBuilder.Entity<DocVisibility>(entity =>
+        {
+            entity.HasKey(e => e.Id).HasName("PK__DocVisib__3214EC07263E13BE");
+
+            entity.HasOne(d => d.Doc).WithOne(p => p.DocVisibility).HasConstraintName("FK__DocVisibi__DocId__07E124C1");
+        });
+
         modelBuilder.Entity<Document>(entity =>
         {
-            entity.HasKey(e => e.Id).HasName("PK__Document__3214EC07E0ADAC08");
-
-            entity.Property(e => e.IsVisible).HasDefaultValueSql("((1))");
+            entity.HasKey(e => e.Id).HasName("PK__Document__3214EC07E28C52AA");
 
             entity.HasOne(d => d.UserProfile).WithOne(p => p.Document)
                 .OnDelete(DeleteBehavior.ClientSetNull)
@@ -110,11 +125,11 @@ public partial class PortoDbContext : DbContext
 
         modelBuilder.Entity<Experience>(entity =>
         {
-            entity.HasKey(e => e.Id).HasName("PK__Experien__3214EC0763B5279A");
+            entity.HasKey(e => e.Id).HasName("PK__Experien__3214EC0712A2554F");
 
             entity.HasOne(d => d.UserProfile).WithMany(p => p.Experiences)
                 .OnDelete(DeleteBehavior.ClientSetNull)
-                .HasConstraintName("FK__Experienc__UserP__4BCC3ABA");
+                .HasConstraintName("FK__Experienc__UserP__08D548FA");
         });
 
         modelBuilder.Entity<ExperienceYear>(entity =>
@@ -129,13 +144,22 @@ public partial class PortoDbContext : DbContext
             entity.Property(e => e.Id).ValueGeneratedOnAdd();
         });
 
+        modelBuilder.Entity<ImageProfile>(entity =>
+        {
+            entity.HasKey(e => e.Id).HasName("PK__ImagePro__3214EC07FCE578CC");
+
+            entity.Property(e => e.Id).ValueGeneratedNever();
+
+            entity.HasOne(d => d.Porifle).WithMany(p => p.ImageProfiles).HasConstraintName("FK__ImageProf__Porif__65570293");
+        });
+
         modelBuilder.Entity<Language>(entity =>
         {
             entity.HasKey(e => e.Id).HasName("PK_About");
 
             entity.HasOne(d => d.UserProfile).WithMany(p => p.Languages)
                 .OnDelete(DeleteBehavior.ClientSetNull)
-                .HasConstraintName("FK__Languages__UserP__4CC05EF3");
+                .HasConstraintName("FK__Languages__UserP__09C96D33");
         });
 
         modelBuilder.Entity<Offer>(entity =>
@@ -194,20 +218,27 @@ public partial class PortoDbContext : DbContext
 
         modelBuilder.Entity<TrainShip>(entity =>
         {
-            entity.HasKey(e => e.Id).HasName("PK__TrainShi__3214EC079021B8A6");
+            entity.HasKey(e => e.Id).HasName("PK__TrainShi__3214EC07EC1EEEC2");
 
             entity.HasOne(d => d.UserProfile).WithMany(p => p.TrainShips)
                 .OnDelete(DeleteBehavior.ClientSetNull)
-                .HasConstraintName("FK__TrainShip__UserP__4DB4832C");
+                .HasConstraintName("FK__TrainShip__UserP__0ABD916C");
         });
 
         modelBuilder.Entity<UserProfile>(entity =>
         {
-            entity.HasKey(e => e.Id).HasName("PK__UserProf__3214EC073BBD4B1F");
+            entity.HasKey(e => e.Id).HasName("PK__UserProf__3214EC073DC57FDB");
 
             entity.Property(e => e.CreationDate).HasDefaultValueSql("(getdate())");
             entity.Property(e => e.IsVisible).HasDefaultValueSql("((1))");
             entity.Property(e => e.UpdateDate).HasDefaultValueSql("(getdate())");
+        });
+
+        modelBuilder.Entity<UserVisibility>(entity =>
+        {
+            entity.HasKey(e => e.Id).HasName("PK__UserVisi__3213E83FC86C941F");
+
+            entity.HasOne(d => d.UserProfile).WithMany(p => p.UserVisibilities).HasConstraintName("FK__UserVisib__userP__0BB1B5A5");
         });
 
         modelBuilder.Entity<WorkType>(entity =>

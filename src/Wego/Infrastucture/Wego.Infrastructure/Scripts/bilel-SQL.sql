@@ -7,3 +7,13 @@ BEGIN
     ALTER TABLE [profile].[UserProfiles]
     ADD InitialUserName varchar(50)
 END
+
+
+CREATE TABLE profile.ImageProfile (
+Id BIGINT IDENTITY(1,1) PRIMARY KEY,
+ImageData varbinary(max) NOT NULL,
+Width TINYINT,
+Height TINYINT,
+PorifleId BIGINT NULL,
+FOREIGN KEY (PorifleId) REFERENCES [profile].[UserProfiles](Id)
+);

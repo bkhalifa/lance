@@ -1,13 +1,11 @@
-﻿using System;
-using System.Collections.Generic;
+﻿using Microsoft.EntityFrameworkCore;
+
 using System.ComponentModel.DataAnnotations;
 using System.ComponentModel.DataAnnotations.Schema;
-using Microsoft.EntityFrameworkCore;
 
 namespace Wego.Domain.Entities;
 
 [Table("BusinessSkills", Schema = "config")]
-[Index("Code", Name = "NonClusteredIndex-20221014-011723", IsUnique = true)]
 public partial class BusinessSkill
 {
     [Key]

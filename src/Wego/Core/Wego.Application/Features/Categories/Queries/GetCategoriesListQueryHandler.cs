@@ -1,6 +1,5 @@
 ﻿using MediatR;
 
-using Wego.Application.Extensions;
 using Wego.Application.IRepository;
 
 namespace Wego.Application.Features.Categories.Queries
@@ -19,6 +18,6 @@ namespace Wego.Application.Features.Categories.Queries
 
         public async Task<List<GetCategoriesModel>> Handle(GetCategoriesListQuery request, CancellationToken cancellationToken)
          => (await _categoryRepository.GetAllAsync()).ToList();
-        
+
     }
 }

@@ -92,9 +92,15 @@ public partial class UserProfile
     [InverseProperty("UserProfile")]
     public virtual ICollection<Experience> Experiences { get; set; } = new List<Experience>();
 
+    [InverseProperty("Porifle")]
+    public virtual ICollection<ImageProfile> ImageProfiles { get; set; } = new List<ImageProfile>();
+
     [InverseProperty("UserProfile")]
     public virtual ICollection<Language> Languages { get; set; } = new List<Language>();
 
     [InverseProperty("UserProfile")]
     public virtual ICollection<TrainShip> TrainShips { get; set; } = new List<TrainShip>();
+
+    [InverseProperty("UserProfile")]
+    public virtual ICollection<UserVisibility> UserVisibilities { get; set; } = new List<UserVisibility>();
 }

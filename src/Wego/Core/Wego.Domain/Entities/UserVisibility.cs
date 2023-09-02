@@ -24,5 +24,5 @@ public partial class UserVisibility
 
     [ForeignKey("UserProfileId")]
     [InverseProperty("UserVisibilities")]
-    public virtual UserProfile? UserProfile { get; set; }
+    public virtual UserProfile UserProfile { get; set; }
 }

@@ -35,6 +35,4 @@ public partial class LocationsSearch
     public string ParentName { get; set; }
 
     public bool? IsPriority { get; set; }
-
-    public bool? DefaultOrder { get; set; }
 }

@@ -25,5 +25,5 @@ public partial class DocVisibility
 
     [ForeignKey("DocId")]
     [InverseProperty("DocVisibility")]
-    public virtual Document? Doc { get; set; }
+    public virtual Document Doc { get; set; }
 }

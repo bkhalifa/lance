@@ -43,9 +43,6 @@ public partial class Offer
     public string SearchPreference { get; set; }
 
     [Column(TypeName = "datetime")]
-    public DateTime? StartDate { get; set; }
-
-    [Column(TypeName = "datetime")]
     public DateTime? CreatedDate { get; set; }
 
     [StringLength(450)]
