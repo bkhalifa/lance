@@ -1,8 +1,8 @@
 ﻿using Wego.Application.Features.Categories.Queries;
 
-namespace Wego.Application.IRepository;
+namespace Wego.Application.IRepo;
 
-public interface ICategoryRepository
+public interface ICategoryRepository 
 {
     Task<IEnumerable<GetCategoriesModel>> GetAllAsync();
 }

@@ -3,6 +3,7 @@
 using Microsoft.AspNetCore.Mvc;
 
 using Wego.Application.Features.Profile.Commands;
+using Wego.Application.Features.Profile.Queries;
 using Wego.Application.Models.Profile;
 
 namespace Wego.Api.Controllers.Features.profile;
@@ -23,5 +24,7 @@ public class ProfileController : ControllerBase
     public async Task<ActionResult<long>> CreateImageProfile([FromBody] ImageProfileModel model, CancellationToken ct)
         => Ok(await _mediator.Send(new ImageProfileModelCommand(model.ProfileId, model.Base64, model.Width, model.Height)));
 
-
+    [HttpGet("thumbnail")]
+    public async Task<ActionResult<long>> GetImageProfile(long fileId, CancellationToken ct)
+       => Ok(await _mediator.Send(new GetImageByIdQuery(fileId)));
 }

@@ -1,6 +1,6 @@
-﻿using Microsoft.Extensions.Configuration;
-using Microsoft.Extensions.DependencyInjection;
+﻿using Microsoft.Extensions.DependencyInjection;
 
+using Wego.Application.IRepo;
 using Wego.Application.IRepository;
 using Wego.Persistence.Repositories.Page;
 using Wego.Persistence.Repositories.Profile;
@@ -14,7 +14,6 @@ public static class DapperServiceRegistration
         services.AddSingleton<DapperContext>();
         services.AddScoped<ICategoryRepository, CategoryRepository>();
         services.AddScoped<IProfileRepository, ProfileRepository>();
-
         return services;
     }
 }

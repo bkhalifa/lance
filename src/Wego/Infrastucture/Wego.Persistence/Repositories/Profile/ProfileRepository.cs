@@ -16,6 +16,7 @@ public class ProfileRepository : IProfileRepository
     }
     public async Task<long> CreateImageAsync(ImageProfileModelCommand model)
     {
+
         var sql = "INSERT INTO [profile].[ImageProfile]  VALUES (@ImageData, @Width, @Height, @ProfileId)";
         var parameters = new DynamicParameters();
         parameters.Add("ImageData", model.Base64, DbType.Binary);
@@ -24,13 +25,20 @@ public class ProfileRepository : IProfileRepository
         parameters.Add("ProfileId", model.ProfileId, DbType.Int32);
         using (var connection = _context.CreateConnection())
         {
-         var result = await connection.ExecuteAsync(sql, parameters);
-         return result;
+            var result = await connection.ExecuteAsync(sql, parameters);
+            return result;
         }
     }
 
-    public Task<long> UpdateImageAsync(ImageProfileModelCommand model)
+    public async Task<byte[]> GetImageByIdAsync(long fileId)
     {
-        throw new NotImplementedException();
+        var query = "SELECT * FROM [profile].[ImageProfile] WHERE Id = @fileId";
+
+        using (var connection = _context.CreateConnection())
+        {
+            var result = await connection.QuerySingleOrDefaultAsync<byte[]>(query, new { fileId });
+            return result;
+        }
     }
+
 }

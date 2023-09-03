@@ -1,6 +1,7 @@
 ﻿using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
+
 using Wego.Application.Contracts.Persistence;
 using Wego.Persistence.EF;
 using Wego.Persistence.Respositories;
@@ -13,10 +14,8 @@ public static class PersistenceServiceRegistration
     {
         services.AddDbContext<PortoDbContext>(options =>
             options.UseSqlServer(configuration.GetConnectionString("PortoDb")));
-
         services.AddScoped(typeof(IBaseRepository<>), typeof(BaseRepository<>));
         services.AddScoped<IDataManager, DataManager>();
-
         return services;
     }
 }

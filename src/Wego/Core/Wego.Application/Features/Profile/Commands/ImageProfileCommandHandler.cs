@@ -16,6 +16,6 @@ public class ImageProfileCommandHandler : IRequestHandler<ImageProfileModelComma
 
     public async Task<long> Handle(ImageProfileModelCommand request, CancellationToken cancellationToken)
     {
-        return await _profileRepository.CreateImageAsync(request);
+        return await _profileRepository.CreateImageAsync(request).ConfigureAwait(false);
     }
 }

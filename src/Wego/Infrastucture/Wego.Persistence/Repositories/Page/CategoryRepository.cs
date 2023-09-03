@@ -1,7 +1,8 @@
 ﻿using Dapper;
 
 using Wego.Application.Features.Categories.Queries;
-using Wego.Application.IRepository;
+using Wego.Application.IRepo;
+
 
 namespace Wego.Persistence.Repositories.Page
 {

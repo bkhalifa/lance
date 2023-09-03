@@ -1,6 +1,6 @@
 ﻿using MediatR;
 
-using Wego.Application.IRepository;
+using Wego.Application.IRepo;
 
 namespace Wego.Application.Features.Categories.Queries
 {

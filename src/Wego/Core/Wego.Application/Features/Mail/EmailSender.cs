@@ -5,6 +5,7 @@ using MimeKit;
 
 using Wego.Application.Models.Mail;
 using Wego.Application.Contracts.Common;
+using Wego.Domain.Mail;
 
 namespace Wego.Application.Features.Common
 {
