@@ -1,14 +1,8 @@
 ﻿-- =============================================
--- Creation date:   09/07/2023
--- Description:	Add new column initialUserName
+-- Creation date:   03/09/2023
+-- Description:	Add table ImageProfile
 -- =============================================
-IF COL_LENGTH('[profile].[UserProfiles]', 'InitialUserName') IS NULL
-BEGIN
-    ALTER TABLE [profile].[UserProfiles]
-    ADD InitialUserName varchar(50)
-END
 
-GO
 
 IF OBJECT_ID(N'[profile].[ImageProfile]', N'U') IS NULL
 CREATE TABLE profile.ImageProfile (

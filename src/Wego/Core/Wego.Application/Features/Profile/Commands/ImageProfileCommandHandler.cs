@@ -4,7 +4,7 @@ using Wego.Application.IRepository;
 
 namespace Wego.Application.Features.Profile.Commands;
 
-public record ImageProfileModelCommand(long ProfileId, byte[] Base64, int Width, int Height) : IRequest<long>;
+public record ImageProfileModelCommand(long ProfileId, byte[] Base64, int Width, int Height, string ContentType) : IRequest<long>;
 
 public class ImageProfileCommandHandler : IRequestHandler<ImageProfileModelCommand, long>
 {

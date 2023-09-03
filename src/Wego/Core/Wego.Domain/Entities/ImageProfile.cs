@@ -18,6 +18,11 @@ public partial class ImageProfile
 
     public long? PorifleId { get; set; }
 
+    public  string  ContentType{ get; set; }
+
+    public DateTime? CreationDate { get; set; }
+    public DateTime? UpateDate { get; set; }
+
     [ForeignKey("PorifleId")]
     [InverseProperty("ImageProfiles")]
     public virtual UserProfile Porifle { get; set; }

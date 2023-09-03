@@ -22,9 +22,16 @@ public class ProfileController : ControllerBase
 
     [HttpPost("create-thumbnail")]
     public async Task<ActionResult<long>> CreateImageProfile([FromBody] ImageProfileModel model, CancellationToken ct)
-        => Ok(await _mediator.Send(new ImageProfileModelCommand(model.ProfileId, model.Base64, model.Width, model.Height)));
+        => Ok(await _mediator.Send(new ImageProfileModelCommand(model.ProfileId, model.Base64, model.Width, model.Height, model.ContentType)));
 
-    [HttpGet("thumbnail")]
-    public async Task<ActionResult<long>> GetImageProfile(long fileId, CancellationToken ct)
-       => Ok(await _mediator.Send(new GetImageByIdQuery(fileId)));
+    [HttpGet("{pid}/thumbnail")]
+    public async Task<ActionResult> GetImageProfile(long pid, CancellationToken ct)
+    {
+      var result  = await _mediator.Send(new GetImageByIdQuery(pid));
+        return File(result.ImageData, result.ContentType);
+    }
+  
+
+   
+
 }
