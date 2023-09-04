@@ -1,36 +1,26 @@
 ﻿using MediatR;
 using Wego.Application.Contracts.Context;
-using Wego.Application.Contracts.Persistence;
-using Wego.Application.Exceptions;
-using Wego.Application.Extensions;
-using Wego.Application.Models.Common;
-using Wego.Domain.Entities;
+using Wego.Application.IRepo;
+using Wego.Domain.OfferProfile;
 
 namespace Wego.Application.Features.OfferProfile.Queries
 {
-    public record GetOfferFavoriteListQuery() : IRequest<List<GetOfferFavoriteModel>>;
+    public record GetOfferFavoriteListQuery() : IRequest<List<OfferFavoriteModel>>;
 
-    public class GetOfferFavoriteListQueryHandler : IRequestHandler<GetOfferFavoriteListQuery, List<GetOfferFavoriteModel>>
+    public class GetOfferFavoriteListQueryHandler : IRequestHandler<GetOfferFavoriteListQuery, List<OfferFavoriteModel>>
     {
-        private readonly IBaseRepository<OfferProfileFavorite> _favoriteRepository;
-        private readonly IBaseRepository<UserProfile> _userProfile;
+        private readonly IOfferProfileRepository _favoriteRepository;
         private readonly ICurrentContext _currentContext;
-
-        public GetOfferFavoriteListQueryHandler(IBaseRepository<OfferProfileFavorite> favoriteRepository, IBaseRepository<UserProfile> userProfile, ICurrentContext currentContext)
+        public GetOfferFavoriteListQueryHandler(IOfferProfileRepository favoriteRepository, ICurrentContext currentContext)
         {
             _favoriteRepository = favoriteRepository;
-            _userProfile = userProfile;
             _currentContext = currentContext;
         }
 
-        public async Task<List<GetOfferFavoriteModel>> Handle(GetOfferFavoriteListQuery request, CancellationToken cancellationToken)
+        public async Task<List<OfferFavoriteModel>> Handle(GetOfferFavoriteListQuery request, CancellationToken cancellationToken)
         {
-            var profile = await _userProfile.FirstOrDefaultAsync(x => x.Email == _currentContext.Identity.Email);
-            if (profile == null) throw new UserNotFoundException($"Email '{_currentContext.Identity.Email}' not found");
-         
-            var result = await _favoriteRepository.FindAsync(x=> x.ProfileId == profile.Id,"Offerfavorite"+ profile.Id, CacheDuration.OneDay, cancellationToken);
-            return result.MapTo<List<GetOfferFavoriteModel>>();
+            var result = await _favoriteRepository.GetAllAsync(_currentContext.Identity.ProfileId);
+            return result.ToList();
         }
     }
-
 }

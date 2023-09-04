@@ -11,7 +11,7 @@ namespace Wego.Application.Features.Locations.Queries
     {
         public GetLocationsByCodeListQueryValidator()
         {
-            RuleFor(x => x.Code).NotNull().NotEmpty();
+            RuleFor(x => x.Codes).NotNull().NotEmpty();
         } 
     }
 }

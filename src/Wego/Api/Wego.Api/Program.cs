@@ -13,7 +13,6 @@ using Wego.Infrastructure.HealthCheck;
 using Wego.Infrastructure.Logging;
 using Wego.Persistence;
 
-using Wego.Persistence.EF;
 
 var builder = WebApplication.CreateBuilder(args);
 builder.Services.AddResponseCompression(options =>
@@ -73,9 +72,7 @@ builder.Services.AddGoogleServices(builder.Configuration);
 builder.Services.AddIdentityServices(builder.Configuration);
 builder.Services.AddCustomProblemDetails(builder.Environment);
 builder.Services.AddCustomHealthCheck(builder.Configuration)
-    .AddDbContextCheck<InetDbContext>()
-    .AddDbContextCheck<PortoDbContext>();
-builder.Services.AddDapperPersistenceServices();
+    .AddDbContextCheck<InetDbContext>();
 
 builder.Services.AddControllers();
 builder.Services.AddEndpointsApiExplorer();

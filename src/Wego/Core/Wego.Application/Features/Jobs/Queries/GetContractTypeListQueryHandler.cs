@@ -1,27 +1,28 @@
 ﻿using MediatR;
 using Wego.Application.Contracts.Persistence;
 using Wego.Application.Extensions;
+using Wego.Application.IRepo;
 using Wego.Application.Models.Common;
+using Wego.Domain.Common;
 using Wego.Domain.Entities;
 
 namespace Wego.Application.Features.Jobs.Queries
 {
-    public class GetContractTypeModel : BaseReferentialModel { }
-    public record GetContractTypeListQuery() : IRequest<List<GetContractTypeModel>>;
+    public record GetContractTypeListQuery() : IRequest<List<ContractTypeModel>>;
 
-    public class GetContractTypeListQueryHandler : IRequestHandler<GetContractTypeListQuery, List<GetContractTypeModel>>
+    public class GetContractTypeListQueryHandler : IRequestHandler<GetContractTypeListQuery, List<ContractTypeModel>>
     {
-        private readonly IBaseRepository<ContractType> _repository;
+        private readonly IContractTypeRepository _repository;
 
-        public GetContractTypeListQueryHandler(IBaseRepository<ContractType> repository)
+        public GetContractTypeListQueryHandler(IContractTypeRepository repository)
         {
             _repository = repository;
         }
 
-        public async Task<List<GetContractTypeModel>> Handle(GetContractTypeListQuery request, CancellationToken cancellationToken)
+        public async Task<List<ContractTypeModel>> Handle(GetContractTypeListQuery request, CancellationToken cancellationToken)
         {
-            var result= await _repository.GetAllAsync(CacheDuration.OneMonth, cancellationToken);
-            return result.MapTo<List<GetContractTypeModel>>();
+            var result= await _repository.GetAllAsync();
+            return result.ToList();
         }
     }
 

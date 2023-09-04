@@ -2,29 +2,26 @@
 using Microsoft.Data.SqlClient;
 using System.ComponentModel.DataAnnotations;
 using Wego.Application.Contracts.Persistence;
-
+using Wego.Application.IRepo;
+using Wego.Domain.Common;
 
 namespace Wego.Application.Features.Locations.Queries
 {
-    public record GetLocationsByQueryListQuery([Required][StringLength(20, MinimumLength = 2)] string Query) : IRequest<List<GetLocationsByQueryModel>>;
+    public record GetLocationsByQueryListQuery([Required][StringLength(20, MinimumLength = 2)] string Query) : IRequest<List<LocationModel>>;
 
-    public class GetLocationsByQueryListQueryHandler : IRequestHandler<GetLocationsByQueryListQuery, List<GetLocationsByQueryModel>>
+    public class GetLocationsByQueryListQueryHandler : IRequestHandler<GetLocationsByQueryListQuery, List<LocationModel>>
     {
-        private readonly IDataManager _dataManager;
+        private readonly ILocationRepository _repository;
 
-        public GetLocationsByQueryListQueryHandler(IDataManager dataManager)
+        public GetLocationsByQueryListQueryHandler(ILocationRepository repository)
         {
-            _dataManager = dataManager;
+            _repository = repository;
         }
 
-        public async Task<List<GetLocationsByQueryModel>> Handle(GetLocationsByQueryListQuery request, CancellationToken cancellationToken)
+        public async Task<List<LocationModel>> Handle(GetLocationsByQueryListQuery request, CancellationToken cancellationToken)
         {
-            var sqlParams = new List<SqlParameter>
-            {
-                new SqlParameter("Query", request.Query)
-            };
-
-            return await _dataManager.GetListAsync<GetLocationsByQueryModel>("LocationSearchEngine", sqlParams);
+            var result = await _repository.GetByQueryAsync(request.Query);
+            return result.ToList();
         }
     }
 }

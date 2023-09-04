@@ -1,25 +1,22 @@
 ﻿using MediatR;
-
-using Wego.Application.Contracts.Persistence;
-using Wego.Application.Extensions;
-using Wego.Domain.Entities;
+using Wego.Application.IRepo;
+using Wego.Domain.Offers;
 
 namespace Wego.Application.Features.Offers.Queries;
 
-public record GetOfferByIdQuery(int Id) : IRequest<GetOfferByIdModel>;
+public record GetOfferByIdQuery(int Id) : IRequest<OfferModel>;
 
-public class GetOfferByIdQueryHandler : IRequestHandler<GetOfferByIdQuery, GetOfferByIdModel?>
+public class GetOfferByIdQueryHandler : IRequestHandler<GetOfferByIdQuery, OfferModel>
 {
-    private readonly IBaseRepository<OffersSearch> _repository;
+    private readonly IOfferRepository _offerRepository;
 
-    public GetOfferByIdQueryHandler(IBaseRepository<OffersSearch> repository)
+    public GetOfferByIdQueryHandler(IOfferRepository offerRepository)
     {
-        _repository = repository;
+        _offerRepository = offerRepository;
     }
 
-    public async Task<GetOfferByIdModel?> Handle(GetOfferByIdQuery request, CancellationToken cancellationToken)
+    public async Task<OfferModel> Handle(GetOfferByIdQuery request, CancellationToken cancellationToken)
     {
-        var result = await _repository.FirstOrDefaultAsync((x) => x.Id == request.Id, cancellationToken: cancellationToken);
-        return result?.MapTo<GetOfferByIdModel>();
+        return await _offerRepository.GetOffersByIdAsync(request.Id);
     }
 }

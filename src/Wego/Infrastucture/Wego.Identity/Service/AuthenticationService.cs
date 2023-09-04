@@ -1,4 +1,5 @@
-﻿using Microsoft.AspNetCore.Identity;
+﻿using AutoMapper;
+using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.WebUtilities;
 using Microsoft.Extensions.Logging;
@@ -12,9 +13,12 @@ using Wego.Application.Contracts.Context;
 using Wego.Application.Contracts.Identity;
 using Wego.Application.Contracts.Persistence;
 using Wego.Application.Exceptions;
+using Wego.Application.IRepo;
+using Wego.Application.IRepository;
 using Wego.Application.Models.Authentification;
 using Wego.Application.Models.Mail;
-using Wego.Domain.Entities;
+using Wego.Domain.OfferProfile;
+using Wego.Domain.Profile;
 using Wego.Identity.Helpers;
 
 namespace Wego.Identity.Service;
@@ -27,8 +31,8 @@ public class AuthenticationService : IAuthenticationService
     private readonly ILogger<IAuthenticationService> _logger;
     private readonly IEmailSender _emailSender;
     private readonly ICurrentContext _currentContext;
-    private readonly IBaseRepository<UserProfile> _profileRepository;
-    private readonly IBaseRepository<Candidate> _candidateRepository;
+    private readonly IProfileRepository _profileRepository;
+    private readonly ICandidateRepository _candidateRepository;
     private readonly IGoogleCapthaService _googleCaptchaService;
 
     public AuthenticationService(UserManager<ApplicationUser> userManager,
@@ -37,8 +41,8 @@ public class AuthenticationService : IAuthenticationService
          ILogger<IAuthenticationService> logger,
          IEmailSender emailSender,
          ICurrentContext currentContext,
-         IBaseRepository<UserProfile> profileRepository,
-         IBaseRepository<Candidate> candidateRepository,
+         IProfileRepository profileRepository,
+         ICandidateRepository candidateRepository,
          IGoogleCapthaService googleCaptchaService
          )
     {
@@ -74,11 +78,11 @@ public class AuthenticationService : IAuthenticationService
         if (!result.Succeeded)
             throw new CredentialInvalidException($"Credentials for '{request.Email} aren't valid'.");
 
-        var profile = await _profileRepository.FirstOrDefaultAsync(x => x.Email == request.Email).ConfigureAwait(false);
+        var profile = await _profileRepository.GetProfileByEmailAsync(request.Email).ConfigureAwait(false);
         if (profile is null)
             throw new UserNotFoundException($"User profile not found for '{request.Email}.");
 
-        var jwtSecurityToken = await _jwtTokenService.GenerateTokenAsync(user);
+        var jwtSecurityToken = await _jwtTokenService.GenerateTokenAsync(user, profile.Id);
 
         return new AuthenticationResponse
         {
@@ -104,7 +108,7 @@ public class AuthenticationService : IAuthenticationService
         if (existingUser is not null)
             throw new UserAlreadyExistsException($"Email '{request.Email}' already exists.");
 
-        var profile = await _profileRepository.FirstOrDefaultAsync(x => x.Email == request.Email);
+        var profile = await _profileRepository.GetProfileByEmailAsync(request.Email).ConfigureAwait(false);
 
         if (profile is not null)
             throw new UserAlreadyExistsException($"Email '{request.Email}' already exists.");
@@ -134,29 +138,28 @@ public class AuthenticationService : IAuthenticationService
 
             _logger.LogInformation("User Created: {email}", user.Email);
 
-            var resultProfile = await _profileRepository.AddAsync(new UserProfile
+            var newProfile = new ProfileModel
             {
                 UserId = user.Id,
                 Email = request.Email,
                 UsId = string.Concat(request.Email.SplitMail(), IdentityHelpers.GetRandomId()),
                 InitialUserName = request.Email.GetInitials(),
-                CreationDate = DateTime.UtcNow,
-                UpdateDate = DateTime.UtcNow,
-            });
+            };
+            var resultProfile = await _profileRepository.AddProfileAsync(newProfile);
 
-            await _candidateRepository.AddAsync(new Candidate
+            await _candidateRepository.AddAsync(new CandidateModel
             {
-                CandidateEmail = request.Email,
-                CandidateName = request.Email.Substring(0, request.Email.IndexOf("@")),
+                Email = request.Email,
+                Name = request.Email.Substring(0, request.Email.IndexOf("@")),
                 IsConnected = false,
-                ProfileId = resultProfile.Id,
+                ProfileId = resultProfile,
             });
 
             return new RegistrationResponse()
             {
                 Email = user.Email!,
                 ConfirmedMail = false,
-                InitialUserName = resultProfile.InitialUserName!
+                InitialUserName = newProfile.InitialUserName!
             };
         }
 
@@ -183,12 +186,12 @@ public class AuthenticationService : IAuthenticationService
 
         if (result.Succeeded)
         {
-            var resultProfile = await _profileRepository.FirstOrDefaultAsync(x => x.UserId.Equals(encodedUserId)).ConfigureAwait(false);
+            var resultProfile = await _profileRepository.GetProfileByUserIdAsync(encodedUserId).ConfigureAwait(false);
 
             if (resultProfile is null)
                 throw new UserNotFoundException($"Profile not found .");
 
-            var jwtSecurityToken = await _jwtTokenService.GenerateTokenAsync(user);
+            var jwtSecurityToken = await _jwtTokenService.GenerateTokenAsync(user, resultProfile.Id);
 
             return new RegistrationResponse()
             {
@@ -269,14 +272,14 @@ public class AuthenticationService : IAuthenticationService
             }
 
             await _emailSender.SendMailAsync(new Email(user.Email!, "Reset Password Ok",
-           $"Reset Password are Ok !"));
+           "Reset Password are Ok !"));
 
-            var resultProfile = await _profileRepository.FirstOrDefaultAsync(x => x.Email.Equals(request.Email)).ConfigureAwait(false);
+            var resultProfile = await _profileRepository.GetProfileByEmailAsync(request.Email).ConfigureAwait(false);
 
             if (resultProfile is null)
                 throw new UserNotFoundException($"Profile not found .");
 
-            var jwtSecurityToken = await _jwtTokenService.GenerateTokenAsync(user);
+            var jwtSecurityToken = await _jwtTokenService.GenerateTokenAsync(user, resultProfile.Id);
 
             return new RegistrationResponse()
             {
@@ -306,11 +309,11 @@ public class AuthenticationService : IAuthenticationService
         var user = await _userManager.FindByEmailAsync(userName);
         if (user == null) throw new UserNotFoundException($"Email '{_currentContext.Identity.Email}' not found");
 
-        var profile = await _profileRepository.FirstOrDefaultAsync(x => x.Email == user.Email).ConfigureAwait(false);
+        var profile = await _profileRepository.GetProfileByEmailAsync(user.Email).ConfigureAwait(false);
         if (profile is null)
             throw new UserNotFoundException($"User profile not found for '{user.Email}.");
 
-        return await _jwtTokenService.GenerateTokenAsync(user);
+        return await _jwtTokenService.GenerateTokenAsync(user, profile.Id);
     }
 
 }

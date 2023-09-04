@@ -6,7 +6,7 @@ namespace Wego.Application.Contracts.Identity
 {
     public interface IJwtTokenService
     {
-        Task<TokenModel> GenerateTokenAsync(ApplicationUser user);
-        ClaimsPrincipal? GetPrincipalFromExpiredToken(string token);
+        Task<TokenModel> GenerateTokenAsync(ApplicationUser user, long profileId);
+        ClaimsPrincipal GetPrincipalFromExpiredToken(string token);
     }
 }

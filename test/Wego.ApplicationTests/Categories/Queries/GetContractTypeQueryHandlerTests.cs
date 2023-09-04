@@ -30,7 +30,7 @@ namespace Wego.ApplicationTests.Categories.Queries
 
             //Assert
             Assert.NotNull(result);
-            Assert.IsType<List<GetContractTypeModel>>(result);
+            Assert.IsType<List<ContractTypeModel>>(result);
             Assert.Equal(3, result.Count());
         }
 
@@ -47,7 +47,7 @@ namespace Wego.ApplicationTests.Categories.Queries
 
             //Assert
             Assert.Empty(result);
-            Assert.IsType<List<GetContractTypeModel>>(result);
+            Assert.IsType<List<ContractTypeModel>>(result);
         }
 
     }

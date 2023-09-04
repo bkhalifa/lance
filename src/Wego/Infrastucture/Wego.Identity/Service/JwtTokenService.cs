@@ -27,7 +27,7 @@ namespace Wego.Identity.Service
 
         }
 
-        public async Task<TokenModel> GenerateTokenAsync(ApplicationUser user)
+        public async Task<TokenModel> GenerateTokenAsync(ApplicationUser user, long profileId)
         {
             if (string.IsNullOrEmpty(user?.UserName) || string.IsNullOrEmpty(user?.Email)) throw new UserNotFoundException("User Token not found");
 
@@ -38,6 +38,7 @@ namespace Wego.Identity.Service
             new Claim(JwtRegisteredClaimNames.Sub, user.UserName),
             new Claim(JwtRegisteredClaimNames.Jti, Guid.NewGuid().ToString()),
             new Claim(JwtRegisteredClaimNames.Email, user.Email),
+            new Claim("profileId", profileId.ToString()),
             new Claim("uid", user.Id),
             }
             .Union(userClaims);
@@ -70,7 +71,7 @@ namespace Wego.Identity.Service
                 signingCredentials: new SigningCredentials(symmetricSecurityKey, SecurityAlgorithms.HmacSha256));
         }
 
-        public ClaimsPrincipal? GetPrincipalFromExpiredToken(string? token)
+        public ClaimsPrincipal GetPrincipalFromExpiredToken(string? token)
         {
             var tokenValidationParameters = new TokenValidationParameters
             {
@@ -82,22 +83,11 @@ namespace Wego.Identity.Service
             };
 
             var tokenHandler = new JwtSecurityTokenHandler();
-            try
-            {
-                var principal = tokenHandler.ValidateToken(token, tokenValidationParameters, out SecurityToken securityToken);
-                if (securityToken is not JwtSecurityToken jwtSecurityToken || !jwtSecurityToken.Header.Alg.Equals(SecurityAlgorithms.HmacSha256, StringComparison.InvariantCultureIgnoreCase))
-                    throw new SecurityTokenException("Invalid token");
+            var principal = tokenHandler.ValidateToken(token, tokenValidationParameters, out SecurityToken securityToken);
+            if (securityToken is not JwtSecurityToken jwtSecurityToken || !jwtSecurityToken.Header.Alg.Equals(SecurityAlgorithms.HmacSha256, StringComparison.InvariantCultureIgnoreCase))
+                throw new SecurityTokenException("Invalid token");
 
-                return principal;
-            }
-            catch (Exception ex)
-            {
-
-                throw ex;
-            }
-
-
-
+            return principal;
         }
 
         public static class TokenLifetimeValidator

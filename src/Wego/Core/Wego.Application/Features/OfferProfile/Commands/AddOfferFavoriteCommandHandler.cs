@@ -1,9 +1,7 @@
 ﻿using MediatR;
 using System.ComponentModel.DataAnnotations;
 using Wego.Application.Contracts.Context;
-using Wego.Application.Contracts.Persistence;
-using Wego.Application.Exceptions;
-using Wego.Domain.Entities;
+using Wego.Application.IRepo;
 
 namespace Wego.Application.Features.OfferProfile.Commands
 {
@@ -11,31 +9,20 @@ namespace Wego.Application.Features.OfferProfile.Commands
 
     public class AddOfferFavoriteCommandHandler : IRequestHandler<AddOfferFavoriteCommand, Unit>
     {
-        private readonly IBaseRepository<OfferProfileFavorite> _favoriteRepository;
-        private readonly IBaseRepository<UserProfile> _userProfile;
+        private readonly IOfferProfileRepository _favoriteRepository;
         private readonly ICurrentContext _currentContext;
-
-        public AddOfferFavoriteCommandHandler(IBaseRepository<OfferProfileFavorite> favoriteRepository, IBaseRepository<UserProfile> userProfile, ICurrentContext currentContext)
+        public AddOfferFavoriteCommandHandler(IOfferProfileRepository favoriteRepository, ICurrentContext currentContext)
         {
             _favoriteRepository = favoriteRepository;
-            _userProfile = userProfile;
             _currentContext = currentContext;
         }
 
         public async Task<Unit> Handle(AddOfferFavoriteCommand command, CancellationToken cancellationToken)
         {
-            var profile = await _userProfile.FirstOrDefaultAsync(x => x.Email == _currentContext.Identity.Email);
-            if (profile == null) throw new UserNotFoundException($"Email '{_currentContext.Identity.Email}' not found");
-
-            var favorite = await _favoriteRepository.FirstOrDefaultAsync(x => x.OfferId == command.OfferId && x.ProfileId == profile.Id);
+            var favorite = await _favoriteRepository.GetOfferFavoriteAsync(command.OfferId, _currentContext.Identity.ProfileId);
 
             if (favorite == null)
-                await _favoriteRepository.AddAsync(new OfferProfileFavorite
-                {
-                    ProfileId = profile.Id,
-                    OfferId = command.OfferId,
-                    CreatedDate = DateTime.UtcNow,
-                });
+                await _favoriteRepository.AddOfferFavoriteAsync(command.OfferId, _currentContext.Identity.ProfileId);
             return Unit.Value;
         }
     }

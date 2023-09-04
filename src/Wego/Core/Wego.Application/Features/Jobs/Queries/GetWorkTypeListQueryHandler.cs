@@ -1,27 +1,28 @@
 ﻿using MediatR;
 using Wego.Application.Contracts.Persistence;
 using Wego.Application.Extensions;
+using Wego.Application.IRepo;
 using Wego.Application.Models.Common;
+using Wego.Domain.Common;
 using Wego.Domain.Entities;
 
 namespace Wego.Application.Features.Jobs.Queries
 {
-    public class GetWorkTypeModel : BaseReferentialModel { }
-    public record GetWorkTypeListQuery() : IRequest<List<GetWorkTypeModel>>;
+    public record GetWorkTypeListQuery() : IRequest<List<WorkTypeModel>>;
 
-    public class GetWorkTypeListQueryHandler : IRequestHandler<GetWorkTypeListQuery, List<GetWorkTypeModel>>
+    public class GetWorkTypeListQueryHandler : IRequestHandler<GetWorkTypeListQuery, List<WorkTypeModel>>
     {
-        private readonly IBaseRepository<WorkType> _repository;
+        private readonly IWorkTypeRepository _repository;
 
-        public GetWorkTypeListQueryHandler(IBaseRepository<WorkType> repository)
+        public GetWorkTypeListQueryHandler(IWorkTypeRepository repository)
         {
             _repository = repository;
         }
 
-        public async Task<List<GetWorkTypeModel>> Handle(GetWorkTypeListQuery request, CancellationToken cancellationToken)
+        public async Task<List<WorkTypeModel>> Handle(GetWorkTypeListQuery request, CancellationToken cancellationToken)
         {
-            var result= await _repository.GetAllAsync(CacheDuration.OneMonth, cancellationToken);
-            return result.MapTo<List<GetWorkTypeModel>>();
+            var result= await _repository.GetAllAsync();
+            return result.ToList();
         }
     }
 }

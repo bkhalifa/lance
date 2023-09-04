@@ -1,27 +1,28 @@
 ﻿using MediatR;
 using Wego.Application.Contracts.Persistence;
 using Wego.Application.Extensions;
+using Wego.Application.IRepo;
 using Wego.Application.Models.Common;
+using Wego.Domain.Common;
 using Wego.Domain.Entities;
 
 namespace Wego.Application.Features.Jobs.Queries
 {
-    public class GetJobLevelModel : BaseReferentialModel { }
-    public record GetJobLevelListQuery() : IRequest<List<GetJobLevelModel>>;
+    public record GetJobLevelListQuery() : IRequest<List<JobLevelModel>>;
 
-    public class GetJobLevelListQueryHandler : IRequestHandler<GetJobLevelListQuery, List<GetJobLevelModel>>
+    public class GetJobLevelListQueryHandler : IRequestHandler<GetJobLevelListQuery, List<JobLevelModel>>
     {
-        private readonly IBaseRepository<JobLevel> _repository;
+        private readonly IJobLevelRepository _repository;
 
-        public GetJobLevelListQueryHandler(IBaseRepository<JobLevel> repository)
+        public GetJobLevelListQueryHandler(IJobLevelRepository repository)
         {
             _repository = repository;
         }
 
-        public async Task<List<GetJobLevelModel>> Handle(GetJobLevelListQuery request, CancellationToken cancellationToken)
+        public async Task<List<JobLevelModel>> Handle(GetJobLevelListQuery request, CancellationToken cancellationToken)
         {
-            var result= await _repository.GetAllAsync(CacheDuration.OneMonth, cancellationToken);
-            return result.MapTo<List<GetJobLevelModel>>();
+            var result= await _repository.GetAllAsync();
+            return result.ToList();
         }
     }
 }

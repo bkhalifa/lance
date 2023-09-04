@@ -1,27 +1,24 @@
 ﻿using MediatR;
-using Wego.Application.Contracts.Persistence;
-using Wego.Application.Extensions;
-using Wego.Application.Models.Common;
-using Wego.Domain.Entities;
+using Wego.Application.IRepo;
+using Wego.Domain.Common;
 
 namespace Wego.Application.Features.Skills.Queries
 {
-    public class GetSkillModel : BaseReferentialModel { }
-    public record GetSkillListQuery() : IRequest<List<GetSkillModel>>;
+    public record GetSkillListQuery() : IRequest<List<SkillModel>>;
 
-    public class GetSkillListQueryHandler : IRequestHandler<GetSkillListQuery, List<GetSkillModel>>
+    public class GetSkillListQueryHandler : IRequestHandler<GetSkillListQuery, List<SkillModel>>
     {
-        private readonly IBaseRepository<Skill> _repository;
+        private readonly ISkillRepository _repository;
 
-        public GetSkillListQueryHandler(IBaseRepository<Skill> repository)
+        public GetSkillListQueryHandler(ISkillRepository repository)
         {
             _repository = repository;
         }
 
-        public async Task<List<GetSkillModel>> Handle(GetSkillListQuery request, CancellationToken cancellationToken)
+        public async Task<List<SkillModel>> Handle(GetSkillListQuery request, CancellationToken cancellationToken)
         {
-            var result= await _repository.GetAllAsync(CacheDuration.OneMonth, cancellationToken);
-            return result.MapTo<List<GetSkillModel>>();
+            var result = await _repository.GetAllAsync();
+            return result.ToList();
         }
     }
 
