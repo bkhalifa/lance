@@ -4,6 +4,6 @@ namespace Wego.Application.IRepo
 {
     public interface IWorkTypeRepository
     {
-        Task<IEnumerable<WorkTypeModel>> GetAllAsync();
+        Task<IEnumerable<WorkTypeModel>> GetAllAsync(CancellationToken cancellationToken = default);
     }
 }

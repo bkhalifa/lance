@@ -4,5 +4,5 @@ namespace Wego.Application.IRepo;
 
 public interface ISkillRepository
 {
-    Task<IEnumerable<SkillModel>> GetAllAsync();
+    Task<IEnumerable<SkillModel>> GetAllAsync(CancellationToken cancellationToken = default);
 }

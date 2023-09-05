@@ -21,7 +21,7 @@ namespace Wego.Application.Features.Jobs.Queries
 
         public async Task<List<WorkTypeModel>> Handle(GetWorkTypeListQuery request, CancellationToken cancellationToken)
         {
-            var result= await _repository.GetAllAsync();
+            var result= await _repository.GetAllAsync(cancellationToken);
             return result.ToList();
         }
     }

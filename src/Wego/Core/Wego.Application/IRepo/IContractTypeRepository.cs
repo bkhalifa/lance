@@ -4,6 +4,6 @@ namespace Wego.Application.IRepo
 {
     public interface IContractTypeRepository
     {
-        Task<IEnumerable<ContractTypeModel>> GetAllAsync();
+        Task<IEnumerable<ContractTypeModel>> GetAllAsync(CancellationToken cancellationToken = default);
     }
 }

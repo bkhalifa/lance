@@ -17,7 +17,7 @@ namespace Wego.Application.Features.Locations.Queries
 
         public async Task<List<RegionModel>> Handle(GetRegionListQuery request, CancellationToken cancellationToken)
         {
-            var result = await _repository.GetAllRegionsAsync();
+            var result = await _repository.GetAllRegionsAsync(cancellationToken);
             return result.ToList();
         }
     }

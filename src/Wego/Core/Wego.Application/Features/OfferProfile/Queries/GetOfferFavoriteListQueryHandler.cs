@@ -19,7 +19,7 @@ namespace Wego.Application.Features.OfferProfile.Queries
 
         public async Task<List<OfferFavoriteModel>> Handle(GetOfferFavoriteListQuery request, CancellationToken cancellationToken)
         {
-            var result = await _favoriteRepository.GetAllAsync(_currentContext.Identity.ProfileId);
+            var result = await _favoriteRepository.GetAllAsync(_currentContext.Identity.ProfileId, cancellationToken);
             return result.ToList();
         }
     }

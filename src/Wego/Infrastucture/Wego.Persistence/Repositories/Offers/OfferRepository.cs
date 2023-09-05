@@ -1,5 +1,6 @@
 ﻿using Dapper;
 using System.Data;
+using System.Web;
 using Wego.Application.IRepo;
 using Wego.Domain.Offers;
 
@@ -13,12 +14,11 @@ namespace Wego.Persistence.Repositories.Offers
             _context = context;
         }
 
-
-        public async Task<IEnumerable<OfferSearchModel>> GetOffersByFilterAsync(OfferFilterParam filter)
+        public async Task<IEnumerable<OfferSearchModel>> GetOffersByFilterAsync(OfferFilterParam filter, CancellationToken cancellationToken = default)
         {
             var parameters = new DynamicParameters();
 
-            parameters.Add("SearchText", CheckField(filter.Query));
+            parameters.Add("SearchText", CheckField(HttpUtility.UrlDecode(filter.Query)));
             parameters.Add("LocationCodes", CheckField(filter.Locations));
             parameters.Add("ContractTypeCodes", CheckField(filter.ContractTypes));
             parameters.Add("SkillCodes", CheckField(filter.Skills));
@@ -33,11 +33,12 @@ namespace Wego.Persistence.Repositories.Offers
 
             using (var connection = _context.CreateConnection())
             {
-                return await connection.QueryAsync<OfferSearchModel>("OfferSearchEngine", parameters, commandType: CommandType.StoredProcedure);
+                return await connection.QueryAsync<OfferSearchModel>(new CommandDefinition("OfferSearchEngine", parameters, 
+                    commandType: CommandType.StoredProcedure, cancellationToken: cancellationToken));
             }
         }
 
-        public async Task<OfferModel> GetOffersByIdAsync(int id)
+        public async Task<OfferModel> GetOffersByIdAsync(int id, CancellationToken cancellationToken = default)
         {
             var sql = "SELECT * FROM dbo.OffersSearch WHERE id = @id";
             var parameters = new DynamicParameters();
@@ -45,7 +46,7 @@ namespace Wego.Persistence.Repositories.Offers
 
             using (var connection = _context.CreateConnection())
             {
-                return await connection.QueryFirstOrDefaultAsync<OfferModel>(sql, parameters);
+                return await connection.QueryFirstOrDefaultAsync<OfferModel>(new CommandDefinition(sql, parameters, cancellationToken: cancellationToken));
             }
         }
         private static string CheckField(string field)

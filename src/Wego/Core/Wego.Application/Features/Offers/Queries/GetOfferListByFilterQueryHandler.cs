@@ -21,7 +21,7 @@ namespace Wego.Application.Features.Jobs.Queries
         public async Task<List<OfferSearchModel>> Handle(GetOfferListByFilterQuery request, CancellationToken cancellationToken)
         {
             var param = request.MapTo<OfferFilterParam>();
-            var result = await _offerRepository.GetOffersByFilterAsync(param);
+            var result = await _offerRepository.GetOffersByFilterAsync(param, cancellationToken);
 
             return result.ToList();
 

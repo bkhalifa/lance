@@ -17,6 +17,6 @@ public class GetOfferByIdQueryHandler : IRequestHandler<GetOfferByIdQuery, Offer
 
     public async Task<OfferModel> Handle(GetOfferByIdQuery request, CancellationToken cancellationToken)
     {
-        return await _offerRepository.GetOffersByIdAsync(request.Id);
+        return await _offerRepository.GetOffersByIdAsync(request.Id, cancellationToken);
     }
 }

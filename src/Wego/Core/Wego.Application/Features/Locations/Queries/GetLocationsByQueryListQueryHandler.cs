@@ -20,7 +20,7 @@ namespace Wego.Application.Features.Locations.Queries
 
         public async Task<List<LocationModel>> Handle(GetLocationsByQueryListQuery request, CancellationToken cancellationToken)
         {
-            var result = await _repository.GetByQueryAsync(request.Query);
+            var result = await _repository.GetByQueryAsync(request.Query, cancellationToken);
             return result.ToList();
         }
     }

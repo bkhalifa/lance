@@ -17,7 +17,7 @@ namespace Wego.Application.Features.Locations.Queries
 
         public async Task<List<CountryModel>> Handle(GetCountryListQuery request, CancellationToken cancellationToken)
         {
-            var result = await _repository.GetAllCountriesAsync();
+            var result = await _repository.GetAllCountriesAsync(cancellationToken);
             return result.ToList();
         }
     }

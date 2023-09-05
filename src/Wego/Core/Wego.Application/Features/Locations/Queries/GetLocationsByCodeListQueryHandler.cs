@@ -17,7 +17,7 @@ namespace Wego.Application.Features.Locations.Queries
 
         public async Task<List<GetLocationsByCodeModel>> Handle(GetLocationsByCodeListQuery request, CancellationToken cancellationToken)
         {
-            var result = await _repository.GetByCodesAsync(request.Codes);
+            var result = await _repository.GetByCodesAsync(request.Codes, cancellationToken);
 
             return result.GroupBy(x => x.Code).Select(x => new GetLocationsByCodeModel
             {
