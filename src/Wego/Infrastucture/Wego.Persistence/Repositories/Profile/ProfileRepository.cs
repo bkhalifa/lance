@@ -53,13 +53,13 @@ public class ProfileRepository : IProfileRepository
         }
     }
 
-    public async Task<ImageProfileResponse> GetImageByIdAsync(long fid)
+    public async Task<ImageProfileResponse> GetImageByIdAsync(long pid)
     {
-        var query = "SELECT ImageData, ContentType FROM [profile].[ImageProfile] WHERE Id = @fid ORDER BY CreationDate DESC";
+        var query = "SELECT ImageData, ContentType FROM [profile].[ImageProfile] WHERE ProfileId = @pid ORDER BY CreationDate DESC";
 
         using (var connection = _context.CreateConnection())
         {
-            var result = await connection.QueryFirstOrDefaultAsync<ImageProfileResponse>(query, new { fid });
+            var result = await connection.QueryFirstOrDefaultAsync<ImageProfileResponse>(query, new { pid });
 
             return result ?? new ImageProfileResponse { ContentType = "image/png", ImageData = new byte[] { 0x20, 0x20, 0x20, 0x20, 0x20, 0x20, 0x20 } };
         }
