@@ -1,6 +1,6 @@
 ﻿using MediatR;
 
-using Wego.Application.IRepository;
+using Wego.Application.IService;
 
 namespace Wego.Application.Features.Profile.Commands;
 
@@ -8,14 +8,14 @@ public record ImageProfileModelCommand(long ProfileId, byte[] Base64, int Width,
 
 public class ImageProfileCommandHandler : IRequestHandler<ImageProfileModelCommand, long>
 {
-    private readonly IProfileRepository _profileRepository;
-    public ImageProfileCommandHandler(IProfileRepository profileRepository)
+    private readonly IProfileService _profileService;
+    public ImageProfileCommandHandler(IProfileService profileService)
     {
-        _profileRepository = profileRepository;
+        _profileService = profileService;
     }
 
     public async Task<long> Handle(ImageProfileModelCommand request, CancellationToken cancellationToken)
     {
-        return await _profileRepository.CreateImageAsync(request).ConfigureAwait(false);
+        return await _profileService.SaveImageAsync(request).ConfigureAwait(false);
     }
 }

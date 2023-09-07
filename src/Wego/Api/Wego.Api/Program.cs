@@ -65,14 +65,16 @@ builder.Host.UseLogging(builder.Configuration, "WegoApi");
 builder.Services.AddHttpContextAccessor();
 builder.Services.AddDistributedMemoryCache();
 builder.Services.AddResponseCompression(options => { options.EnableForHttps = true; });
+
 builder.Services.AddApplicationServices(builder.Configuration);
 builder.Services.AddInfrastructureServices(builder.Configuration);
 builder.Services.AddPersistenceServices(builder.Configuration);
 builder.Services.AddGoogleServices(builder.Configuration);
 builder.Services.AddIdentityServices(builder.Configuration);
+
 builder.Services.AddCustomProblemDetails(builder.Environment);
 builder.Services.AddCustomHealthCheck(builder.Configuration)
-    .AddDbContextCheck<InetDbContext>();
+                .AddDbContextCheck<InetDbContext>();
 
 builder.Services.AddControllers();
 builder.Services.AddEndpointsApiExplorer();

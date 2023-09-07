@@ -61,7 +61,7 @@ public class ProfileRepository : IProfileRepository
         {
             var result = await connection.QueryFirstOrDefaultAsync<ImageProfileResponse>(query, new { pid });
 
-            return result ?? new ImageProfileResponse { ContentType = "image/png", ImageData = new byte[] { 0x20, 0x20, 0x20, 0x20, 0x20, 0x20, 0x20 } };
+            return result ;
         }
     }
 

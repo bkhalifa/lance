@@ -1,6 +1,6 @@
 ﻿using MediatR;
 
-using Wego.Application.IRepository;
+using Wego.Application.IService;
 using Wego.Domain.Profile;
 
 namespace Wego.Application.Features.Profile.Queries;
@@ -8,13 +8,13 @@ namespace Wego.Application.Features.Profile.Queries;
 public record GetImageByIdQuery(long pid) : IRequest<ImageProfileResponse>;
 public class GetImageByIdQueryHandler : IRequestHandler<GetImageByIdQuery, ImageProfileResponse>
 {
-    private readonly IProfileRepository _profileRepository;
-    public GetImageByIdQueryHandler(IProfileRepository profileRepository)
+    private readonly IProfileService _profileService;
+    public GetImageByIdQueryHandler(IProfileService profileService)
     {
-        _profileRepository = profileRepository;
+        _profileService = profileService;
     }
     public Task<ImageProfileResponse> Handle(GetImageByIdQuery request, CancellationToken cancellationToken)
     {
-        return _profileRepository.GetImageByIdAsync(request.pid);
+        return _profileService.GetImageByIdAsync(request.pid);
     }
 }

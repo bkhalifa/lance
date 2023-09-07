@@ -1,9 +1,4 @@
-﻿using MediatR;
-using Wego.Application.Contracts.Persistence;
-using Wego.Application.Extensions;
-using Wego.Domain.Entities;
-
-namespace Wego.Application.Features.Chat.Queries
+﻿namespace Wego.Application.Features.Chat.Queries
 {
 
     public record GetChatMessageListQuery(long profileFromId, long profileToId) : IRequest<List<GetChatMessageModel>>;

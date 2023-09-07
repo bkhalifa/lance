@@ -5,9 +5,11 @@ using Microsoft.Extensions.Options;
 
 using Wego.Application.Contracts.Context;
 using Wego.Application.Contracts.Infrastructure;
+using Wego.Application.IService;
 using Wego.Application.Models.Common;
 using Wego.Infrastructure.Context;
 using Wego.Infrastructure.Log;
+using Wego.Infrastructure.Services.Feature.Profile;
 
 namespace Wego.Persistence;
 
@@ -20,6 +22,7 @@ public static class InfrastructureServiceRegistration
 
         services.AddScoped<ICacheManager, CacheManager>();
         services.AddScoped<ICurrentContext, CurrentContext>();
+        services.AddScoped<IProfileService, ProfileService>();
         services.AddEasyCaching(options => options.UseInMemory("default"));
 
         services.TryAddSingleton<IWebSettings>(sp => sp.GetRequiredService<IOptions<WebSettings>>().Value);
