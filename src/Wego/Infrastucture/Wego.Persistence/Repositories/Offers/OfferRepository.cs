@@ -23,6 +23,7 @@ namespace Wego.Persistence.Repositories.Offers
             parameters.Add("ContractTypeCodes", CheckField(filter.ContractTypes));
             parameters.Add("SkillCodes", CheckField(filter.Skills));
             parameters.Add("SeniorityCodes", CheckField(filter.Seniorities));
+            parameters.Add("CategoryCodes", CheckField(filter.Categories));
             parameters.Add("WorkTypeCodes", CheckField(filter.WorkTypes));
             parameters.Add("DailyRateMin", filter.DailyRateMin);
             parameters.Add("SalaryMin", filter.SalaryMin);

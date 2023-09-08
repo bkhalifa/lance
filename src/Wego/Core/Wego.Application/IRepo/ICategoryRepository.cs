@@ -4,5 +4,5 @@ namespace Wego.Application.IRepo;
 
 public interface ICategoryRepository 
 {
-    Task<IEnumerable<GetCategoriesModel>> GetAllAsync(CancellationToken cancellationToken = default);
+    Task<IEnumerable<CategoryModel>> GetAllAsync(CancellationToken cancellationToken = default);
 }

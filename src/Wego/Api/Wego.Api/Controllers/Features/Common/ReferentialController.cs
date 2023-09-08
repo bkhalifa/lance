@@ -21,15 +21,15 @@ namespace Wego.Api.Controllers.Features.Common
         }
 
 
-        [HttpGet("get-categories")]
+        [HttpGet("categories")]
         [ProducesResponseType(StatusCodes.Status200OK)]
-        public async Task<ActionResult<List<GetCategoriesModel>>> GetAllCategories()
+        public async Task<ActionResult<List<CategoryModel>>> GetAllCategories()
         {
             var dtos = await _mediator.Send(new GetCategoriesListQuery());
             return Ok(dtos);
         }
 
-        [HttpGet("get-skills")]
+        [HttpGet("skills")]
         [ProducesResponseType(StatusCodes.Status200OK)]
         public async Task<ActionResult<List<SkillModel>>> GetAllSkills()
         {
@@ -37,7 +37,7 @@ namespace Wego.Api.Controllers.Features.Common
             return Ok(dtos);
         }
 
-        [HttpGet("get-contracttypes")]
+        [HttpGet("contracttypes")]
         [ProducesResponseType(StatusCodes.Status200OK)]
         public async Task<ActionResult<List<ContractTypeModel>>> GetAllContractTypes()
         {
@@ -45,7 +45,7 @@ namespace Wego.Api.Controllers.Features.Common
             return Ok(dtos);
         }
 
-        [HttpGet("get-worktypes")]
+        [HttpGet("worktypes")]
         [ProducesResponseType(StatusCodes.Status200OK)]
         public async Task<ActionResult<List<WorkTypeModel>>> GetAllWorkTypes()
         {
@@ -53,7 +53,7 @@ namespace Wego.Api.Controllers.Features.Common
             return Ok(dtos);
         }
 
-        [HttpGet("get-joblevels")]
+        [HttpGet("joblevels")]
         [ProducesResponseType(StatusCodes.Status200OK)]
         public async Task<ActionResult<List<JobLevelModel>>> GetAllJobLevels()
         {

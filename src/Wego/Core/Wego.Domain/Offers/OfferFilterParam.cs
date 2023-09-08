@@ -10,6 +10,7 @@ namespace Wego.Domain.Offers
         public string Skills { get; set; }
         public string Seniorities { get; set; }
         public string ContractTypes { get; set; }
+        public string Categories { get; set; }
         public string WorkTypes { get; set; }
         public OrderByType? OrderBy { get; set; }
         public decimal? SalaryMin { get; set; }

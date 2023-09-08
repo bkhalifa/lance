@@ -15,14 +15,14 @@ namespace Wego.Persistence.Repositories.Common
             _context = context;
             _cacheManager = cacheManager;
         }
-        public async Task<IEnumerable<GetCategoriesModel>> GetAllAsync(CancellationToken cancellationToken = default)
+        public async Task<IEnumerable<CategoryModel>> GetAllAsync(CancellationToken cancellationToken = default)
         {
-            return await _cacheManager.GetAsync(nameof(GetCategoriesModel), async () =>
+            return await _cacheManager.GetAsync(nameof(CategoryModel), async () =>
             {
                 var sql = "SELECT * FROM config.Categories";
                 using (var connection = _context.CreateConnection())
                 {
-                    var result = await connection.QueryAsync<GetCategoriesModel>(sql);
+                    var result = await connection.QueryAsync<CategoryModel>(sql);
                     return result;
                 }
             }, CacheDuration.OneDay, cancellationToken);

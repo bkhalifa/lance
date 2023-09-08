@@ -17,18 +17,5 @@ namespace Wego.Api.Controllers.Pages
         {
             _mediator = mediator;
         }
-
-
-
-        [HttpGet(nameof(GetAll))]
-        [ProducesResponseType(StatusCodes.Status200OK)]
-        [ProducesResponseType(StatusCodes.Status500InternalServerError)]
-        [ProducesResponseType(StatusCodes.Status401Unauthorized)]
-        [Authorize]
-        public async Task<ActionResult<List<GetCategoriesModel>>> GetAll()
-        {
-            var dtos = await _mediator.Send(new GetCategoriesListQuery());
-            return Ok(dtos);
-        }
     }
 }

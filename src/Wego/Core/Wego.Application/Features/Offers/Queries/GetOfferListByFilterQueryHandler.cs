@@ -6,7 +6,7 @@ using Wego.Domain.Offers;
 
 namespace Wego.Application.Features.Jobs.Queries
 {
-    public record GetOfferListByFilterQuery(string? Query, string Locations, string Skills, string Seniorities, string ContractTypes, string WorkTypes, OrderByType? OrderBy,
+    public record GetOfferListByFilterQuery(string Query, string Locations, string Categories, string Skills, string Seniorities, string ContractTypes, string WorkTypes, OrderByType? OrderBy,
     decimal? SalaryMin, decimal? DailyRateMin, int PageIndex = 1, int PageSize = 10) : IRequest<List<OfferSearchModel>>;
 
     public class GetOfferListByFilterQueryHandler : IRequestHandler<GetOfferListByFilterQuery, List<OfferSearchModel>>
