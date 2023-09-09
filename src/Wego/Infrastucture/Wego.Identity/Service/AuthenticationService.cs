@@ -165,7 +165,6 @@ public class AuthenticationService : IAuthenticationService
 
         throw new ValidationException(result.Errors.ToDictionary(x => x.Code, x => x.Description));
     }
-
     public async Task<RegistrationResponse> ConfirmRegistration(ConfirmRegisterModel request)
     {
         if (request is null)
