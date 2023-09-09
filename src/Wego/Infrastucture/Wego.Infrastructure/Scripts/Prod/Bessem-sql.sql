@@ -379,3 +379,9 @@ BEGIN
 END
 
 GO
+
+delete
+  FROM [config].[Categories]
+  where code in('mechanical-engineer','executive-assistant', 'teacher')
+
+insert into [config].[Categories] values('software-engineer','Software Engineer')
