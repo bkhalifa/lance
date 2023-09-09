@@ -1,4 +1,4 @@
-﻿using AutoMapper;
+﻿
 using Dapper;
 
 using System.Data;
@@ -76,7 +76,7 @@ public class ProfileRepository : IProfileRepository
 
     public async Task<ProfileModel> GetProfileByEmailAsync(string email)
     {
-        var query = "SELECT * FROM [profile].[Profiles] WHERE email = @email ";
+        var query = "SELECT * FROM [profile].[Profiles] WHERE Email = @email ";
         var parameters = new DynamicParameters();
         parameters.Add("email", email);
 
@@ -88,7 +88,7 @@ public class ProfileRepository : IProfileRepository
 
     public async Task<ProfileModel> GetProfileByUserIdAsync(string userId)
     {
-        var query = "SELECT * FROM [profile].[Profiles] WHERE userId = @userId ";
+        var query = "SELECT * FROM [profile].[Profiles] WHERE UserId = @userId ";
         var parameters = new DynamicParameters();
         parameters.Add("userId", userId);
 
