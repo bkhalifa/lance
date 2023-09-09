@@ -145,15 +145,15 @@ public class AuthenticationService : IAuthenticationService
                 UsId = string.Concat(request.Email.SplitMail(), IdentityHelpers.GetRandomId()),
                 InitialUserName = request.Email.GetInitials(),
             };
-            var resultProfile = await _profileRepository.AddProfileAsync(newProfile);
+            var resultProfile = await _profileRepository.AddProfileInfoAsync(newProfile);
 
-            await _candidateRepository.AddAsync(new CandidateModel
-            {
-                Email = request.Email,
-                Name = request.Email.Substring(0, request.Email.IndexOf("@")),
-                IsConnected = false,
-                ProfileId = resultProfile,
-            });
+            //await _candidateRepository.AddAsync(new CandidateModel
+            //{
+            //    Email = request.Email,
+            //    Name = request.Email.Substring(0, request.Email.IndexOf("@")),
+            //    IsConnected = false,
+            //    ProfileId = resultProfile,
+            //});
 
             return new RegistrationResponse()
             {

@@ -4,7 +4,6 @@ using Dapper;
 using System.Data;
 using Wego.Application.Features.Profile.Commands;
 using Wego.Application.IRepository;
-using Wego.Domain.OfferProfile;
 using Wego.Domain.Profile;
 
 namespace Wego.Persistence.Repositories.Profile;
@@ -67,7 +66,7 @@ public class ProfileRepository : IProfileRepository
 
     public async Task<ProfileModel> GetProfileAsync(long profileId)
     {
-        var query = "SELECT * FROM [profile].[UserProfiles] WHERE Id = @profileId ";
+        var query = "SELECT * FROM [profile].[Profiles] WHERE Id = @profileId ";
         var parameters = new DynamicParameters();
         parameters.Add("profileId", profileId);
 
@@ -79,7 +78,7 @@ public class ProfileRepository : IProfileRepository
 
     public async Task<ProfileModel> GetProfileByEmailAsync(string email)
     {
-        var query = "SELECT * FROM [profile].[UserProfiles] WHERE email = @email ";
+        var query = "SELECT * FROM [profile].[Profiles] WHERE email = @email ";
         var parameters = new DynamicParameters();
         parameters.Add("email", email);
 
@@ -91,7 +90,7 @@ public class ProfileRepository : IProfileRepository
 
     public async Task<ProfileModel> GetProfileByUserIdAsync(string userId)
     {
-        var query = "SELECT * FROM [profile].[UserProfiles] WHERE userId = @userId ";
+        var query = "SELECT * FROM [profile].[Profiles] WHERE userId = @userId ";
         var parameters = new DynamicParameters();
         parameters.Add("userId", userId);
 
@@ -101,16 +100,23 @@ public class ProfileRepository : IProfileRepository
         }
     }
 
-    public async Task<long> AddProfileAsync(ProfileModel profile)
+    public async Task<long> AddProfileInfoAsync(ProfileModel profile)
     {
-        var sql = "INSERT INTO [profile].[UserProfiles] (UserId, Email, UsId, InitialUserName, CreationDate, UpdateDate)  VALUES " +
-            "(@userId, @email, @usId, @initial, GETUTCDATE(), GETUTCDATE())" +
+        var sql = "INSERT INTO [profile].[Profiles] VALUES " +
+            " (@userId, @FirstName, @LastName, @InitialUserName, @Email, @PhoneNumber, @CreationDate, @UpdateDate, @UsId, @Position, @Skills) " +
             "SELECT CAST(SCOPE_IDENTITY() AS INT) ";
         var parameters = new DynamicParameters();
         parameters.Add("userId", profile.UserId);
+        parameters.Add("firstName", default);
+        parameters.Add("lastName", default);
+        parameters.Add("initialUserName", profile.InitialUserName); 
         parameters.Add("email", profile.Email);
-        parameters.Add("usId", profile.UsId);
-        parameters.Add("initial", profile.InitialUserName);
+        parameters.Add("phoneNumber", default);
+        parameters.Add("creationDate", DateTime.UtcNow);
+        parameters.Add("updateDate",default(DateTime?));
+        parameters.Add("usid", profile.UserId);
+        parameters.Add("position", default(string));
+        parameters.Add("skills", default(string));
 
 
         using (var connection = _context.CreateConnection())
