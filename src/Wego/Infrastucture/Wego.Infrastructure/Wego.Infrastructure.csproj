@@ -24,4 +24,8 @@
     <ProjectReference Include="..\..\Core\Wego.Application\Wego.Application.csproj" />
   </ItemGroup>
 
+  <ItemGroup>
+    <Folder Include="Content\" />
+  </ItemGroup>
+
 </Project>

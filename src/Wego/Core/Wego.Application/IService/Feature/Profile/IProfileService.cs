@@ -1,7 +1,7 @@
 ﻿using Wego.Application.Features.Profile.Commands;
 using Wego.Domain.Profile;
 
-namespace Wego.Application.IService;
+namespace Wego.Application.IService.Feature.Profile;
 
 public interface IProfileService
 {

@@ -52,15 +52,13 @@ public class ProfileRepository : IProfileRepository
         }
     }
 
-    public async Task<ImageProfileResponse> GetImageByIdAsync(long pid)
+    public async Task<ImageProfileResponse> GetImageByIdAsync(long fid)
     {
-        var query = "SELECT ImageData, ContentType FROM [profile].[ImageProfile] WHERE ProfileId = @pid ORDER BY CreationDate DESC";
-
+        var query = "SELECT ImageData, ContentType, ProfileId FROM [profile].[ImageProfile] WHERE Id = @fid";
         using (var connection = _context.CreateConnection())
         {
-            var result = await connection.QueryFirstOrDefaultAsync<ImageProfileResponse>(query, new { pid });
-
-            return result ;
+            var result = await connection.QueryFirstOrDefaultAsync<ImageProfileResponse>(query, new { fid });
+            return result;
         }
     }
 
@@ -124,4 +122,4 @@ public class ProfileRepository : IProfileRepository
             return await connection.QuerySingleOrDefaultAsync<long>(sql, parameters);
         }
     }
-}
+ }
