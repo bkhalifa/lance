@@ -48,8 +48,6 @@ public class ProfileController : ControllerBase
 
 
     [HttpGet("{fid}/thumbnail")]
-    [ProducesResponseType(StatusCodes.Status200OK)]
-    [ProducesResponseType(StatusCodes.Status404NotFound)]
     [Authorize]
     [ProducesResponseType(StatusCodes.Status200OK)]
     [ProducesResponseType(StatusCodes.Status500InternalServerError)]
