@@ -22,6 +22,10 @@ public class ProfileController : ControllerBase
     }
 
     [HttpGet("{uid}/{pid}/info")]
+    [Authorize]
+    [ProducesResponseType(StatusCodes.Status200OK)]
+    [ProducesResponseType(StatusCodes.Status500InternalServerError)]
+    [ProducesResponseType(StatusCodes.Status401Unauthorized)]
     public async Task<ActionResult> GetProfileInfo(string uid, long pid)
     {
       var result = await _mediator.Send(new GetProfileInfoQuery(uid, pid));
@@ -35,6 +39,9 @@ public class ProfileController : ControllerBase
 
     [HttpPost("create-thumbnail")]
     [Authorize]
+    [ProducesResponseType(StatusCodes.Status200OK)]
+    [ProducesResponseType(StatusCodes.Status500InternalServerError)]
+    [ProducesResponseType(StatusCodes.Status401Unauthorized)]
     public async Task<ActionResult<long>> CreateImageProfile([FromBody] ImageProfileModel model, CancellationToken ct)
       => Ok(await _mediator.Send(new ImageProfileModelCommand(model.ProfileId, model.Base64, model.Width, model.Height, model.ContentType)));
 
@@ -44,6 +51,9 @@ public class ProfileController : ControllerBase
     [ProducesResponseType(StatusCodes.Status200OK)]
     [ProducesResponseType(StatusCodes.Status404NotFound)]
     [Authorize]
+    [ProducesResponseType(StatusCodes.Status200OK)]
+    [ProducesResponseType(StatusCodes.Status500InternalServerError)]
+    [ProducesResponseType(StatusCodes.Status401Unauthorized)]
     public async Task<ActionResult<ImageProfileResponse>> GetImageProfile(long fid, CancellationToken ct)
      => Ok(await _mediator.Send(new GetImageByIdQuery(fid)));
 
