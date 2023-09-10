@@ -5,7 +5,7 @@ using Microsoft.Extensions.Options;
 
 using Wego.Application.Contracts.Context;
 using Wego.Application.Contracts.Infrastructure;
-using Wego.Application.IService;
+using Wego.Application.IService.Feature.Profile;
 using Wego.Application.Models.Common;
 using Wego.Infrastructure.Context;
 using Wego.Infrastructure.Log;

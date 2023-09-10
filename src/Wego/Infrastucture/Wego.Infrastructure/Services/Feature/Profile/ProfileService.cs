@@ -2,7 +2,7 @@
 
 using Wego.Application.Features.Profile.Commands;
 using Wego.Application.IRepository;
-using Wego.Application.IService;
+using Wego.Application.IService.Feature.Profile;
 using Wego.Domain.Profile;
 
 namespace Wego.Infrastructure.Services.Feature.Profile;
@@ -16,26 +16,21 @@ public class ProfileService : IProfileService
     }
     public async Task<long> SaveImageAsync(ImageProfileModelCommand model)
     {
-        if(model is not null)
+        var image = await _profileRepository.GetImageByIdAsync(model.ProfileId);
+
+        if(image is null)
         {
-            var dataImage = ToThumbnail(model.Base64, 160, 160);
-
+            return await _profileRepository.CreateImageAsync(model).ConfigureAwait(false);
         }
-        return await _profileRepository.CreateImageAsync(model).ConfigureAwait(false);
+
+        return await _profileRepository.UpdateImageAsync(model).ConfigureAwait(false);
     }
 
-    public async Task<ImageProfileResponse> GetImageByIdAsync(long profileId)
+    public async Task<ImageProfileResponse> GetImageByIdAsync(long fileId)
     {
-        return await _profileRepository.GetImageByIdAsync(profileId);
+        var result = await _profileRepository.GetImageByIdAsync(fileId);
+
+       return result;
     }
 
-    private static byte[] ToThumbnail(byte[] myImage, int thumbWidth, int thumbHeight)
-    {
-        using (MemoryStream ms = new MemoryStream())
-        using (Image thumbnail = Image.FromStream(new MemoryStream(myImage)).GetThumbnailImage(thumbWidth, thumbHeight, null, new IntPtr()))
-        {
-            thumbnail.Save(ms, System.Drawing.Imaging.ImageFormat.Png);
-            return ms.ToArray();
-        }
-    }
 }

@@ -1,6 +1,5 @@
 ﻿using MediatR;
-
-using Wego.Application.IService;
+using Wego.Application.IService.Feature.Profile;
 
 namespace Wego.Application.Features.Profile.Commands;
 

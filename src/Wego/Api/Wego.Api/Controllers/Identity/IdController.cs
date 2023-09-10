@@ -7,7 +7,7 @@ using Wego.Application.Models.Authentification;
 namespace Wego.Api.Controllers.Identity;
 
 
-[Route("api/[controller]")]
+[Route("api/id")]
 [ApiController]
 public class IdController : ControllerBase
 {
@@ -19,7 +19,7 @@ public class IdController : ControllerBase
         _currentContext = currentContext;
     }
 
-    [HttpPost(nameof(Login))]
+    [HttpPost("login")]
     [ProducesResponseType(StatusCodes.Status200OK)]
     [ProducesResponseType(StatusCodes.Status500InternalServerError)]
     [ProducesResponseType(StatusCodes.Status401Unauthorized)]
@@ -27,7 +27,7 @@ public class IdController : ControllerBase
      => Ok(await _authenticationService.LoginAsync(request));
 
 
-    [HttpPost(nameof(Register))]
+    [HttpPost("register")]
     public async Task<ActionResult<RegistrationResponse>> Register([FromBody] RegistrationRequest request)
     => Ok(await _authenticationService.RegisterAsync(request));
 
