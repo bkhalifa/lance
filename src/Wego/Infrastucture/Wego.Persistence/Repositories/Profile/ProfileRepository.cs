@@ -62,11 +62,17 @@ public class ProfileRepository : IProfileRepository
         }
     }
 
-    public async Task<ProfileModel> GetProfileAsync(long profileId)
+    public async Task<ProfileModel> GetProfileAsync(long profileId, string suId)
     {
-        var query = "SELECT * FROM [profile].[Profiles] WHERE Id = @profileId ";
+        var query = "SELECT pfl.Id, pfl.UserId, pfl.FirstName, pfl.LastName, pfl.InitialUserName, pfl.Email, pfl.PhoneNumber, pfl.CreationDate, pfl.UpdateDate, pfl.UsId, pfl.Position, img.Id as fileId " +
+            "FROM [profile].[Profiles] pfl " +
+            "LEFT JOIN [profile].[ImageProfile] img " +
+            "ON pfl.Id = img.ProfileId " +
+            "WHERE pfl.Id =@profileId AND pfl.UsId =@suId";
+
         var parameters = new DynamicParameters();
         parameters.Add("profileId", profileId);
+        parameters.Add("suId", suId);
 
         using (var connection = _context.CreateConnection())
         {
@@ -112,7 +118,7 @@ public class ProfileRepository : IProfileRepository
         parameters.Add("phoneNumber", default);
         parameters.Add("creationDate", DateTime.UtcNow);
         parameters.Add("updateDate",default(DateTime?));
-        parameters.Add("usid", profile.UserId);
+        parameters.Add("usid", profile.UsId);
         parameters.Add("position", default(string));
         parameters.Add("skills", default(string));
 

@@ -29,7 +29,7 @@ namespace Wego.Identity.Helpers
             foreach (var item in multiArray)
             {
                 if (item.Trim() != "")
-                    result += item + "-";
+                    result += item;
             }
             return result;
         }

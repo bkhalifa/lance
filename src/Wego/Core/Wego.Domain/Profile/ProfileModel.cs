@@ -8,10 +8,10 @@ public class ProfileModel
     public string LastName { get; set; }
     public string InitialUserName { get; set; }
     public string Email { get; set; }
-    public string? PhoneNumber { get; set; }
+    public int? PhoneNumber { get; set; }
     public DateTime CreationDate { get; set; }
     public DateTime? UpdateDate { get; set; }
     public string UsId { get; set; }
     public string Position { get; set; }
-    public string Skills { get; set; }
+    public long fileId { get; set; }
 }

@@ -8,7 +8,7 @@ public interface IProfileRepository
     Task<long> CreateImageAsync(ImageProfileModelCommand model);
     Task<long> UpdateImageAsync(ImageProfileModelCommand model);
     Task<ImageProfileResponse> GetImageByIdAsync(long FileId);
-    Task<ProfileModel> GetProfileAsync(long profileId);
+    Task<ProfileModel> GetProfileAsync(long profileId, string suId);
     Task<long> AddProfileInfoAsync(ProfileModel profile);
     Task<ProfileModel> GetProfileByEmailAsync(string email);
     Task<ProfileModel> GetProfileByUserIdAsync(string userId);

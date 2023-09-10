@@ -88,6 +88,7 @@ public class AuthenticationService : IAuthenticationService
         {
             Id = user.Id,
             ProfileId = profile.Id,
+            UsId = profile.UsId,
             Token = jwtSecurityToken.AccessToken,
             InitialUserName = request.Email.GetInitials(),
             RefreshToken = jwtSecurityToken.RefreshToken,
@@ -117,7 +118,6 @@ public class AuthenticationService : IAuthenticationService
         {
             UserName = request.Email,
             Email = request.Email,
-
         };
 
         var result = await _userManager.CreateAsync(user, request.Password);
@@ -142,18 +142,11 @@ public class AuthenticationService : IAuthenticationService
             {
                 UserId = user.Id,
                 Email = request.Email,
-                UsId = string.Concat(request.Email.SplitMail(), IdentityHelpers.GetRandomId()),
+                UsId = request.Email.SplitMail() + IdentityHelpers.GetRandomId(),
                 InitialUserName = request.Email.GetInitials(),
             };
-            var resultProfile = await _profileRepository.AddProfileInfoAsync(newProfile);
 
-            //await _candidateRepository.AddAsync(new CandidateModel
-            //{
-            //    Email = request.Email,
-            //    Name = request.Email.Substring(0, request.Email.IndexOf("@")),
-            //    IsConnected = false,
-            //    ProfileId = resultProfile,
-            //});
+            var resultProfile = await _profileRepository.AddProfileInfoAsync(newProfile);
 
             return new RegistrationResponse()
             {
@@ -196,6 +189,7 @@ public class AuthenticationService : IAuthenticationService
             {
                 UserId = user.Id,
                 Email = user.Email!,
+                UsId = resultProfile?.UsId,
                 ConfirmedMail = true,
                 InitialUserName = resultProfile.InitialUserName!,
                 ProfileId = resultProfile.Id,
