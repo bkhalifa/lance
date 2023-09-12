@@ -109,6 +109,7 @@ public class ProfileRepository : IProfileRepository
         var sql = "INSERT INTO [profile].[Profiles] VALUES " +
             " (@userId, @FirstName, @LastName, @InitialUserName, @Email, @PhoneNumber, @CreationDate, @UpdateDate, @UsId, @Position, @Skills) " +
             "SELECT CAST(SCOPE_IDENTITY() AS INT) ";
+
         var parameters = new DynamicParameters();
         parameters.Add("userId", profile.UserId);
         parameters.Add("firstName", default);

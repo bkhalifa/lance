@@ -138,13 +138,7 @@ public class AuthenticationService : IAuthenticationService
 
             _logger.LogInformation("User Created: {email}", user.Email);
 
-            var newProfile = new ProfileModel
-            {
-                UserId = user.Id,
-                Email = request.Email,
-                UsId = request.Email.SplitMail() + IdentityHelpers.GetRandomId(),
-                InitialUserName = request.Email.GetInitials(),
-            };
+            var newProfile = new ProfileModel(user.Id, request.Email);
 
             var resultProfile = await _profileRepository.AddProfileInfoAsync(newProfile);
 
