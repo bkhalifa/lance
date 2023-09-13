@@ -1,4 +1,5 @@
-﻿-- =============================================
+﻿
+-- =============================================
 -- Creation date:   09/09/2023
 -- Description:	remove tables users
 -- =============================================
@@ -79,3 +80,7 @@ FOREIGN KEY (ProfileId) REFERENCES [profile].[Profiles](Id)
 );
 END
 GO
+
+ALTER TABLE profile.Profiles DROP CONSTRAINT IF EXISTS uniqueusid;
+ALTER TABLE profile.Profiles
+ADD CONSTRAINT uniqueusid UNIQUE ([UsId]);

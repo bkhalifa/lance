@@ -1,17 +1,24 @@
-﻿using Wego.Application.IRepository;
+﻿using MediatR;
+
+using Wego.Application.IService.Feature.Profile;
+using Wego.Domain.Profile;
 
 namespace Wego.Application.Features.Profile.Queries;
 
 
-public record GetProfileInfoQuery(long pid);
+public record GetProfileInfoQuery(string suId, long pid) : IRequest<ProfileModel>;
 
-public class GetProfileInfoQueryHandler
+public class GetProfileInfoQueryHandler : IRequestHandler<GetProfileInfoQuery, ProfileModel>
 {
-    private readonly IProfileRepository _profileRepository;
-    public GetProfileInfoQueryHandler(IProfileRepository profileRepository)
+    private readonly IProfileService _profileService;
+    public GetProfileInfoQueryHandler(IProfileService profileService)
     {
-        _profileRepository = profileRepository;
+        _profileService = profileService;
     }
 
+    public async Task<ProfileModel> Handle(GetProfileInfoQuery request, CancellationToken cancellationToken)
+    {
+        return await _profileService.GetProfileInfo(request.suId, request.pid).ConfigureAwait(false);
+    }
 }
 

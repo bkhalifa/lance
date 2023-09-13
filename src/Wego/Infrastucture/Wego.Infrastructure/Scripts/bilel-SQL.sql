@@ -79,3 +79,6 @@ FOREIGN KEY (ProfileId) REFERENCES [profile].[Profiles](Id)
 );
 END
 GO
+ALTER TABLE profile.Profiles DROP CONSTRAINT IF EXISTS uniqueusid;
+ALTER TABLE profile.Profiles
+ADD CONSTRAINT uniqueusid UNIQUE ([UsId]);
