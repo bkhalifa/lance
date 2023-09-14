@@ -12,4 +12,5 @@ public interface IProfileRepository
     Task<long> AddProfileInfoAsync(ProfileModel profile);
     Task<ProfileModel> GetProfileByEmailAsync(string email);
     Task<ProfileModel> GetProfileByUserIdAsync(string userId);
+    Task<string> CheckProfileIfExistByUsIdAsync(string usId);
 }

@@ -2,6 +2,7 @@
 using Dapper;
 
 using System.Data;
+
 using Wego.Application.Features.Profile.Commands;
 using Wego.Application.IRepository;
 using Wego.Domain.Profile;
@@ -51,7 +52,6 @@ public class ProfileRepository : IProfileRepository
             return result;
         }
     }
-
     public async Task<ImageProfileResponse> GetImageByIdAsync(long fid)
     {
         var query = "SELECT ImageData, ContentType, ProfileId FROM [profile].[ImageProfile] WHERE Id = @fid";
@@ -61,7 +61,6 @@ public class ProfileRepository : IProfileRepository
             return result;
         }
     }
-
     public async Task<ProfileModel> GetProfileAsync(long profileId, string suId)
     {
         var query = "SELECT pfl.Id, pfl.UserId, pfl.FirstName, pfl.LastName, pfl.InitialUserName, pfl.Email, pfl.PhoneNumber, pfl.CreationDate, pfl.UpdateDate, pfl.UsId, pfl.Position, img.Id as fileId " +
@@ -79,19 +78,18 @@ public class ProfileRepository : IProfileRepository
             return await connection.QueryFirstOrDefaultAsync<ProfileModel>(query, parameters);
         }
     }
-
     public async Task<ProfileModel> GetProfileByEmailAsync(string email)
     {
-        var query = "SELECT * FROM [profile].[Profiles] WHERE Email = @email ";
+        var query = "SELECT pfl.Id, pfl.UserId, pfl.FirstName, pfl.LastName, pfl.InitialUserName, pfl.Email, pfl.PhoneNumber, pfl.CreationDate, pfl.UpdateDate, pfl.UsId, pfl.Position FROM [profile].[Profiles] pfl WHERE pfl.Email = @email ";
         var parameters = new DynamicParameters();
         parameters.Add("email", email);
-
+       
         using (var connection = _context.CreateConnection())
-        {
-            return await connection.QueryFirstOrDefaultAsync<ProfileModel>(query, parameters);
-        }
+         {
+          return await connection.QueryFirstOrDefaultAsync<ProfileModel>(query, parameters);
+         }
+        
     }
-
     public async Task<ProfileModel> GetProfileByUserIdAsync(string userId)
     {
         var query = "SELECT * FROM [profile].[Profiles] WHERE UserId = @userId ";
@@ -103,7 +101,6 @@ public class ProfileRepository : IProfileRepository
             return await connection.QueryFirstOrDefaultAsync<ProfileModel>(query, parameters);
         }
     }
-
     public async Task<long> AddProfileInfoAsync(ProfileModel profile)
     {
         var sql = "INSERT INTO [profile].[Profiles] VALUES " +
@@ -114,11 +111,11 @@ public class ProfileRepository : IProfileRepository
         parameters.Add("userId", profile.UserId);
         parameters.Add("firstName", default);
         parameters.Add("lastName", default);
-        parameters.Add("initialUserName", profile.InitialUserName); 
+        parameters.Add("initialUserName", profile.InitialUserName);
         parameters.Add("email", profile.Email);
         parameters.Add("phoneNumber", default);
         parameters.Add("creationDate", DateTime.UtcNow);
-        parameters.Add("updateDate",default(DateTime?));
+        parameters.Add("updateDate", default(DateTime?));
         parameters.Add("usid", profile.UsId);
         parameters.Add("position", default(string));
         parameters.Add("skills", default(string));
@@ -129,4 +126,15 @@ public class ProfileRepository : IProfileRepository
             return await connection.QuerySingleOrDefaultAsync<long>(sql, parameters);
         }
     }
- }
+    public async Task<string> CheckProfileIfExistByUsIdAsync(string usId)
+    {
+        var query = "SELECT UsId FROM [profile].[Profiles] WHERE [UsId]= @usId ";
+        var parameters = new DynamicParameters();
+        parameters.Add("usId", usId);
+
+        using (var connection = _context.CreateConnection())
+        {
+            return await connection.QueryFirstOrDefaultAsync<string>(query, parameters);
+        }
+    }
+}

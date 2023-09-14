@@ -1,5 +1,4 @@
-﻿using AutoMapper;
-using Microsoft.AspNetCore.Identity;
+﻿using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.WebUtilities;
 using Microsoft.Extensions.Logging;
@@ -11,13 +10,11 @@ using Wego.Application.Contracts.Captcha;
 using Wego.Application.Contracts.Common;
 using Wego.Application.Contracts.Context;
 using Wego.Application.Contracts.Identity;
-using Wego.Application.Contracts.Persistence;
 using Wego.Application.Exceptions;
 using Wego.Application.IRepo;
-using Wego.Application.IRepository;
+using Wego.Application.IService.Feature.Profile;
 using Wego.Application.Models.Authentification;
 using Wego.Application.Models.Mail;
-using Wego.Domain.OfferProfile;
 using Wego.Domain.Profile;
 using Wego.Identity.Helpers;
 
@@ -31,7 +28,7 @@ public class AuthenticationService : IAuthenticationService
     private readonly ILogger<IAuthenticationService> _logger;
     private readonly IEmailSender _emailSender;
     private readonly ICurrentContext _currentContext;
-    private readonly IProfileRepository _profileRepository;
+    private readonly IProfileService _profileService;
     private readonly ICandidateRepository _candidateRepository;
     private readonly IGoogleCapthaService _googleCaptchaService;
 
@@ -41,7 +38,7 @@ public class AuthenticationService : IAuthenticationService
          ILogger<IAuthenticationService> logger,
          IEmailSender emailSender,
          ICurrentContext currentContext,
-         IProfileRepository profileRepository,
+         IProfileService profileService,
          ICandidateRepository candidateRepository,
          IGoogleCapthaService googleCaptchaService
          )
@@ -52,7 +49,7 @@ public class AuthenticationService : IAuthenticationService
         _logger = logger;
         _emailSender = emailSender;
         _currentContext = currentContext;
-        _profileRepository = profileRepository;
+        _profileService = profileService;
         _candidateRepository = candidateRepository;
         _googleCaptchaService = googleCaptchaService;
     }
@@ -78,7 +75,8 @@ public class AuthenticationService : IAuthenticationService
         if (!result.Succeeded)
             throw new CredentialInvalidException($"Credentials for '{request.Email} aren't valid'.");
 
-        var profile = await _profileRepository.GetProfileByEmailAsync(request.Email).ConfigureAwait(false);
+        var profile = await _profileService.GetProfileByEmailAsync(request.Email).ConfigureAwait(false);
+
         if (profile is null)
             throw new UserNotFoundException($"User profile not found for '{request.Email}.");
 
@@ -109,7 +107,7 @@ public class AuthenticationService : IAuthenticationService
         if (existingUser is not null)
             throw new UserAlreadyExistsException($"Email '{request.Email}' already exists.");
 
-        var profile = await _profileRepository.GetProfileByEmailAsync(request.Email).ConfigureAwait(false);
+        var profile = await _profileService.GetProfileByEmailAsync(request.Email).ConfigureAwait(false);
 
         if (profile is not null)
             throw new UserAlreadyExistsException($"Email '{request.Email}' already exists.");
@@ -140,7 +138,7 @@ public class AuthenticationService : IAuthenticationService
 
             var newProfile = new ProfileModel(user.Id, request.Email);
 
-            var resultProfile = await _profileRepository.AddProfileInfoAsync(newProfile);
+            var resultProfile = await _profileService.AddProfileInfoAsync(newProfile);
 
             return new RegistrationResponse()
             {
@@ -172,7 +170,7 @@ public class AuthenticationService : IAuthenticationService
 
         if (result.Succeeded)
         {
-            var resultProfile = await _profileRepository.GetProfileByUserIdAsync(encodedUserId).ConfigureAwait(false);
+            var resultProfile = await _profileService.GetProfileByUserIdAsync(encodedUserId).ConfigureAwait(false);
 
             if (resultProfile is null)
                 throw new UserNotFoundException($"Profile not found .");
@@ -261,7 +259,7 @@ public class AuthenticationService : IAuthenticationService
             await _emailSender.SendMailAsync(new Email(user.Email!, "Reset Password Ok",
            "Reset Password are Ok !"));
 
-            var resultProfile = await _profileRepository.GetProfileByEmailAsync(request.Email).ConfigureAwait(false);
+            var resultProfile = await _profileService.GetProfileByEmailAsync(request.Email).ConfigureAwait(false);
 
             if (resultProfile is null)
                 throw new UserNotFoundException($"Profile not found .");
@@ -296,7 +294,7 @@ public class AuthenticationService : IAuthenticationService
         var user = await _userManager.FindByEmailAsync(userName);
         if (user == null) throw new UserNotFoundException($"Email '{_currentContext.Identity.Email}' not found");
 
-        var profile = await _profileRepository.GetProfileByEmailAsync(user.Email).ConfigureAwait(false);
+        var profile = await _profileService.GetProfileByEmailAsync(user.Email).ConfigureAwait(false);
         if (profile is null)
             throw new UserNotFoundException($"User profile not found for '{user.Email}.");
 

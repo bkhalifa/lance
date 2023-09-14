@@ -28,10 +28,10 @@ public class ProfileController : ControllerBase
     [ProducesResponseType(StatusCodes.Status401Unauthorized)]
     public async Task<ActionResult> GetProfileInfo(string uid, long pid)
     {
-      var result = await _mediator.Send(new GetProfileInfoQuery(uid, pid));
+        var result = await _mediator.Send(new GetProfileInfoQuery(uid, pid));
 
         if (result is null)
-          return  Unauthorized();
+            return Unauthorized();
 
         return Ok(result);
     }

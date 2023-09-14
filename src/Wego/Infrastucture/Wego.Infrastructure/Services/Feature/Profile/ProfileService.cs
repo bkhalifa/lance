@@ -37,4 +37,27 @@ public class ProfileService : IProfileService
         ArgumentNullException.ThrowIfNull(suId);
         return await _profileRepository.GetProfileAsync(pid, suId).ConfigureAwait(false);
     }
+
+    public async Task<ProfileModel> GetProfileByEmailAsync(string email)
+    {
+        ArgumentNullException.ThrowIfNull(email);
+        return await _profileRepository.GetProfileByEmailAsync(email).ConfigureAwait(false);
+    }
+
+    public async Task<long> AddProfileInfoAsync(ProfileModel profile)
+    {
+        ArgumentNullException.ThrowIfNull(profile);
+
+        var existUSId = await _profileRepository.CheckProfileIfExistByUsIdAsync(profile.UsId);
+        if (string.IsNullOrEmpty(existUSId)) { return await _profileRepository.AddProfileInfoAsync(profile).ConfigureAwait(false); }
+        profile.SetUsId();
+
+        return await _profileRepository.AddProfileInfoAsync(profile).ConfigureAwait(false);
+    }
+
+    public async Task<ProfileModel> GetProfileByUserIdAsync(string userId)
+    {
+        ArgumentNullException.ThrowIfNull(userId);
+        return await _profileRepository.GetProfileByUserIdAsync(userId);
+    }
 }

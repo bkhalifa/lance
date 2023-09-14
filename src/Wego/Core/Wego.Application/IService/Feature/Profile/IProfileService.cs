@@ -8,4 +8,7 @@ public interface IProfileService
     Task<long> SaveImageAsync(ImageProfileModelCommand model);
     Task<ImageProfileResponse> GetImageByIdAsync(long profileId);
     Task<ProfileModel> GetProfileInfo(string suiD, long pid);
+    Task<ProfileModel> GetProfileByEmailAsync(string email);
+    Task<long> AddProfileInfoAsync(ProfileModel profile);
+    Task<ProfileModel> GetProfileByUserIdAsync(string userId);
 }

@@ -13,22 +13,27 @@ public class ProfileModel
     public int? PhoneNumber { get; set; }
     public DateTime CreationDate { get; set; }
     public DateTime? UpdateDate { get; set; }
-    public string UsId { get; set; }
+    public string UsId { get; private set; }
     public string Position { get; set; }
     public long fileId { get; set; }
+
     public ProfileModel()
     {
-
+        
     }
     public ProfileModel(string id, string email)
     {
         UserId = id;
         Email = email;
-        UsId = SplitMail(email) + GenerateRandomNumber() + GetRandomId();
+        UsId = SplitMail(email)+ GetRandomId();
         InitialUserName = GetInitials(email);
     }
-    public int GenerateRandomNumber() => Random.Shared.Next(1, 9);
 
+    public string SetUsId()
+    {
+        return UsId + GenerateRandomNumber();
+    }
+    public int GenerateRandomNumber() => Random.Shared.Next(1, 9);
     public static string SplitMail(string adressMail)
     {
         var mail = adressMail.Split('@');
