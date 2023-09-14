@@ -61,16 +61,15 @@ public class ProfileRepository : IProfileRepository
             return result;
         }
     }
-    public async Task<ProfileModel> GetProfileAsync(long profileId, string suId)
+    public async Task<ProfileModel> GetProfileAsync(string suId)
     {
         var query = "SELECT pfl.Id, pfl.UserId, pfl.FirstName, pfl.LastName, pfl.InitialUserName, pfl.Email, pfl.PhoneNumber, pfl.CreationDate, pfl.UpdateDate, pfl.UsId, pfl.Position, img.Id as fileId " +
             "FROM [profile].[Profiles] pfl " +
             "LEFT JOIN [profile].[ImageProfile] img " +
             "ON pfl.Id = img.ProfileId " +
-            "WHERE pfl.Id =@profileId AND pfl.UsId =@suId";
+            "WHERE pfl.UsId =@suId";
 
         var parameters = new DynamicParameters();
-        parameters.Add("profileId", profileId);
         parameters.Add("suId", suId);
 
         using (var connection = _context.CreateConnection())

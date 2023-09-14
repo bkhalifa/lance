@@ -21,14 +21,14 @@ public class ProfileController : ControllerBase
         _mediator = mediator;
     }
 
-    [HttpGet("{uid}/{pid}/info")]
+    [HttpGet("info/{uid}")]
     [Authorize]
     [ProducesResponseType(StatusCodes.Status200OK)]
     [ProducesResponseType(StatusCodes.Status500InternalServerError)]
     [ProducesResponseType(StatusCodes.Status401Unauthorized)]
-    public async Task<ActionResult> GetProfileInfo(string uid, long pid)
+    public async Task<ActionResult> GetProfileInfo(string uid)
     {
-        var result = await _mediator.Send(new GetProfileInfoQuery(uid, pid));
+        var result = await _mediator.Send(new GetProfileInfoQuery(uid));
 
         if (result is null)
             return Unauthorized();

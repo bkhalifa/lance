@@ -6,7 +6,7 @@ using Wego.Domain.Profile;
 namespace Wego.Application.Features.Profile.Queries;
 
 
-public record GetProfileInfoQuery(string suId, long pid) : IRequest<ProfileModel>;
+public record GetProfileInfoQuery(string usId) : IRequest<ProfileModel>;
 
 public class GetProfileInfoQueryHandler : IRequestHandler<GetProfileInfoQuery, ProfileModel>
 {
@@ -18,7 +18,7 @@ public class GetProfileInfoQueryHandler : IRequestHandler<GetProfileInfoQuery, P
 
     public async Task<ProfileModel> Handle(GetProfileInfoQuery request, CancellationToken cancellationToken)
     {
-        return await _profileService.GetProfileInfo(request.suId, request.pid).ConfigureAwait(false);
+        return await _profileService.GetProfileInfo(request.usId).ConfigureAwait(false);
     }
 }
 

@@ -1,4 +1,5 @@
-﻿using Wego.Application.Features.Profile.Commands;
+﻿using Wego.Application.Contracts.Context;
+using Wego.Application.Features.Profile.Commands;
 using Wego.Application.IRepository;
 using Wego.Application.IService.Feature.Profile;
 using Wego.Domain.Profile;
@@ -8,9 +9,11 @@ namespace Wego.Infrastructure.Services.Feature.Profile;
 public class ProfileService : IProfileService
 {
     private readonly IProfileRepository _profileRepository;
-    public ProfileService(IProfileRepository profileRepository)
+    private readonly ICurrentContext _currentContext;
+    public ProfileService(IProfileRepository profileRepository, ICurrentContext currentContext)
     {
         _profileRepository = profileRepository;
+        _currentContext = currentContext;
     }
     public async Task<long> SaveImageAsync(ImageProfileModelCommand model)
     {
@@ -31,11 +34,21 @@ public class ProfileService : IProfileService
         return result;
     }
 
-    public async Task<ProfileModel> GetProfileInfo(string suId, long pid)
+    public async Task<ProfileModel> GetProfileInfo(string suID)
     {
-        ArgumentNullException.ThrowIfNull(pid);
-        ArgumentNullException.ThrowIfNull(suId);
-        return await _profileRepository.GetProfileAsync(pid, suId).ConfigureAwait(false);
+
+        ArgumentNullException.ThrowIfNull(suID);
+
+        var result = await _profileRepository.GetProfileAsync(suID.Trim()).ConfigureAwait(false);
+       
+ 
+        if (result is not null && result.Email == _currentContext.Identity.Email && _currentContext.Identity.UserId == result.UserId)
+        {
+            return result;
+        }
+
+        return await Task.FromResult<ProfileModel>(default);
+
     }
 
     public async Task<ProfileModel> GetProfileByEmailAsync(string email)
