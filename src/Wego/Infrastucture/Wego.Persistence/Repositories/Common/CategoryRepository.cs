@@ -1,5 +1,4 @@
 ﻿using Dapper;
-using Org.BouncyCastle.Math.EC.Rfc7748;
 using Wego.Application.Contracts.Infrastructure;
 using Wego.Application.Features.Categories.Queries;
 using Wego.Application.IRepo;
@@ -24,7 +23,7 @@ namespace Wego.Persistence.Repositories.Common
                 using (var connection = _context.CreateConnection())
                 {
                     var result = await connection.QueryAsync<CategoryModel>(sql);
-                    return result.OrderBy(x => x.Audience ?? 100).OrderBy(x=> x.Code);
+                    return result.OrderBy(x => x.Audience ?? 100);
                 }
             }, CacheDuration.OneDay, cancellationToken);
         }
