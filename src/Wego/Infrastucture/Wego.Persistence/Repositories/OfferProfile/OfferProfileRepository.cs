@@ -1,12 +1,7 @@
-﻿using AutoMapper;
-using Dapper;
-using IdentityModel.OidcClient;
-using System.Threading;
-using Wego.Application.Contracts.Context;
+﻿using Dapper;
 using Wego.Application.Contracts.Infrastructure;
 using Wego.Application.IRepo;
 using Wego.Application.Models.Common;
-using Wego.Domain.Common;
 using Wego.Domain.OfferProfile;
 
 namespace Wego.Persistence.Repositories.OfferProfile
