@@ -23,26 +23,26 @@ public class IdController : ControllerBase
     [ProducesResponseType(StatusCodes.Status200OK)]
     [ProducesResponseType(StatusCodes.Status500InternalServerError)]
     [ProducesResponseType(StatusCodes.Status401Unauthorized)]
-    public async Task<ActionResult<AuthenticationResponse>> Login([FromBody] AuthenticationRequest request)
-     => Ok(await _authenticationService.LoginAsync(request));
+    public async Task<ActionResult<AuthenticationResponse>> Login([FromBody] AuthenticationRequest request, CancellationToken cancellationToken = default)
+     => Ok(await _authenticationService.LoginAsync(request, cancellationToken));
 
 
     [HttpPost("register")]
-    public async Task<ActionResult<RegistrationResponse>> Register([FromBody] RegistrationRequest request)
-    => Ok(await _authenticationService.RegisterAsync(request));
+    public async Task<ActionResult<RegistrationResponse>> Register([FromBody] RegistrationRequest request, CancellationToken cancellationToken = default)
+    => Ok(await _authenticationService.RegisterAsync(request, cancellationToken));
 
     [HttpPost(nameof(RegisterConfirm))]
     [ProducesResponseType(StatusCodes.Status200OK)]
     [ProducesResponseType(StatusCodes.Status500InternalServerError)]
-    public async Task<ActionResult<TokenModel>> RegisterConfirm([FromBody] ConfirmRegisterModel request)
-    => Ok(await _authenticationService.ConfirmRegistration(request));
+    public async Task<ActionResult<TokenModel>> RegisterConfirm([FromBody] ConfirmRegisterModel request, CancellationToken cancellationToken = default)
+    => Ok(await _authenticationService.ConfirmRegistration(request, cancellationToken));
 
 
     [HttpPost(nameof(Reset))]
     [ProducesResponseType(StatusCodes.Status200OK)]
     [ProducesResponseType(StatusCodes.Status500InternalServerError)]
-    public async Task<ActionResult<TokenModel>> Reset([FromBody] ResetPasswordModel request)
-    => Ok(await _authenticationService.ResetRegistration(request));
+    public async Task<ActionResult<TokenModel>> Reset([FromBody] ResetPasswordModel request, CancellationToken cancellationToken = default)
+    => Ok(await _authenticationService.ResetRegistration(request, cancellationToken));
 
 
     [HttpPost(nameof(Logout))]
@@ -54,8 +54,8 @@ public class IdController : ControllerBase
     }
 
     [HttpPost(nameof(Refresh))]
-    public async Task<ActionResult<TokenModel>> Refresh([FromBody] TokenModel tokenModel)
-     => Ok(await _authenticationService.RefreshAsync(tokenModel));
+    public async Task<ActionResult<TokenModel>> Refresh([FromBody] TokenModel tokenModel, CancellationToken cancellationToken = default)
+     => Ok(await _authenticationService.RefreshAsync(tokenModel, cancellationToken));
 
 
     [HttpPost(nameof(Forgot))]

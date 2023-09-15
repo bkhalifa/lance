@@ -5,6 +5,7 @@ using Microsoft.Extensions.Logging;
 
 using System.Text;
 using System.Text.Encodings.Web;
+using System.Threading;
 
 using Wego.Application.Contracts.Captcha;
 using Wego.Application.Contracts.Common;
@@ -54,7 +55,7 @@ public class AuthenticationService : IAuthenticationService
         _googleCaptchaService = googleCaptchaService;
     }
 
-    public async Task<AuthenticationResponse> LoginAsync(AuthenticationRequest request)
+    public async Task<AuthenticationResponse> LoginAsync(AuthenticationRequest request, CancellationToken cancellationToken = default)
     {
         if (request is null)
             ArgumentNullException.ThrowIfNull(nameof(request));
@@ -75,7 +76,7 @@ public class AuthenticationService : IAuthenticationService
         if (!result.Succeeded)
             throw new CredentialInvalidException($"Credentials for '{request.Email} aren't valid'.");
 
-        var profile = await _profileService.GetProfileByEmailAsync(request.Email).ConfigureAwait(false);
+        var profile = await _profileService.GetProfileByEmailAsync(request.Email, cancellationToken).ConfigureAwait(false);
 
         if (profile is null)
             throw new UserNotFoundException($"User profile not found for '{request.Email}.");
@@ -93,7 +94,7 @@ public class AuthenticationService : IAuthenticationService
             Email = user.Email!
         };
     }
-    public async Task<RegistrationResponse> RegisterAsync(RegistrationRequest request)
+    public async Task<RegistrationResponse> RegisterAsync(RegistrationRequest request, CancellationToken cancellationToken = default)
     {
         if (request is null)
             ArgumentNullException.ThrowIfNull(nameof(request));
@@ -107,7 +108,7 @@ public class AuthenticationService : IAuthenticationService
         if (existingUser is not null)
             throw new UserAlreadyExistsException($"Email '{request.Email}' already exists.");
 
-        var profile = await _profileService.GetProfileByEmailAsync(request.Email).ConfigureAwait(false);
+        var profile = await _profileService.GetProfileByEmailAsync(request.Email, cancellationToken).ConfigureAwait(false);
 
         if (profile is not null)
             throw new UserAlreadyExistsException($"Email '{request.Email}' already exists.");
@@ -138,7 +139,7 @@ public class AuthenticationService : IAuthenticationService
 
             var newProfile = new ProfileModel(user.Id, request.Email);
 
-            var resultProfile = await _profileService.AddProfileInfoAsync(newProfile);
+            var resultProfile = await _profileService.AddProfileInfoAsync(newProfile, cancellationToken);
 
             return new RegistrationResponse()
             {
@@ -150,7 +151,7 @@ public class AuthenticationService : IAuthenticationService
 
         throw new ValidationException(result.Errors.ToDictionary(x => x.Code, x => x.Description));
     }
-    public async Task<RegistrationResponse> ConfirmRegistration(ConfirmRegisterModel request)
+    public async Task<RegistrationResponse> ConfirmRegistration(ConfirmRegisterModel request, CancellationToken cancellationToken = default)
     {
         if (request is null)
             ArgumentNullException.ThrowIfNull(nameof(request));
@@ -170,7 +171,7 @@ public class AuthenticationService : IAuthenticationService
 
         if (result.Succeeded)
         {
-            var resultProfile = await _profileService.GetProfileByUserIdAsync(encodedUserId).ConfigureAwait(false);
+            var resultProfile = await _profileService.GetProfileByUserIdAsync(encodedUserId, cancellationToken).ConfigureAwait(false);
 
             if (resultProfile is null)
                 throw new UserNotFoundException($"Profile not found .");
@@ -230,7 +231,7 @@ public class AuthenticationService : IAuthenticationService
         return true;
 
     }
-    public async Task<RegistrationResponse> ResetRegistration(ResetPasswordModel request)
+    public async Task<RegistrationResponse> ResetRegistration(ResetPasswordModel request, CancellationToken cancellationToken = default)
     {
         if (request is null)
             ArgumentNullException.ThrowIfNull(nameof(request));
@@ -259,7 +260,7 @@ public class AuthenticationService : IAuthenticationService
             await _emailSender.SendMailAsync(new Email(user.Email!, "Reset Password Ok",
            "Reset Password are Ok !"));
 
-            var resultProfile = await _profileService.GetProfileByEmailAsync(request.Email).ConfigureAwait(false);
+            var resultProfile = await _profileService.GetProfileByEmailAsync(request.Email, cancellationToken).ConfigureAwait(false);
 
             if (resultProfile is null)
                 throw new UserNotFoundException($"Profile not found .");
@@ -282,7 +283,7 @@ public class AuthenticationService : IAuthenticationService
         return default!;
 
     }
-    public async Task<TokenModel> RefreshAsync(TokenModel tokenModel)
+    public async Task<TokenModel> RefreshAsync(TokenModel tokenModel, CancellationToken cancellationToken = default)
     {
         var principal = _jwtTokenService.GetPrincipalFromExpiredToken(tokenModel.AccessToken);
         if (principal is null) throw new UserNotAuthentificatedException("User not Authentificated");
@@ -294,7 +295,7 @@ public class AuthenticationService : IAuthenticationService
         var user = await _userManager.FindByEmailAsync(userName);
         if (user == null) throw new UserNotFoundException($"Email '{_currentContext.Identity.Email}' not found");
 
-        var profile = await _profileService.GetProfileByEmailAsync(user.Email).ConfigureAwait(false);
+        var profile = await _profileService.GetProfileByEmailAsync(user.Email, cancellationToken).ConfigureAwait(false);
         if (profile is null)
             throw new UserNotFoundException($"User profile not found for '{user.Email}.");
 

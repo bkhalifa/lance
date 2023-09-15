@@ -4,7 +4,7 @@ using Wego.Domain.Profile;
 
 namespace Wego.Application.Features.Profile.Queries;
 
-public record GetImageByIdQuery(long fid) : IRequest<ImageProfileResponse>;
+public record GetImageByIdQuery(long fid, CancellationToken cancellationtoken = default) : IRequest<ImageProfileResponse>;
 public class GetImageByIdQueryHandler : IRequestHandler<GetImageByIdQuery, ImageProfileResponse>
 {
     private readonly IProfileService _profileService;
@@ -12,8 +12,8 @@ public class GetImageByIdQueryHandler : IRequestHandler<GetImageByIdQuery, Image
     {
         _profileService = profileService;
     }
-    public Task<ImageProfileResponse> Handle(GetImageByIdQuery request, CancellationToken cancellationToken)
+    public Task<ImageProfileResponse> Handle(GetImageByIdQuery request, CancellationToken cancellationtoken = default)
     {
-        return _profileService.GetImageByIdAsync(request.fid);
+        return _profileService.GetImageByIdAsync(request.fid, cancellationtoken);
     }
 }
