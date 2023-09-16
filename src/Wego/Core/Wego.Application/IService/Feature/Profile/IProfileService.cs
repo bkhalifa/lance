@@ -6,7 +6,7 @@ namespace Wego.Application.IService.Feature.Profile;
 
 public interface IProfileService
 {
-    Task<long> SaveImageAsync(ImageProfileModelCommand model, CancellationToken cancellationtoken);
+    Task<ImageProfileResponse> SaveImageAsync(ImageProfileModelCommand model, CancellationToken cancellationtoken);
     Task<ImageProfileResponse> GetImageByIdAsync(long profileId, CancellationToken ct);
     Task<ProfileInfoResponse> GetProfileInfo(string suID, CancellationToken cancellationtoken);
     Task<ProfileModel> GetProfileByEmailAsync(string email, CancellationToken cancellationtoken);

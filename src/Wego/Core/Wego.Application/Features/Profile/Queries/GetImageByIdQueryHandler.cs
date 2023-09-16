@@ -12,8 +12,7 @@ public class GetImageByIdQueryHandler : IRequestHandler<GetImageByIdQuery, Image
     {
         _profileService = profileService;
     }
-    public Task<ImageProfileResponse> Handle(GetImageByIdQuery request, CancellationToken cancellationtoken = default)
-    {
-        return _profileService.GetImageByIdAsync(request.fid, cancellationtoken);
-    }
+    public async Task<ImageProfileResponse> Handle(GetImageByIdQuery request, CancellationToken cancellationtoken = default)
+    => await _profileService.GetImageByIdAsync(request.fid, cancellationtoken);
+
 }

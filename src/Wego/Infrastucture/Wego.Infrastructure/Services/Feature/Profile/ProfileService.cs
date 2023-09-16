@@ -17,16 +17,20 @@ public class ProfileService : IProfileService
         _profileRepository = profileRepository;
         _currentContext = currentContext;
     }
-    public async Task<long> SaveImageAsync(ImageProfileModelCommand model, CancellationToken cancellationtoken = default)
+    public async Task<ImageProfileResponse> SaveImageAsync(ImageProfileModelCommand model, CancellationToken cancellationtoken = default)
     {
         var image = await _profileRepository.GetImageByProfileIdAsync(model.ProfileId, cancellationtoken);
 
+
         if (image is null)
         {
-            return await _profileRepository.CreateImageAsync(model, cancellationtoken).ConfigureAwait(false);
+            var id = await _profileRepository.CreateImageAsync(model, cancellationtoken).ConfigureAwait(false);
+            return new ImageProfileResponse(id, model.ContentType, model.Base64);
         }
 
-        return await _profileRepository.UpdateImageAsync(model, cancellationtoken).ConfigureAwait(false);
+         await _profileRepository.UpdateImageAsync(model, cancellationtoken).ConfigureAwait(false);
+        
+        return new ImageProfileResponse(image.Id, model.ContentType, model.Base64);
     }
 
     public async Task<ImageProfileResponse> GetImageByIdAsync(long fileId, CancellationToken cancellationtoken = default)

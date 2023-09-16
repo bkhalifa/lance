@@ -34,7 +34,7 @@ public class ProfileRepository : IProfileRepository
             return id;
         }
     }
-    public async Task<long> UpdateImageAsync(ImageProfileModelCommand model, CancellationToken cancellationtoken = default)
+    public async Task UpdateImageAsync(ImageProfileModelCommand model, CancellationToken cancellationtoken = default)
     {
 
         var sql = "UPDATE [profile].[ImageProfile] SET ImageData = @ImageData , Width = @Width, Height = @Height," +
@@ -49,33 +49,33 @@ public class ProfileRepository : IProfileRepository
      
         using (var connection = _context.CreateConnection())
         {
-          var result = await connection.ExecuteAsync(sql, parameters);
-           return result;
+          await connection.ExecuteAsync(sql, parameters);
          }
        
     }
     public async Task<ImageProfileResponse> GetImageByIdAsync(long fid, CancellationToken cancellationtoken = default)
     {
-        var query = "SELECT ImageData, ContentType FROM [profile].[ImageProfile] WHERE Id = @fid";
+        var query = "SELECT Id,  ContentType, ImageData FROM [profile].[ImageProfile] WHERE Id = @fid";
         var parameters = new DynamicParameters();
         parameters.Add("fid", fid);
 
         using (var connection = _context.CreateConnection())
          {
            var result = await connection.QueryFirstOrDefaultAsync<ImageProfileResponse>(new CommandDefinition(query, parameters, cancellationToken: cancellationtoken));
-           return result ?? new ImageProfileResponse { ContentType = "image/png", ImageData = new byte[] { 0x20, 0x20, 0x20, 0x20, 0x20, 0x20, 0x20 } };
+            return result;
          }       
     }
 
     public async Task<ImageProfileResponse> GetImageByProfileIdAsync(long pid, CancellationToken cancellationtoken = default)
     {
-        var query = "SELECT ImageData, ContentType FROM [profile].[ImageProfile] WHERE ProfileId = @pid";
+        var query = "SELECT Id, ContentType,  ImageData FROM [profile].[ImageProfile] WHERE ProfileId = @pid";
         var parameters = new DynamicParameters();
         parameters.Add("pid", pid);
 
         using (var connection = _context.CreateConnection())
         {
-           return await connection.QueryFirstOrDefaultAsync<ImageProfileResponse>(new CommandDefinition(query, parameters, cancellationToken: cancellationtoken));
+           var result = await connection.QueryFirstOrDefaultAsync<ImageProfileResponse>(new CommandDefinition(query, parameters, cancellationToken: cancellationtoken));
+            return result;
         }
     }
     public async Task<ProfileModel> GetProfileAsync(string suId, CancellationToken cancellationtoken = default)

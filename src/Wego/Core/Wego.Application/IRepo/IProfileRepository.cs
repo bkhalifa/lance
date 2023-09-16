@@ -6,7 +6,7 @@ namespace Wego.Application.IRepository;
 public interface IProfileRepository
 {
     Task<long> CreateImageAsync(ImageProfileModelCommand model, CancellationToken cancellationtoken);
-    Task<long> UpdateImageAsync(ImageProfileModelCommand model, CancellationToken cancellationtoken);
+    Task UpdateImageAsync(ImageProfileModelCommand model, CancellationToken cancellationtoken);
     Task<ImageProfileResponse> GetImageByIdAsync(long FileId, CancellationToken cancellationtoken);
     Task<ImageProfileResponse> GetImageByProfileIdAsync(long pid, CancellationToken cancellationtoken);
     Task<ProfileModel> GetProfileAsync(string suId, CancellationToken cancellationtoken);
