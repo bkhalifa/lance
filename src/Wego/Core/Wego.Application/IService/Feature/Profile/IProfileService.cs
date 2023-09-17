@@ -8,6 +8,7 @@ public interface IProfileService
 {
     Task<ImageProfileResponse> SaveImageAsync(ImageProfileModelCommand model, CancellationToken cancellationtoken);
     Task<ImageProfileResponse> GetImageByIdAsync(long profileId, CancellationToken ct);
+    Task<bool> DeleteImageByIdAsync(long fileId, CancellationToken ct);
     Task<ProfileInfoResponse> GetProfileInfo(string suID, CancellationToken cancellationtoken);
     Task<ProfileModel> GetProfileByEmailAsync(string email, CancellationToken cancellationtoken);
     Task<long> AddProfileInfoAsync(ProfileModel profile, CancellationToken cancellationtoken);

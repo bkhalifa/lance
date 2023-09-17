@@ -46,9 +46,18 @@ public class ProfileController : ControllerBase
 
 
     [HttpGet("{pid}/thumbnail")]
+    [Authorize]
     [ProducesResponseType(StatusCodes.Status200OK)]
     [ProducesResponseType(StatusCodes.Status404NotFound)]
     public async Task<ActionResult> GetImageProfile(long pid, CancellationToken cancellationToken = default)
       => Ok(await _mediator.Send(new GetImageByIdQuery(pid, cancellationToken)));
+
+
+    [HttpDelete("{fid}/delete-thumbnail")]
+    [Authorize]
+    [ProducesResponseType(StatusCodes.Status200OK)]
+    [ProducesResponseType(StatusCodes.Status404NotFound)]
+    public async Task<ActionResult> DeleteImageProfile(long fid, CancellationToken cancellationToken = default)
+      => Ok(await _mediator.Send(new DeleteImageProfileModelCommand(fid, cancellationToken)));
 }
 

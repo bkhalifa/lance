@@ -14,4 +14,6 @@ public interface IProfileRepository
     Task<ProfileModel> GetProfileByEmailAsync(string email, CancellationToken cancellationtoken);
     Task<ProfileModel> GetProfileByUserIdAsync(string userId, CancellationToken cancellationtoken);
     Task<string> CheckProfileIfExistByUsIdAsync(string usId, CancellationToken cancellationtoken);
+    Task<bool> DeleteImageByIdAsync(long fileId, CancellationToken cancellationtoken);
 }
+

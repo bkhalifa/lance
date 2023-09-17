@@ -1,4 +1,7 @@
-﻿using Wego.Application.Contracts.Context;
+﻿using k8s.KubeConfigModels;
+using System.Threading;
+
+using Wego.Application.Contracts.Context;
 using Wego.Application.Extensions;
 using Wego.Application.Features.Profile.Commands;
 using Wego.Application.IRepository;
@@ -77,5 +80,11 @@ public class ProfileService : IProfileService
     {
         ArgumentNullException.ThrowIfNull(userId);
         return await _profileRepository.GetProfileByUserIdAsync(userId, cancellationtoken);
+    }
+
+    public async Task<bool> DeleteImageByIdAsync(long fileId, CancellationToken cancellationtoken = default)
+    {
+        ArgumentNullException.ThrowIfNull(fileId);
+        return await _profileRepository.DeleteImageByIdAsync(fileId, cancellationtoken).ConfigureAwait(false);
     }
 }

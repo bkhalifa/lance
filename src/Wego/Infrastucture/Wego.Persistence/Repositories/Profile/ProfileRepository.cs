@@ -1,4 +1,6 @@
 ﻿
+using AutoMapper;
+
 using Dapper;
 
 using System.Data;
@@ -6,6 +8,7 @@ using System.Data;
 using Wego.Application.Features.Profile.Commands;
 using Wego.Application.IRepository;
 using Wego.Domain.Profile;
+
 
 namespace Wego.Persistence.Repositories.Profile;
 
@@ -152,5 +155,16 @@ public class ProfileRepository : IProfileRepository
         {
             return await connection.QueryFirstOrDefaultAsync<string>(new CommandDefinition(query, parameters, cancellationToken: cancellationtoken));
         }
+    }
+
+    public async Task<bool> DeleteImageByIdAsync(long id, CancellationToken cancellationtoken = default)
+    {
+        var query = "DELETE FROM profile.ImageProfile WHERE Id = @Id";
+      
+        using (var connection = _context.CreateConnection())
+         {
+               var effectedRow = await connection.ExecuteAsync(new CommandDefinition(query, new { id }, cancellationToken: cancellationtoken));
+               return effectedRow > 0;
+         }
     }
 }
