@@ -1,7 +1,4 @@
-﻿using k8s.KubeConfigModels;
-using System.Threading;
-
-using Wego.Application.Contracts.Context;
+﻿using Wego.Application.Contracts.Context;
 using Wego.Application.Extensions;
 using Wego.Application.Features.Profile.Commands;
 using Wego.Application.IRepository;
@@ -22,8 +19,9 @@ public class ProfileService : IProfileService
     }
     public async Task<ImageProfileResponse> SaveImageAsync(ImageProfileModelCommand model, CancellationToken cancellationtoken = default)
     {
-        var image = await _profileRepository.GetImageByProfileIdAsync(model.ProfileId, cancellationtoken);
+        ArgumentNullException.ThrowIfNull(model);
 
+        var image = await _profileRepository.GetImageByProfileIdAsync(model.ProfileId, cancellationtoken);
 
         if (image is null)
         {
@@ -31,8 +29,8 @@ public class ProfileService : IProfileService
             return new ImageProfileResponse(id, model.ContentType, model.Base64);
         }
 
-         await _profileRepository.UpdateImageAsync(model, cancellationtoken).ConfigureAwait(false);
-        
+        await _profileRepository.UpdateImageAsync(model, cancellationtoken).ConfigureAwait(false);
+
         return new ImageProfileResponse(image.Id, model.ContentType, model.Base64);
     }
 
