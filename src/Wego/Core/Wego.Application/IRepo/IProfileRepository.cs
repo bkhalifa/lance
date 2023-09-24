@@ -1,12 +1,12 @@
-﻿using Wego.Application.Features.Profile.Commands;
+﻿using Wego.Application.Models.Profile;
 using Wego.Domain.Profile;
 
 namespace Wego.Application.IRepository;
 
 public interface IProfileRepository
 {
-    Task<long> CreateImageAsync(ImageProfileModelCommand model, CancellationToken cancellationtoken);
-    Task UpdateImageAsync(ImageProfileModelCommand model, CancellationToken cancellationtoken);
+    Task<long> CreateImageAsync(ImageProfileModel model, CancellationToken cancellationtoken);
+    Task UpdateImageAsync(ImageProfileModel model, CancellationToken cancellationtoken);
     Task<ImageProfileResponse> GetImageByIdAsync(long FileId, CancellationToken cancellationtoken);
     Task<ImageProfileResponse> GetImageByProfileIdAsync(long pid, CancellationToken cancellationtoken);
     Task<ProfileModel> GetProfileAsync(string suId, CancellationToken cancellationtoken);

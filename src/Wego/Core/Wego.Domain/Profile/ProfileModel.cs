@@ -15,7 +15,6 @@ public class ProfileModel
     public DateTime? UpdateDate { get; set; }
     public string UsId { get; private set; }
     public string Position { get; set; }
-    public long fileId { get; set; }
 
     public ProfileModel()
     {

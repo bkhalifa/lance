@@ -1,6 +1,7 @@
-﻿using Wego.Application.Contracts.Context;
+﻿using System.Drawing;
+
+using Wego.Application.Contracts.Context;
 using Wego.Application.Extensions;
-using Wego.Application.Features.Profile.Commands;
 using Wego.Application.IRepository;
 using Wego.Application.IService.Feature.Profile;
 using Wego.Application.Models.Profile;
@@ -17,11 +18,12 @@ public class ProfileService : IProfileService
         _profileRepository = profileRepository;
         _currentContext = currentContext;
     }
-    public async Task<ImageProfileResponse> SaveImageAsync(ImageProfileModelCommand model, CancellationToken cancellationtoken = default)
+    public async Task<ImageProfileResponse> SaveImageAsync(ImageProfileModel model, CancellationToken cancellationtoken = default)
     {
         ArgumentNullException.ThrowIfNull(model);
 
         var image = await _profileRepository.GetImageByProfileIdAsync(model.ProfileId, cancellationtoken);
+        model.Base64 = MakeThumbnail(model.Base64, model.Width, model.Height);
 
         if (image is null)
         {
@@ -34,9 +36,9 @@ public class ProfileService : IProfileService
         return new ImageProfileResponse(image.Id, model.ContentType, model.Base64);
     }
 
-    public async Task<ImageProfileResponse> GetImageByIdAsync(long fileId, CancellationToken cancellationtoken = default)
+    public async Task<ImageProfileResponse> GetImageByIdAsync(long profileId, CancellationToken cancellationtoken = default)
     {
-        var result = await _profileRepository.GetImageByIdAsync(fileId, cancellationtoken).ConfigureAwait(false);
+        var result = await _profileRepository.GetImageByIdAsync(profileId, cancellationtoken).ConfigureAwait(false);
         return result;
     }
 
@@ -84,5 +86,15 @@ public class ProfileService : IProfileService
     {
         ArgumentNullException.ThrowIfNull(fileId);
         return await _profileRepository.DeleteImageByIdAsync(fileId, cancellationtoken).ConfigureAwait(false);
+    }
+
+    public static byte[] MakeThumbnail(byte[] myImage, int thumbWidth, int thumbHeight)
+    {
+        using (MemoryStream ms = new MemoryStream())
+        using (Image thumbnail = Image.FromStream(new MemoryStream(myImage)).GetThumbnailImage(thumbWidth, thumbHeight, null, new IntPtr()))
+        {
+            thumbnail.Save(ms, System.Drawing.Imaging.ImageFormat.Png);
+            return ms.ToArray();
+        }
     }
 }

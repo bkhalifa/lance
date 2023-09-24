@@ -42,7 +42,7 @@ public class ProfileController : ControllerBase
     [ProducesResponseType(StatusCodes.Status500InternalServerError)]
     [ProducesResponseType(StatusCodes.Status401Unauthorized)]
     public async Task<ActionResult<long>> SaveImageProfile([FromBody] ImageProfileModel model, CancellationToken cancellationToken = default)
-      => Ok(await _mediator.Send(new ImageProfileModelCommand(model.ProfileId, model.Base64, model.Width, model.Height, model.ContentType)));
+      => Ok(await _mediator.Send(new ImageProfileModelCommand(model, cancellationToken)));
 
 
     [HttpGet("{pid}/thumbnail")]
