@@ -55,7 +55,7 @@ public class ProfileRepository : IProfileRepository
     }
     public async Task<ImageProfileResponse> GetImageByIdAsync(long pid, CancellationToken cancellationtoken = default)
     {
-        var query = "SELECT Id,  ContentType, ImageData FROM [profile].[ImageProfile] WHERE profileId = @pid";
+        var query = "SELECT Id,  ContentType, ImageData FROM [profile].[ImageProfile] WHERE ProfileId = @pid";
         var parameters = new DynamicParameters();
         parameters.Add("pid", pid);
 
