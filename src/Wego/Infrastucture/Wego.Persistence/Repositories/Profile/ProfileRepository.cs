@@ -1,9 +1,12 @@
-﻿using Dapper;
+﻿using AutoMapper;
+
+using Dapper;
 
 using System.Data;
 
 using Wego.Application.IRepository;
 using Wego.Application.Models.Profile;
+using Wego.Domain.Common;
 using Wego.Domain.Profile;
 
 
@@ -160,6 +163,32 @@ public class ProfileRepository : IProfileRepository
         {
             var effectedRow = await connection.ExecuteAsync(new CommandDefinition(query, new { id }, cancellationToken: cancellationtoken));
             return effectedRow > 0;
+        }
+    }
+
+    public async Task<long> SaveBackGroundAsync(BackGroundFile file, CancellationToken cancellationtoken)
+    {
+        var sql = "INSERT INTO [profile].[BackGroundImage] VALUES " +
+              "(@ParentId, @ProfileId, @FileName, @ContentType, @BigData, @LittleData, @Width, @Height, @CreationDate, @UpDateDate, @FileType) " +
+              "SELECT CAST(SCOPE_IDENTITY() AS INT) ";
+        var parameters = new DynamicParameters();
+
+        parameters.Add("ParentId", file.ParentId);
+        parameters.Add("ProfileId", file.ProfileId);
+        parameters.Add("FileName", file.FileName);
+        parameters.Add("ContentType", file.ContentType);
+        parameters.Add("BigData", file.BigData);
+        parameters.Add("LittleData", file.LittleData);
+        parameters.Add("creationDate", DateTime.UtcNow);
+        parameters.Add("Width", file.Width);
+        parameters.Add("Height", file.Height);
+        parameters.Add("CreationDate", file.CreationDate);
+        parameters.Add("UpDateDate", DateTime.Now);
+        parameters.Add("FileType", file.FileType);
+
+        using (var connection = _context.CreateConnection())
+        {
+            return await connection.QuerySingleOrDefaultAsync<long>(new CommandDefinition(sql, parameters, cancellationToken: cancellationtoken));
         }
     }
 }

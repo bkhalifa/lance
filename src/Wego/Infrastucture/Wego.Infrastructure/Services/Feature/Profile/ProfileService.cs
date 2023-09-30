@@ -4,7 +4,9 @@ using Wego.Application.Contracts.Context;
 using Wego.Application.Extensions;
 using Wego.Application.IRepository;
 using Wego.Application.IService.Feature.Profile;
+using Wego.Application.Models.Common;
 using Wego.Application.Models.Profile;
+using Wego.Domain.Common;
 using Wego.Domain.Profile;
 
 namespace Wego.Infrastructure.Services.Feature.Profile;
@@ -23,7 +25,7 @@ public class ProfileService : IProfileService
         ArgumentNullException.ThrowIfNull(model);
 
         var image = await _profileRepository.GetImageByProfileIdAsync(model.ProfileId, cancellationtoken);
-        model.Base64 = MakeThumbnail(model.Base64, model.Width, model.Height);
+        model.Base64 = MakeThumbnail(model.Base64, 200, 200);
 
         if (image is null)
         {
@@ -35,13 +37,11 @@ public class ProfileService : IProfileService
 
         return new ImageProfileResponse(image.Id, model.ContentType, model.Base64);
     }
-
     public async Task<ImageProfileResponse> GetImageByIdAsync(long profileId, CancellationToken cancellationtoken = default)
     {
         var result = await _profileRepository.GetImageByIdAsync(profileId, cancellationtoken).ConfigureAwait(false);
         return result;
     }
-
     public async Task<ProfileInfoResponse> GetProfileInfo(string suID, CancellationToken cancellationtoken = default)
     {
 
@@ -58,13 +58,11 @@ public class ProfileService : IProfileService
         return await Task.FromResult<ProfileInfoResponse>(default);
 
     }
-
     public async Task<ProfileModel> GetProfileByEmailAsync(string email, CancellationToken cancellationtoken = default)
     {
         ArgumentNullException.ThrowIfNull(email);
         return await _profileRepository.GetProfileByEmailAsync(email, cancellationtoken).ConfigureAwait(false);
     }
-
     public async Task<long> AddProfileInfoAsync(ProfileModel profile, CancellationToken cancellationtoken = default)
     {
         ArgumentNullException.ThrowIfNull(profile);
@@ -75,20 +73,37 @@ public class ProfileService : IProfileService
 
         return await _profileRepository.AddProfileInfoAsync(profile, cancellationtoken).ConfigureAwait(false);
     }
-
     public async Task<ProfileModel> GetProfileByUserIdAsync(string userId, CancellationToken cancellationtoken = default)
     {
         ArgumentNullException.ThrowIfNull(userId);
         return await _profileRepository.GetProfileByUserIdAsync(userId, cancellationtoken);
     }
-
     public async Task<bool> DeleteImageByIdAsync(long fileId, CancellationToken cancellationtoken = default)
     {
         ArgumentNullException.ThrowIfNull(fileId);
         return await _profileRepository.DeleteImageByIdAsync(fileId, cancellationtoken).ConfigureAwait(false);
-    }
+    }  
+    public async Task<long> SaveBackGroundProfileAsync(BackGroundModel model, CancellationToken cancellationtoken)
+    {
+        var file = model.MapTo<BackGroundFile>();
 
-    public static byte[] MakeThumbnail(byte[] myImage, int thumbWidth, int thumbHeight)
+        file.BigData = ToArrayBase(model.FileBase64);
+        file.LittleData = MakeThumbnail(file.BigData, 200, 200);
+
+        var id = await _profileRepository.SaveBackGroundAsync(file, cancellationtoken).ConfigureAwait(false);
+        return id;
+    }
+    public Task<long> GetBackGroundByIdAsync(long profileId, CancellationToken cancellationtoken)
+    {
+        throw new NotImplementedException();
+    }
+    private static byte[] ToArrayBase(string FileAsBase64)
+    {
+        return FileAsBase64.Contains(",") ?
+                             Convert.FromBase64String(FileAsBase64.Substring(FileAsBase64.IndexOf(",") + 1)) :
+                             Convert.FromBase64String(FileAsBase64);
+    }
+    private static byte[] MakeThumbnail(byte[] myImage, int thumbWidth, int thumbHeight)
     {
         using (MemoryStream ms = new MemoryStream())
         using (Image thumbnail = Image.FromStream(new MemoryStream(myImage)).GetThumbnailImage(thumbWidth, thumbHeight, null, new IntPtr()))
@@ -97,4 +112,5 @@ public class ProfileService : IProfileService
             return ms.ToArray();
         }
     }
+
 }

@@ -28,10 +28,7 @@ public class ProfileModel
         InitialUserName = GetInitials(email);
     }
 
-    public string SetUsId()
-    {
-        return UsId + GenerateRandomNumber();
-    }
+    public string SetUsId() => UsId.Substring(0, UsId.Length - 1) + GenerateRandomNumber();
     public int GenerateRandomNumber() => Random.Shared.Next(1, 9);
     public static string SplitMail(string adressMail)
     {

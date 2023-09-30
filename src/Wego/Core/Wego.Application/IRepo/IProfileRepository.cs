@@ -1,4 +1,5 @@
 ﻿using Wego.Application.Models.Profile;
+using Wego.Domain.Common;
 using Wego.Domain.Profile;
 
 namespace Wego.Application.IRepository;
@@ -15,5 +16,6 @@ public interface IProfileRepository
     Task<ProfileModel> GetProfileByUserIdAsync(string userId, CancellationToken cancellationtoken);
     Task<string> CheckProfileIfExistByUsIdAsync(string usId, CancellationToken cancellationtoken);
     Task<bool> DeleteImageByIdAsync(long fileId, CancellationToken cancellationtoken);
+    Task<long> SaveBackGroundAsync(BackGroundFile file, CancellationToken cancellationtoken);
 }
 
