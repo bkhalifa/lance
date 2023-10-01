@@ -88,15 +88,18 @@ ADD CONSTRAINT uniqueusid UNIQUE ([UsId])
 -- Creation date:   30/09/2023
 -- Description:	add image profiles
 -- =============================================
+
 IF OBJECT_ID(N'[profile].[BackGroundImage]', N'U') IS NULL
 BEGIN
 CREATE TABLE profile.BackGroundImage (
 Id BIGINT IDENTITY(1,1) PRIMARY KEY,
 ParentId BIGINT NULL,
 FileName  NVARCHAR(250) NULL,
+Extension NVARCHAR(50) NULL,
 ContentType NVARCHAR(50),
 BigData varbinary(max)  NULL,
 LittleData varbinary(max)  NULL,
+Size INT NULL,
 Width INT NULL,
 Height INT NULL,
 CreationDate datetime NULL,

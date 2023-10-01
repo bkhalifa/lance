@@ -17,5 +17,7 @@ public interface IProfileRepository
     Task<string> CheckProfileIfExistByUsIdAsync(string usId, CancellationToken cancellationtoken);
     Task<bool> DeleteImageByIdAsync(long fileId, CancellationToken cancellationtoken);
     Task<long> SaveBackGroundAsync(BackGroundFile file, CancellationToken cancellationtoken);
+    Task<BackGroundResponse> GetBgImageByIdAsync(long fileId, CancellationToken cancellationtoken);
+    
 }
 

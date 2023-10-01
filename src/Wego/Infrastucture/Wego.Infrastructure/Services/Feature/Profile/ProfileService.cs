@@ -93,9 +93,10 @@ public class ProfileService : IProfileService
         var id = await _profileRepository.SaveBackGroundAsync(file, cancellationtoken).ConfigureAwait(false);
         return id;
     }
-    public Task<long> GetBackGroundByIdAsync(long profileId, CancellationToken cancellationtoken)
+    public  async Task<BackGroundResponse> GetBackGroundByIdAsync(long fileId, CancellationToken cancellationtoken)
     {
-        throw new NotImplementedException();
+        var result = await _profileRepository.GetBgImageByIdAsync(fileId, cancellationtoken).ConfigureAwait(false);
+        return result;
     }
     private static byte[] ToArrayBase(string FileAsBase64)
     {
@@ -113,4 +114,5 @@ public class ProfileService : IProfileService
         }
     }
 
+ 
 }

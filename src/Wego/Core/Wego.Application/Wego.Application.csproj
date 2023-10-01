@@ -30,8 +30,4 @@
     <ProjectReference Include="..\Wego.Domain\Wego.Domain.csproj" />
   </ItemGroup>
 
-  <ItemGroup>
-    <Folder Include="Features\BackGround\Queries\" />
-  </ItemGroup>
-
 </Project>

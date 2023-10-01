@@ -1,6 +1,4 @@
-﻿using AutoMapper;
-
-using Dapper;
+﻿using Dapper;
 
 using System.Data;
 
@@ -69,6 +67,19 @@ public class ProfileRepository : IProfileRepository
         }
     }
 
+    public async Task<BackGroundResponse> GetBgImageByIdAsync(long fid, CancellationToken cancellationtoken = default)
+    {
+        var query = "SELECT Id, ContentType,Extension, BigData, LittleData FROM profile.BackGroundImage WHERE Id = @fid";
+        var parameters = new DynamicParameters();
+        parameters.Add("fid", fid);
+
+        using (var connection = _context.CreateConnection())
+        {
+            var result = await connection.QueryFirstOrDefaultAsync<BackGroundResponse>(new CommandDefinition(query, parameters, cancellationToken: cancellationtoken));
+            return result;
+        }
+    }
+
     public async Task<ImageProfileResponse> GetImageByProfileIdAsync(long pid, CancellationToken cancellationtoken = default)
     {
         var query = "SELECT Id, ContentType,  ImageData FROM [profile].[ImageProfile] WHERE ProfileId = @pid";
@@ -83,7 +94,7 @@ public class ProfileRepository : IProfileRepository
     }
     public async Task<ProfileModel> GetProfileAsync(string suId, CancellationToken cancellationtoken = default)
     {
-        var query = "SELECT pfl.Id, pfl.UserId, pfl.FirstName, pfl.LastName, pfl.InitialUserName, pfl.Email, pfl.PhoneNumber, pfl.CreationDate, pfl.UpdateDate, pfl.UsId, pfl.Position "+
+        var query = "SELECT pfl.Id, pfl.UserId, pfl.FirstName, pfl.LastName, pfl.InitialUserName, pfl.Email, pfl.PhoneNumber, pfl.CreationDate, pfl.UpdateDate, pfl.UsId, pfl.Position " +
             "FROM [profile].[Profiles] pfl " +
             "WHERE pfl.UsId =@suId";
 
@@ -169,26 +180,39 @@ public class ProfileRepository : IProfileRepository
     public async Task<long> SaveBackGroundAsync(BackGroundFile file, CancellationToken cancellationtoken)
     {
         var sql = "INSERT INTO [profile].[BackGroundImage] VALUES " +
-              "(@ParentId, @ProfileId, @FileName, @ContentType, @BigData, @LittleData, @Width, @Height, @CreationDate, @UpDateDate, @FileType) " +
+              "(@ParentId, @FileName, @Extension, @ContentType, @BigData, @LittleData, @Size ,@Width, @Height, @CreationDate, @UpDateDate, @FileType) " +
               "SELECT CAST(SCOPE_IDENTITY() AS INT) ";
         var parameters = new DynamicParameters();
-
-        parameters.Add("ParentId", file.ParentId);
-        parameters.Add("ProfileId", file.ProfileId);
-        parameters.Add("FileName", file.FileName);
-        parameters.Add("ContentType", file.ContentType);
-        parameters.Add("BigData", file.BigData);
-        parameters.Add("LittleData", file.LittleData);
-        parameters.Add("creationDate", DateTime.UtcNow);
-        parameters.Add("Width", file.Width);
-        parameters.Add("Height", file.Height);
-        parameters.Add("CreationDate", file.CreationDate);
-        parameters.Add("UpDateDate", DateTime.Now);
-        parameters.Add("FileType", file.FileType);
-
-        using (var connection = _context.CreateConnection())
+        try
         {
-            return await connection.QuerySingleOrDefaultAsync<long>(new CommandDefinition(sql, parameters, cancellationToken: cancellationtoken));
+            parameters.Add("ParentId", file.ParentId);
+            parameters.Add("FileName", file.FileName);
+
+            parameters.Add("Extension", file.Extension);
+            parameters.Add("ContentType", file.ContentType);
+
+            parameters.Add("BigData", file.BigData);
+            parameters.Add("LittleData", file.LittleData);
+
+            parameters.Add("Size", file.Size);
+            parameters.Add("Width", file.Width);
+            parameters.Add("Height", file.Height);
+
+            parameters.Add("CreationDate", DateTime.Now);
+            parameters.Add("UpDateDate", DateTime.Now);
+
+            parameters.Add("FileType", file.FileType);
+
+            using (var connection = _context.CreateConnection())
+            {
+                return await connection.QuerySingleOrDefaultAsync<long>(new CommandDefinition(sql, parameters, cancellationToken: cancellationtoken));
+            }
         }
+        catch (Exception)
+        {
+
+            throw;
+        }
+
     }
 }
