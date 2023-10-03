@@ -20,7 +20,7 @@ namespace Wego.Api.Controllers.Features.Common
         }
 
 
-        [HttpGet("back-grounds")]
+        [HttpGet("all-backgrounds")]
         [ProducesResponseType(StatusCodes.Status200OK)]
         [ProducesResponseType(StatusCodes.Status404NotFound)]
         public async Task<ActionResult> GetAllBackGrounds(CancellationToken cancellationToken = default)
