@@ -3,6 +3,7 @@
 using Microsoft.AspNetCore.Mvc;
 
 using Wego.Application.Features.BackGround.Commands;
+using Wego.Application.Features.BackGround.Queries;
 using Wego.Application.Features.Profile.Queries;
 using Wego.Application.Models.Common;
 
@@ -19,6 +20,12 @@ namespace Wego.Api.Controllers.Features.Common
         }
 
 
+        [HttpGet("back-grounds")]
+        [ProducesResponseType(StatusCodes.Status200OK)]
+        [ProducesResponseType(StatusCodes.Status404NotFound)]
+        public async Task<ActionResult> GetAllBackGrounds(CancellationToken cancellationToken = default)
+            => Ok(await _mediator.Send(new GetAllBackGroundQuery(cancellationToken)));
+        
 
         [HttpGet("{pid}/thumbnail")]
         [ProducesResponseType(StatusCodes.Status200OK)]

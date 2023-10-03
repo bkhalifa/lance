@@ -98,13 +98,13 @@ FileName  NVARCHAR(250) NULL,
 Extension NVARCHAR(50) NULL,
 ContentType NVARCHAR(50),
 BigData varbinary(max)  NULL,
-LittleData varbinary(max)  NULL,
 Size INT NULL,
 Width INT NULL,
 Height INT NULL,
 CreationDate datetime NULL,
 UpDateDate dateTime NULL,
-FileType BIT NOT NULL,
+FileType BIT  NULL,
 )
 END
 GO
+

@@ -6,17 +6,15 @@
         {
 
         }
-        public BackGroundResponse(long id, string contentType, byte[] bigData, byte[] littleData)
+        public BackGroundResponse(long id, string contentType, byte[] bigData)
         {
             Id = id;
             ContentType = contentType;
             BigData = bigData;
-            LittleData = littleData;
         }
         public long Id { get; set; }
         public string ContentType { get; set; }
         public  string Extension { get; set; }
         public byte[] BigData { get; set; }
-        public byte[] LittleData { get; set; }
     }
 }

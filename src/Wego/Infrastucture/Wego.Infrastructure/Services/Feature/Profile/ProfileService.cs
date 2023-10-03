@@ -86,18 +86,20 @@ public class ProfileService : IProfileService
     public async Task<long> SaveBackGroundProfileAsync(BackGroundModel model, CancellationToken cancellationtoken)
     {
         var file = model.MapTo<BackGroundFile>();
-
         file.BigData = ToArrayBase(model.FileBase64);
-        file.LittleData = MakeThumbnail(file.BigData, 200, 200);
-
-        var id = await _profileRepository.SaveBackGroundAsync(file, cancellationtoken).ConfigureAwait(false);
-        return id;
+        return  await _profileRepository.SaveBackGroundAsync(file, cancellationtoken).ConfigureAwait(false);
     }
     public  async Task<BackGroundResponse> GetBackGroundByIdAsync(long fileId, CancellationToken cancellationtoken)
     {
         var result = await _profileRepository.GetBgImageByIdAsync(fileId, cancellationtoken).ConfigureAwait(false);
         return result;
     }
+    public async Task<IEnumerable<AllBackGroundResponse>> GetAllBackGroundAsync(CancellationToken cancellationtoken)
+    {
+        var result = await _profileRepository.GetAllBackGroundAsync(cancellationtoken).ConfigureAwait(false);
+        return result;
+    }
+
     private static byte[] ToArrayBase(string FileAsBase64)
     {
         return FileAsBase64.Contains(",") ?
@@ -113,6 +115,4 @@ public class ProfileService : IProfileService
             return ms.ToArray();
         }
     }
-
- 
 }

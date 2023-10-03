@@ -18,6 +18,6 @@ public interface IProfileRepository
     Task<bool> DeleteImageByIdAsync(long fileId, CancellationToken cancellationtoken);
     Task<long> SaveBackGroundAsync(BackGroundFile file, CancellationToken cancellationtoken);
     Task<BackGroundResponse> GetBgImageByIdAsync(long fileId, CancellationToken cancellationtoken);
-    
+    Task<IEnumerable<AllBackGroundResponse>> GetAllBackGroundAsync(CancellationToken cancellationtoken);
 }
 
