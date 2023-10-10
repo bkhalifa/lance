@@ -7,13 +7,12 @@
   </PropertyGroup>
 
   <ItemGroup>
+    <Compile Remove="Features\Chat\**" />
     <Compile Remove="Features\Offer\**" />
+    <EmbeddedResource Remove="Features\Chat\**" />
     <EmbeddedResource Remove="Features\Offer\**" />
+    <None Remove="Features\Chat\**" />
     <None Remove="Features\Offer\**" />
-  </ItemGroup>
-
-  <ItemGroup>
-    <Folder Include="Features\Chat\Commands\" />
   </ItemGroup>
 
   <ItemGroup>

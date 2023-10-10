@@ -1,12 +1,10 @@
-﻿
-using AutoMapper;
-
-using Dapper;
+﻿using Dapper;
 
 using System.Data;
 
-using Wego.Application.Features.Profile.Commands;
 using Wego.Application.IRepository;
+using Wego.Application.Models.Profile;
+using Wego.Domain.Common;
 using Wego.Domain.Profile;
 
 
@@ -19,7 +17,7 @@ public class ProfileRepository : IProfileRepository
     {
         _context = context;
     }
-    public async Task<long> CreateImageAsync(ImageProfileModelCommand model, CancellationToken cancellationtoken = default)
+    public async Task<long> CreateImageAsync(ImageProfileModel model, CancellationToken cancellationtoken = default)
     {
         var sql = "INSERT INTO [profile].[ImageProfile]  VALUES (@ImageData, @Width, @Height, @ContentType, @CreationDate, @UpdateDate,  @ProfileId)"
             + "SELECT CAST(SCOPE_IDENTITY() as bigint)";
@@ -37,7 +35,7 @@ public class ProfileRepository : IProfileRepository
             return id;
         }
     }
-    public async Task UpdateImageAsync(ImageProfileModelCommand model, CancellationToken cancellationtoken = default)
+    public async Task UpdateImageAsync(ImageProfileModel model, CancellationToken cancellationtoken = default)
     {
 
         var sql = "UPDATE [profile].[ImageProfile] SET ImageData = @ImageData , Width = @Width, Height = @Height," +
@@ -49,24 +47,37 @@ public class ProfileRepository : IProfileRepository
         parameters.Add("Height", model.Height, DbType.Byte);
         parameters.Add("ContentType", model.ContentType, DbType.String);
         parameters.Add("UpateDate", DateTime.Now, DbType.DateTime);
-     
+
         using (var connection = _context.CreateConnection())
         {
-          await connection.ExecuteAsync(sql, parameters);
-         }
-       
+            await connection.ExecuteAsync(sql, parameters);
+        }
+
     }
-    public async Task<ImageProfileResponse> GetImageByIdAsync(long fid, CancellationToken cancellationtoken = default)
+    public async Task<ImageProfileResponse> GetImageByIdAsync(long pid, CancellationToken cancellationtoken = default)
     {
-        var query = "SELECT Id,  ContentType, ImageData FROM [profile].[ImageProfile] WHERE Id = @fid";
+        var query = "SELECT Id,  ContentType, ImageData FROM [profile].[ImageProfile] WHERE ProfileId = @pid";
+        var parameters = new DynamicParameters();
+        parameters.Add("pid", pid);
+
+        using (var connection = _context.CreateConnection())
+        {
+            var result = await connection.QueryFirstOrDefaultAsync<ImageProfileResponse>(new CommandDefinition(query, parameters, cancellationToken: cancellationtoken));
+            return result;
+        }
+    }
+
+    public async Task<BackGroundResponse> GetBgImageByIdAsync(long fid, CancellationToken cancellationtoken = default)
+    {
+        var query = "SELECT Id, ContentType, Extension, BigData FROM profile.BackGroundImage WHERE Id = @fid";
         var parameters = new DynamicParameters();
         parameters.Add("fid", fid);
 
         using (var connection = _context.CreateConnection())
-         {
-           var result = await connection.QueryFirstOrDefaultAsync<ImageProfileResponse>(new CommandDefinition(query, parameters, cancellationToken: cancellationtoken));
+        {
+            var result = await connection.QueryFirstOrDefaultAsync<BackGroundResponse>(new CommandDefinition(query, parameters, cancellationToken: cancellationtoken));
             return result;
-         }       
+        }
     }
 
     public async Task<ImageProfileResponse> GetImageByProfileIdAsync(long pid, CancellationToken cancellationtoken = default)
@@ -77,16 +88,14 @@ public class ProfileRepository : IProfileRepository
 
         using (var connection = _context.CreateConnection())
         {
-           var result = await connection.QueryFirstOrDefaultAsync<ImageProfileResponse>(new CommandDefinition(query, parameters, cancellationToken: cancellationtoken));
+            var result = await connection.QueryFirstOrDefaultAsync<ImageProfileResponse>(new CommandDefinition(query, parameters, cancellationToken: cancellationtoken));
             return result;
         }
     }
     public async Task<ProfileModel> GetProfileAsync(string suId, CancellationToken cancellationtoken = default)
     {
-        var query = "SELECT pfl.Id, pfl.UserId, pfl.FirstName, pfl.LastName, pfl.InitialUserName, pfl.Email, pfl.PhoneNumber, pfl.CreationDate, pfl.UpdateDate, pfl.UsId, pfl.Position, img.Id as fileId " +
+        var query = "SELECT pfl.Id, pfl.UserId, pfl.FirstName, pfl.LastName, pfl.InitialUserName, pfl.Email, pfl.PhoneNumber, pfl.CreationDate, pfl.UpdateDate, pfl.UsId, pfl.Position " +
             "FROM [profile].[Profiles] pfl " +
-            "LEFT JOIN [profile].[ImageProfile] img " +
-            "ON pfl.Id = img.ProfileId " +
             "WHERE pfl.UsId =@suId";
 
         var parameters = new DynamicParameters();
@@ -160,11 +169,59 @@ public class ProfileRepository : IProfileRepository
     public async Task<bool> DeleteImageByIdAsync(long id, CancellationToken cancellationtoken = default)
     {
         var query = "DELETE FROM profile.ImageProfile WHERE Id = @Id";
-      
+
         using (var connection = _context.CreateConnection())
-         {
-               var effectedRow = await connection.ExecuteAsync(new CommandDefinition(query, new { id }, cancellationToken: cancellationtoken));
-               return effectedRow > 0;
-         }
+        {
+            var effectedRow = await connection.ExecuteAsync(new CommandDefinition(query, new { id }, cancellationToken: cancellationtoken));
+            return effectedRow > 0;
+        }
+    }
+
+    public async Task<long> SaveBackGroundAsync(BackGroundFile file, CancellationToken cancellationtoken)
+    {
+        var sql = "INSERT INTO [profile].[BackGroundImage] VALUES " +
+              "(@ParentId, @FileName, @Extension, @ContentType, @BigData, @Size ,@Width, @Height, @CreationDate, @UpDateDate, @FileType) " +
+              "SELECT CAST(SCOPE_IDENTITY() AS INT) ";
+        var parameters = new DynamicParameters();
+        try
+        {
+            parameters.Add("ParentId", file.ParentId);
+            parameters.Add("FileName", file.FileName);
+
+            parameters.Add("Extension", file.Extension);
+            parameters.Add("ContentType", file.ContentType);
+
+            parameters.Add("BigData", file.BigData);
+
+            parameters.Add("Size", file.Size);
+            parameters.Add("Width", file.Width);
+            parameters.Add("Height", file.Height);
+
+            parameters.Add("CreationDate", DateTime.Now);
+            parameters.Add("UpDateDate", DateTime.Now);
+
+            parameters.Add("FileType", file.FileType);
+
+            using (var connection = _context.CreateConnection())
+            {
+                return await connection.QuerySingleOrDefaultAsync<long>(new CommandDefinition(sql, parameters, cancellationToken: cancellationtoken));
+            }
+        }
+        catch (Exception e)
+        {
+
+            throw e;
+        }
+
+    }
+
+    public async Task<IEnumerable<AllBackGroundResponse>> GetAllBackGroundAsync(CancellationToken cancellationtoken = default)
+    {
+        var query = "SELECT Id, ParentId, FileName , ContentType , FileType FROM [profile].[BackGroundImage]";
+
+        using (var connection = _context.CreateConnection())
+        {
+            return await connection.QueryAsync<AllBackGroundResponse>(new CommandDefinition(query, cancellationToken: cancellationtoken));
+        }
     }
 }

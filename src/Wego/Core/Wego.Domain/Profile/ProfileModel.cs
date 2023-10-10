@@ -15,7 +15,6 @@ public class ProfileModel
     public DateTime? UpdateDate { get; set; }
     public string UsId { get; private set; }
     public string Position { get; set; }
-    public long fileId { get; set; }
 
     public ProfileModel()
     {
@@ -29,10 +28,7 @@ public class ProfileModel
         InitialUserName = GetInitials(email);
     }
 
-    public string SetUsId()
-    {
-        return UsId + GenerateRandomNumber();
-    }
+    public string SetUsId() => UsId.Substring(0, UsId.Length - 1) + GenerateRandomNumber();
     public int GenerateRandomNumber() => Random.Shared.Next(1, 9);
     public static string SplitMail(string adressMail)
     {
