@@ -69,7 +69,7 @@ public class ProfileRepository : IProfileRepository
 
     public async Task<BackGroundResponse> GetBgImageByIdAsync(long fid, CancellationToken cancellationtoken = default)
     {
-        var query = "SELECT Id, ContentType, Extension, BigData FROM profile.BackGroundImage WHERE Id = @fid";
+        var query = "SELECT Id, ContentType, Extension, BigData, LittleData FROM profile.BackGroundImage WHERE Id = @fid";
         var parameters = new DynamicParameters();
         parameters.Add("fid", fid);
 
@@ -180,8 +180,8 @@ public class ProfileRepository : IProfileRepository
     public async Task<long> SaveBackGroundAsync(BackGroundFile file, CancellationToken cancellationtoken)
     {
         var sql = "INSERT INTO [profile].[BackGroundImage] VALUES " +
-              "(@ParentId, @FileName, @Extension, @ContentType, @BigData, @Size ,@Width, @Height, @CreationDate, @UpDateDate, @FileType) " +
-              "SELECT CAST(SCOPE_IDENTITY() AS INT) ";
+              "(@ParentId, @FileName, @Extension, @ContentType, @LittleData, @BigData, @Size ,@Width, @Height, @CreationDate, @UpDateDate, @FileType, @ProfileId) " +
+              "SELECT CAST(SCOPE_IDENTITY() AS INT)";
         var parameters = new DynamicParameters();
         try
         {
@@ -191,6 +191,7 @@ public class ProfileRepository : IProfileRepository
             parameters.Add("Extension", file.Extension);
             parameters.Add("ContentType", file.ContentType);
 
+            parameters.Add("LittleData", file.LittleData);
             parameters.Add("BigData", file.BigData);
 
             parameters.Add("Size", file.Size);
@@ -201,6 +202,7 @@ public class ProfileRepository : IProfileRepository
             parameters.Add("UpDateDate", DateTime.Now);
 
             parameters.Add("FileType", file.FileType);
+            parameters.Add("ProfileId", null!);
 
             using (var connection = _context.CreateConnection())
             {
@@ -217,7 +219,7 @@ public class ProfileRepository : IProfileRepository
 
     public async Task<IEnumerable<AllBackGroundResponse>> GetAllBackGroundAsync(CancellationToken cancellationtoken = default)
     {
-        var query = "SELECT Id, ParentId, FileName , ContentType , FileType FROM [profile].[BackGroundImage]";
+        var query = "SELECT Id, ParentId, FileName , Extension, ProfileId FROM [profile].[BackGroundImage]";
 
         using (var connection = _context.CreateConnection())
         {

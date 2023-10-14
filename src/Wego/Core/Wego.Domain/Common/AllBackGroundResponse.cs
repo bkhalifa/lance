@@ -5,7 +5,7 @@
         public long Id { get; set; }
         public long ParentId { get; set; }
         public string FileName { get; set; }
-        public string ContentType { get; set; }
-        public bool? FileType { get; set; }
+        public string Extension { get; set; }
+        public long ProfileId { get; set; }
     }
 }

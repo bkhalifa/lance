@@ -87,6 +87,7 @@ public class ProfileService : IProfileService
     {
         var file = model.MapTo<BackGroundFile>();
         file.BigData = ToArrayBase(model.FileBase64);
+        file.LittleData = MakeThumbnail(file.BigData, 20, 20);
         return  await _profileRepository.SaveBackGroundAsync(file, cancellationtoken).ConfigureAwait(false);
     }
     public  async Task<BackGroundResponse> GetBackGroundByIdAsync(long fileId, CancellationToken cancellationtoken)

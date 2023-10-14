@@ -97,6 +97,7 @@ ParentId BIGINT NULL,
 FileName  NVARCHAR(250) NULL,
 Extension NVARCHAR(50) NULL,
 ContentType NVARCHAR(50),
+LittleData varbinary(max)  NULL,
 BigData varbinary(max)  NULL,
 Size INT NULL,
 Width INT NULL,
@@ -108,3 +109,11 @@ FileType BIT  NULL,
 END
 GO
 
+IF NOT EXISTS(SELECT 1 FROM sys.columns 
+          WHERE Name = N'ProfileId'
+         AND Object_ID = Object_ID(N'[profile].[ImageProfile]'))
+BEGIN
+    ALTER TABLE [dbo].[T_Wedoc_Template_Wed]
+    ADD [ProfileId] BIGINT  NULL   
+END
+GO
