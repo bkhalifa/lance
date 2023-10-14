@@ -141,6 +141,14 @@ public class AuthenticationService : IAuthenticationService
 
             var resultProfile = await _profileService.AddProfileInfoAsync(newProfile, cancellationToken);
 
+            await _candidateRepository.AddAsync(new CandidateModel
+            {
+                ProfileId = resultProfile,
+                Email = request.Email,
+                IsConnected = false,
+                Name = newProfile.InitialUserName
+            });
+
             return new RegistrationResponse()
             {
                 Email = user.Email!,

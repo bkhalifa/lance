@@ -14,12 +14,13 @@ namespace Wego.Persistence.Repositories.Profile
         }
         public async Task<int> AddAsync(CandidateModel candidate)
         {
-            var sql = "INSERT INTO [chat].[Candidates] (Email, Name, IsConnected, ProfileId, CreationDate, UpdateDate)  VALUES " +
-                      "(@email, @name, @isConnected, @profileId, GETUTCDATE(), GETUTCDATE())";
+            var sql = "INSERT INTO [chat].[Candidates] (Email, Name, IsConnected, ProfileId, ConnectionId, ModifiedDate)  VALUES " +
+                       "(@email, @name, @isConnected, @profileId, @connectionId, GETUTCDATE())";
             var parameters = new DynamicParameters();
             parameters.Add("email", candidate.Email);
             parameters.Add("name", candidate.Name);
             parameters.Add("profileId", candidate.ProfileId);
+            parameters.Add("connectionId", candidate.ConnectionId);
             parameters.Add("isConnected", candidate.IsConnected);
 
             using (var connection = _context.CreateConnection())
