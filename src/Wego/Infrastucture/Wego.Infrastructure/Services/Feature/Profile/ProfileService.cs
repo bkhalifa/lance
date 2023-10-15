@@ -8,6 +8,7 @@ using Wego.Application.Models.Common;
 using Wego.Application.Models.Profile;
 using Wego.Domain.Common;
 using Wego.Domain.Profile;
+using WegoPro.Domain.Profile;
 
 namespace Wego.Infrastructure.Services.Feature.Profile;
 
@@ -97,6 +98,12 @@ public class ProfileService : IProfileService
     public async Task<IEnumerable<AllBackGroundResponse>> GetAllBackGroundAsync(CancellationToken cancellationtoken)
     {
         var result = await _profileRepository.GetAllBackGroundAsync(cancellationtoken).ConfigureAwait(false);
+        return result;
+    }
+
+    public async Task<FileResponse> GetFileByIdAsync(long fileId, CancellationToken cancellationtoken = default)
+    {
+        var result = await _profileRepository.GetFileByIdIdAsync(fileId, cancellationtoken).ConfigureAwait(false);
         return result;
     }
 

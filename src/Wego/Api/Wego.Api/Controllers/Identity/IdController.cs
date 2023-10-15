@@ -47,9 +47,9 @@ public class IdController : ControllerBase
 
     [HttpPost(nameof(Logout))]
     [Authorize]
-    public async Task<ActionResult<AuthenticationResponse>> Logout([FromBody] LogoutModel logoutModel)
+    public async Task<ActionResult<AuthenticationResponse>> Logout([FromBody] LogoutModel logoutModel, CancellationToken cancellationToken = default)
     {
-        await _authenticationService.LogoutAsync(logoutModel);
+        await _authenticationService.LogoutAsync(logoutModel, cancellationToken);
         return Ok();
     }
 

@@ -6,7 +6,7 @@ using Wego.Application.IRepository;
 using Wego.Application.Models.Profile;
 using Wego.Domain.Common;
 using Wego.Domain.Profile;
-
+using WegoPro.Domain.Profile;
 
 namespace Wego.Persistence.Repositories.Profile;
 
@@ -222,6 +222,19 @@ public class ProfileRepository : IProfileRepository
         using (var connection = _context.CreateConnection())
         {
             return await connection.QueryAsync<AllBackGroundResponse>(new CommandDefinition(query, cancellationToken: cancellationtoken));
+        }
+    }
+
+    public async Task<FileResponse> GetFileByIdIdAsync(long fileId, CancellationToken cancellationtoken = default)
+    {
+        var query = "SELECT Id, ContentType,  FileData, FileName FROM [chat].[MessageFiles] WHERE id = @fileId";
+        var parameters = new DynamicParameters();
+        parameters.Add("fileId", fileId);
+
+        using (var connection = _context.CreateConnection())
+        {
+            var result = await connection.QueryFirstOrDefaultAsync<FileResponse>(new CommandDefinition(query, parameters, cancellationToken: cancellationtoken));
+            return result;
         }
     }
 }

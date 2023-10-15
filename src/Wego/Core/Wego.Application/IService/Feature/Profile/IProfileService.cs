@@ -2,6 +2,7 @@
 using Wego.Application.Models.Profile;
 using Wego.Domain.Common;
 using Wego.Domain.Profile;
+using WegoPro.Domain.Profile;
 
 namespace Wego.Application.IService.Feature.Profile;
 
@@ -16,5 +17,6 @@ public interface IProfileService
     Task<ProfileModel> GetProfileByUserIdAsync(string userId, CancellationToken cancellationtoken);
     Task<BackGroundResponse> GetBackGroundByIdAsync(long profileId, CancellationToken cancellationtoken);
     Task<long> SaveBackGroundProfileAsync(BackGroundModel file, CancellationToken cancellationtoken);
+    Task<FileResponse> GetFileByIdAsync(long fileId, CancellationToken cancellationtoken);
     Task<IEnumerable<AllBackGroundResponse>> GetAllBackGroundAsync(CancellationToken cancellationtoken);
 }
