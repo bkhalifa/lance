@@ -40,12 +40,13 @@ namespace Wego.Api.Controllers.Features.Common
         [HttpGet("{fid}/background")]
         [ProducesResponseType(StatusCodes.Status200OK)]
         [ProducesResponseType(StatusCodes.Status404NotFound)]
-        public async Task<ActionResult> GetBackGround(long fid, CancellationToken cancellationToken = default)
+        public async Task<ActionResult> GetBackGround(long fid ,CancellationToken cancellationToken = default)
         {
             var result = await _mediator.Send(new GetBgImageByIdQuery(fid, cancellationToken));
-            return File(result.BigData, result.ContentType);
+            return File(result?.BigData, result.ContentType);
         }
 
+ 
         [HttpPost("save-backgroud")]
         [ProducesResponseType(StatusCodes.Status200OK)]
         [ProducesResponseType(StatusCodes.Status500InternalServerError)]

@@ -17,5 +17,6 @@
         public  string Extension { get; set; }
         public byte[] LittleData { get; set; }
         public byte[] BigData { get; set; }
+       public long ProfileId { get; set; }
     }
 }

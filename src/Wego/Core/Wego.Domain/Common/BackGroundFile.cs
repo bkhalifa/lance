@@ -15,6 +15,7 @@
         public DateTime? CreationDate { get; set; }
         public DateTime? UpDateDate { get; set; }
         public bool? FileType { get; set; }
+        public long? ProfileId { get; set; }
 
     }
 }

@@ -18,6 +18,12 @@ public interface IProfileRepository
     Task<bool> DeleteImageByIdAsync(long fileId, CancellationToken cancellationtoken);
     Task<long> SaveBackGroundAsync(BackGroundFile file, CancellationToken cancellationtoken);
     Task<BackGroundResponse> GetBgImageByIdAsync(long fileId, CancellationToken cancellationtoken);
+    Task<long> GetBgImageByProfileIdAsync(long profileId, CancellationToken cancellationtoken);
     Task<IEnumerable<AllBackGroundResponse>> GetAllBackGroundAsync(CancellationToken cancellationtoken);
+    Task<BackGroundFile> GetBackGroundByProfileId(long profileId, CancellationToken cancellationtoken);
+    Task<BackGroundFile> GetBackGroundByFileId(long fileId, CancellationToken cancellationtoken);
+    Task<long> AddBackGroundProfile(BackGroundFile model, CancellationToken cancellationtoken);
+    Task<long> UpdateBackGroundProfile(BackGroundFile model, CancellationToken cancellationtoken);
+    Task DeleteGroundProfile(long fileId, CancellationToken cancellationtoken);
 }
 

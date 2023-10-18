@@ -14,7 +14,9 @@ public interface IProfileService
     Task<ProfileModel> GetProfileByEmailAsync(string email, CancellationToken cancellationtoken);
     Task<long> AddProfileInfoAsync(ProfileModel profile, CancellationToken cancellationtoken);
     Task<ProfileModel> GetProfileByUserIdAsync(string userId, CancellationToken cancellationtoken);
-    Task<BackGroundResponse> GetBackGroundByIdAsync(long profileId, CancellationToken cancellationtoken);
+    Task<BackGroundResponse> GetBackGroundByIdAsync(long fid, CancellationToken cancellationtoken);
+    Task<long> GetBackGroundByProfileIdAsync(long pid, CancellationToken cancellationtoken);
     Task<long> SaveBackGroundProfileAsync(BackGroundModel file, CancellationToken cancellationtoken);
     Task<IEnumerable<AllBackGroundResponse>> GetAllBackGroundAsync(CancellationToken cancellationtoken);
+    Task<long>SaveBackGroudProfile(BackGroundProfileModel model,  CancellationToken cancellationtoken);
 }

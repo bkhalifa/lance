@@ -3,6 +3,7 @@
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 
+using Wego.Application.Features.BackGround.Queries;
 using Wego.Application.Features.Profile.Commands;
 using Wego.Application.Features.Profile.Queries;
 using Wego.Application.Models.Profile;
@@ -44,6 +45,15 @@ public class ProfileController : ControllerBase
     public async Task<ActionResult<long>> SaveImageProfile([FromBody] ImageProfileModel model, CancellationToken cancellationToken = default)
       => Ok(await _mediator.Send(new ImageProfileModelCommand(model, cancellationToken)));
 
+    [HttpPost("save-background")]
+    [Authorize]
+    [ProducesResponseType(StatusCodes.Status200OK)]
+    [ProducesResponseType(StatusCodes.Status201Created)]
+    [ProducesResponseType(StatusCodes.Status204NoContent)]
+    [ProducesResponseType(StatusCodes.Status500InternalServerError)]
+    [ProducesResponseType(StatusCodes.Status401Unauthorized)]
+    public async Task<ActionResult<long>> SaveBachGroundProfile([FromBody] BackGroundProfileModel model, CancellationToken cancellationToken = default)
+    => Ok(await _mediator.Send(new BackGroundProfileCommand(model, cancellationToken)));
 
     [HttpGet("{pid}/thumbnail")]
     [Authorize]
@@ -59,5 +69,13 @@ public class ProfileController : ControllerBase
     [ProducesResponseType(StatusCodes.Status404NotFound)]
     public async Task<ActionResult> DeleteImageProfile(long fid, CancellationToken cancellationToken = default)
       => Ok(await _mediator.Send(new DeleteImageProfileModelCommand(fid, cancellationToken)));
+   
+    [HttpGet("{pid}/background-profile")]
+    [ProducesResponseType(StatusCodes.Status200OK)]
+    [ProducesResponseType(StatusCodes.Status404NotFound)]
+    public async Task<ActionResult> GetBackGroundByProfileId(long pid, CancellationToken cancellationToken = default)
+        => Ok(await _mediator.Send(new GetBackGroundImageByProfileIdQuery(pid, cancellationToken)));
+    
+
 }
 

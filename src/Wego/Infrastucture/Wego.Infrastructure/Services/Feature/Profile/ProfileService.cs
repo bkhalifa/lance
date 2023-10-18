@@ -1,4 +1,6 @@
-﻿using System.Drawing;
+﻿using Microsoft.Data.SqlClient;
+
+using System.Drawing;
 
 using Wego.Application.Contracts.Context;
 using Wego.Application.Extensions;
@@ -82,23 +84,41 @@ public class ProfileService : IProfileService
     {
         ArgumentNullException.ThrowIfNull(fileId);
         return await _profileRepository.DeleteImageByIdAsync(fileId, cancellationtoken).ConfigureAwait(false);
-    }  
+    }
     public async Task<long> SaveBackGroundProfileAsync(BackGroundModel model, CancellationToken cancellationtoken)
     {
         var file = model.MapTo<BackGroundFile>();
         file.BigData = ToArrayBase(model.FileBase64);
         file.LittleData = MakeThumbnail(file.BigData, 20, 20);
-        return  await _profileRepository.SaveBackGroundAsync(file, cancellationtoken).ConfigureAwait(false);
+        return await _profileRepository.SaveBackGroundAsync(file, cancellationtoken).ConfigureAwait(false);
     }
-    public  async Task<BackGroundResponse> GetBackGroundByIdAsync(long fileId, CancellationToken cancellationtoken)
+    public async Task<BackGroundResponse> GetBackGroundByIdAsync(long fileId, CancellationToken cancellationtoken)
     {
         var result = await _profileRepository.GetBgImageByIdAsync(fileId, cancellationtoken).ConfigureAwait(false);
+        return result;
+    }
+    public async Task<long> GetBackGroundByProfileIdAsync(long profileId, CancellationToken cancellationtoken = default)
+    {
+        var result = await _profileRepository.GetBgImageByProfileIdAsync(profileId, cancellationtoken).ConfigureAwait(false);
         return result;
     }
     public async Task<IEnumerable<AllBackGroundResponse>> GetAllBackGroundAsync(CancellationToken cancellationtoken)
     {
         var result = await _profileRepository.GetAllBackGroundAsync(cancellationtoken).ConfigureAwait(false);
         return result;
+    }
+    public async Task<long> SaveBackGroudProfile(BackGroundProfileModel model, CancellationToken cancellationtoken)
+    {
+        var backGround = await _profileRepository.GetBackGroundByProfileId(model.profileId, cancellationtoken);
+
+        if (backGround is not null)
+        {
+            await _profileRepository.DeleteGroundProfile(backGround.Id, cancellationtoken);
+        }
+
+        var bgModel = await _profileRepository.GetBackGroundByFileId(model.fileId, cancellationtoken);
+        bgModel.ProfileId = model.profileId;
+        return await _profileRepository.AddBackGroundProfile(bgModel, cancellationtoken); ;
     }
 
     private static byte[] ToArrayBase(string FileAsBase64)
@@ -116,4 +136,6 @@ public class ProfileService : IProfileService
             return ms.ToArray();
         }
     }
+
+
 }

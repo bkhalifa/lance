@@ -39,7 +39,7 @@ public class ProfileRepository : IProfileRepository
     {
 
         var sql = "UPDATE [profile].[ImageProfile] SET ImageData = @ImageData , Width = @Width, Height = @Height," +
-                                                             "ContentType = @ContentType, UpateDate = @UpateDate  Where ProfileId = @pid ";
+                                                       "ContentType = @ContentType, UpateDate = @UpateDate  Where ProfileId = @pid ";
         var parameters = new DynamicParameters();
         parameters.Add("pid", model.ProfileId, DbType.Int64);
         parameters.Add("ImageData", model.Base64, DbType.Binary);
@@ -66,7 +66,18 @@ public class ProfileRepository : IProfileRepository
             return result;
         }
     }
+    public async Task<long> GetBgImageByProfileIdAsync(long pid, CancellationToken cancellationtoken = default)
+     {
+        var query = "SELECT Id FROM profile.BackGroundImage WHERE ProfileId = @pid";
+        var parameters = new DynamicParameters();
+        parameters.Add("pid", pid);
 
+        using (var connection = _context.CreateConnection())
+        {
+            var result = await connection.QueryFirstOrDefaultAsync<long>(new CommandDefinition(query, parameters, cancellationToken: cancellationtoken));
+            return result;
+        }
+     }
     public async Task<BackGroundResponse> GetBgImageByIdAsync(long fid, CancellationToken cancellationtoken = default)
     {
         var query = "SELECT Id, ContentType, Extension, BigData, LittleData FROM profile.BackGroundImage WHERE Id = @fid";
@@ -79,7 +90,6 @@ public class ProfileRepository : IProfileRepository
             return result;
         }
     }
-
     public async Task<ImageProfileResponse> GetImageByProfileIdAsync(long pid, CancellationToken cancellationtoken = default)
     {
         var query = "SELECT Id, ContentType,  ImageData FROM [profile].[ImageProfile] WHERE ProfileId = @pid";
@@ -165,7 +175,6 @@ public class ProfileRepository : IProfileRepository
             return await connection.QueryFirstOrDefaultAsync<string>(new CommandDefinition(query, parameters, cancellationToken: cancellationtoken));
         }
     }
-
     public async Task<bool> DeleteImageByIdAsync(long id, CancellationToken cancellationtoken = default)
     {
         var query = "DELETE FROM profile.ImageProfile WHERE Id = @Id";
@@ -176,7 +185,6 @@ public class ProfileRepository : IProfileRepository
             return effectedRow > 0;
         }
     }
-
     public async Task<long> SaveBackGroundAsync(BackGroundFile file, CancellationToken cancellationtoken)
     {
         var sql = "INSERT INTO [profile].[BackGroundImage] VALUES " +
@@ -216,14 +224,99 @@ public class ProfileRepository : IProfileRepository
         }
 
     }
-
     public async Task<IEnumerable<AllBackGroundResponse>> GetAllBackGroundAsync(CancellationToken cancellationtoken = default)
     {
-        var query = "SELECT Id, ParentId, FileName , Extension, ProfileId FROM [profile].[BackGroundImage]";
+        var query = "SELECT Id, ParentId, FileName , Extension, ProfileId FROM [profile].[BackGroundImage] WHERE ProfileId IS NULL";
 
         using (var connection = _context.CreateConnection())
         {
             return await connection.QueryAsync<AllBackGroundResponse>(new CommandDefinition(query, cancellationToken: cancellationtoken));
         }
+    }
+    public async Task<BackGroundFile> GetBackGroundByProfileId(long profileId, CancellationToken cancellationtoken)
+    {
+        var query = "SELECT [Id] ,[ParentId] , [FileName], [Extension], [ContentType], [LittleData], [BigData], [Size], [Width], [Height], [FileType] ,[ProfileId] FROM [profile].[BackGroundImage] where ProfileId =@profileId";
+        var parameters = new DynamicParameters();
+        parameters.Add("profileId", profileId);
+        using (var connection = _context.CreateConnection())
+        {
+            return await connection.QueryFirstOrDefaultAsync<BackGroundFile>(new CommandDefinition(query, parameters, cancellationToken: cancellationtoken));
+        }
+    }
+    public async Task<BackGroundFile> GetBackGroundByFileId(long fileId, CancellationToken cancellationtoken)
+    {
+        var query = "SELECT [Id] ,[ParentId] , [FileName], [Extension], [ContentType], [LittleData], [BigData], [Size], [Width], [Height], [FileType] ,[ProfileId] FROM [profile].[BackGroundImage] where Id =@fileId";
+        var parameters = new DynamicParameters();
+        parameters.Add("fileId", fileId);
+        using (var connection = _context.CreateConnection())
+        {
+            return await connection.QueryFirstOrDefaultAsync<BackGroundFile>(new CommandDefinition(query, parameters, cancellationToken: cancellationtoken));
+        }
+    }
+    public async Task<long> AddBackGroundProfile(BackGroundFile model, CancellationToken cancellationtoken)
+    {
+        var sql = "INSERT INTO [profile].[BackGroundImage] VALUES " +
+            " (@ParentId, @FileName, @Extension, @ContentType, @LittleData, @BigData, @Size, @Width, @Height, @CreationDate, @UpDateDate, @FileType, @ProfileId) " +
+            "SELECT CAST(SCOPE_IDENTITY() AS BIGINT) ";
+
+        var parameters = new DynamicParameters();
+        parameters.Add("ParentId", model.ParentId);
+        parameters.Add("FileName", model.FileName);
+        parameters.Add("Extension", model.Extension);
+        parameters.Add("ContentType", model.ContentType);
+        parameters.Add("LittleData", model.LittleData);
+        parameters.Add("BigData", model.BigData);
+        parameters.Add("Size", model.Size);
+        parameters.Add("Width", model.Width);
+        parameters.Add("Height", model.Height);
+        parameters.Add("CreationDate", DateTime.UtcNow);
+        parameters.Add("UpDateDate", DateTime.UtcNow);
+        parameters.Add("FileType", model.FileType);
+        parameters.Add("ProfileId", model.ProfileId);
+
+        using (var connection = _context.CreateConnection())
+        {
+            return await connection.QuerySingleOrDefaultAsync<long>(new CommandDefinition(sql, parameters, cancellationToken: cancellationtoken));
+        }
+    }
+    public async Task<long> UpdateBackGroundProfile(BackGroundFile model, CancellationToken cancellationtoken)
+    {
+        var query = "UPDATE [profile].[BackGroundImage] SET ParentId =@ParentId , FileName=@FileName, Extension=@Extension, ContentType=@ContentType ,LittleData=@LittleData, BigData=@BigData , Size=@Size,  UpDateDate=@UpDateDate, FileType=@FileType, ProfileId=@ProfileId Where id=@fileId";
+        try
+        {
+            var parameters = new DynamicParameters();
+            parameters.Add("ParentId", model.ParentId);
+            parameters.Add("FileName", model.FileName);
+            parameters.Add("Extension", model.Extension);
+            parameters.Add("ContentType", model.ContentType);
+            parameters.Add("LittleData", model.LittleData);
+            parameters.Add("BigData", model.BigData);
+            parameters.Add("Size", model.Size);
+            parameters.Add("UpDateDate", DateTime.Now);
+            parameters.Add("FileType", false);
+            parameters.Add("ProfileId", model.ProfileId);
+            parameters.Add("fileId", model.Id);
+
+            using (var connection = _context.CreateConnection())
+            {
+                return await connection.QuerySingleOrDefaultAsync<long>(new CommandDefinition(query, parameters, cancellationToken: cancellationtoken));
+            }
+        }
+        catch (Exception e)
+        {
+
+            throw e;
+        }
+    }
+    public async Task DeleteGroundProfile(long fileId, CancellationToken cancellationtoken)
+    {
+        var query = "DELETE FROM [profile].[BackGroundImage] WHERE Id = @fileId";
+        var parameters = new DynamicParameters();
+        parameters.Add("fileId", fileId);
+        using (var connection = _context.CreateConnection())
+        {
+            await connection.ExecuteAsync(new CommandDefinition(query, parameters, cancellationToken: cancellationtoken));
+        }
+
     }
 }

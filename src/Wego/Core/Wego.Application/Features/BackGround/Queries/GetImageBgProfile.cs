@@ -5,7 +5,7 @@ using Wego.Domain.Common;
 
 namespace Wego.Application.Features.Profile.Queries;
 
-public record GetBgImageByIdQuery(long fid, CancellationToken cancellationtoken = default) : IRequest<BackGroundResponse>;
+public record GetBgImageByIdQuery(long pid, CancellationToken cancellationtoken = default) : IRequest<BackGroundResponse>;
 public class GetBgImageByIdQueryHandler : IRequestHandler<GetBgImageByIdQuery, BackGroundResponse>
 {
     private readonly IProfileService _profileService;
@@ -14,6 +14,6 @@ public class GetBgImageByIdQueryHandler : IRequestHandler<GetBgImageByIdQuery, B
         _profileService = profileService;
     }
     public async Task<BackGroundResponse> Handle(GetBgImageByIdQuery request, CancellationToken cancellationtoken = default)
-    => await _profileService.GetBackGroundByIdAsync(request.fid, cancellationtoken);
+    => await _profileService.GetBackGroundByIdAsync(request.pid, cancellationtoken);
 
 }
