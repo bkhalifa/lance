@@ -82,6 +82,7 @@ public class AuthenticationService : IAuthenticationService
             throw new UserNotFoundException($"User profile not found for '{request.Email}.");
 
         var jwtSecurityToken = await _jwtTokenService.GenerateTokenAsync(user, profile.Id);
+        await _candidateRepository.SetConnected(profile.Id, true, cancellationToken);
 
         return new AuthenticationResponse
         {
@@ -146,8 +147,8 @@ public class AuthenticationService : IAuthenticationService
                 ProfileId = resultProfile,
                 Email = request.Email,
                 IsConnected = false,
-                Name = newProfile.InitialUserName
-            });
+                Name = request.Email.Substring(0, request.Email.IndexOf("@"))
+            }, cancellationToken);
 
             return new RegistrationResponse()
             {
@@ -201,11 +202,13 @@ public class AuthenticationService : IAuthenticationService
 
         throw new ValidationException(result.Errors.ToDictionary(x => x.Code, x => x.Description));
     }
-    public async Task LogoutAsync(LogoutModel logoutModel)
+    public async Task LogoutAsync(LogoutModel logoutModel, CancellationToken cancellationToken = default)
     {
         var user = await _userManager.FindByEmailAsync(logoutModel.Email);
-
         if (user == null) throw new UserNotFoundException($"Email '{_currentContext.Identity.Email}' not found");
+
+        var profile = await _profileService.GetProfileByEmailAsync(logoutModel.Email, cancellationToken).ConfigureAwait(false);
+        await _candidateRepository.SetConnected(profile.Id, false, cancellationToken);
 
         await _signInManager.SignOutAsync();
         await _userManager.UpdateSecurityStampAsync(user);
@@ -309,5 +312,8 @@ public class AuthenticationService : IAuthenticationService
 
         return await _jwtTokenService.GenerateTokenAsync(user, profile.Id);
     }
+
+
+    
 
 }

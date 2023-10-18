@@ -10,6 +10,7 @@ using Wego.Application.Models.Common;
 using Wego.Application.Models.Profile;
 using Wego.Domain.Common;
 using Wego.Domain.Profile;
+using WegoPro.Domain.Profile;
 
 namespace Wego.Infrastructure.Services.Feature.Profile;
 
@@ -119,6 +120,12 @@ public class ProfileService : IProfileService
         var bgModel = await _profileRepository.GetBackGroundByFileId(model.fileId, cancellationtoken);
         bgModel.ProfileId = model.profileId;
         return await _profileRepository.AddBackGroundProfile(bgModel, cancellationtoken); ;
+    }
+
+    public async Task<FileResponse> GetFileByIdAsync(long fileId, CancellationToken cancellationtoken = default)
+    {
+        var result = await _profileRepository.GetFileByIdIdAsync(fileId, cancellationtoken).ConfigureAwait(false);
+        return result;
     }
 
     private static byte[] ToArrayBase(string FileAsBase64)

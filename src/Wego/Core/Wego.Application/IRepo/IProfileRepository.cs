@@ -1,6 +1,7 @@
 ﻿using Wego.Application.Models.Profile;
 using Wego.Domain.Common;
 using Wego.Domain.Profile;
+using WegoPro.Domain.Profile;
 
 namespace Wego.Application.IRepository;
 
@@ -20,6 +21,7 @@ public interface IProfileRepository
     Task<BackGroundResponse> GetBgImageByIdAsync(long fileId, CancellationToken cancellationtoken);
     Task<long> GetBgImageByProfileIdAsync(long profileId, CancellationToken cancellationtoken);
     Task<IEnumerable<AllBackGroundResponse>> GetAllBackGroundAsync(CancellationToken cancellationtoken);
+    Task<FileResponse> GetFileByIdIdAsync(long fileId, CancellationToken cancellationtoken);
     Task<BackGroundFile> GetBackGroundByProfileId(long profileId, CancellationToken cancellationtoken);
     Task<BackGroundFile> GetBackGroundByFileId(long fileId, CancellationToken cancellationtoken);
     Task<long> AddBackGroundProfile(BackGroundFile model, CancellationToken cancellationtoken);

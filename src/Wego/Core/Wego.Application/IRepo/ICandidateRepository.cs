@@ -5,6 +5,7 @@ namespace Wego.Application.IRepo
 {
     public interface ICandidateRepository
     {
-        Task<int> AddAsync(CandidateModel candidate);
+        Task<int> AddAsync(CandidateModel candidate, CancellationToken cancellationToken);
+        Task<int> SetConnected(long profileId, bool isConnected, CancellationToken cancellationToken);
     }
 }

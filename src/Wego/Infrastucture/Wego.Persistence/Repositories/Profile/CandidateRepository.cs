@@ -12,7 +12,7 @@ namespace Wego.Persistence.Repositories.Profile
         {
             _context = context;
         }
-        public async Task<int> AddAsync(CandidateModel candidate)
+        public async Task<int> AddAsync(CandidateModel candidate, CancellationToken cancellationToken = default)
         {
             var sql = "INSERT INTO [chat].[Candidates] (Email, Name, IsConnected, ProfileId, ConnectionId, ModifiedDate)  VALUES " +
                        "(@email, @name, @isConnected, @profileId, @connectionId, GETUTCDATE())";
@@ -25,7 +25,20 @@ namespace Wego.Persistence.Repositories.Profile
 
             using (var connection = _context.CreateConnection())
             {
-                return await connection.ExecuteAsync(sql, parameters);
+                return await connection.ExecuteAsync(new CommandDefinition(sql, parameters, cancellationToken: cancellationToken));
+            }
+        }
+
+        public async Task<int> SetConnected(long profileId, bool isConnected, CancellationToken cancellationToken = default)
+        {
+            var sql = "Update [chat].[Candidates] SET IsConnected = @isConnected WHERE ProfileId = @profileId";
+            var parameters = new DynamicParameters();
+            parameters.Add("isConnected", isConnected);
+            parameters.Add("profileId", profileId);
+
+            using (var connection = _context.CreateConnection())
+            {
+                return await connection.ExecuteAsync(new CommandDefinition(sql, parameters, cancellationToken: cancellationToken));
             }
         }
     }
