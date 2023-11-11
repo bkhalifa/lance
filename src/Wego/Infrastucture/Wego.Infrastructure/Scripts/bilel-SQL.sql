@@ -117,3 +117,210 @@ BEGIN
     ADD [ProfileId] BIGINT  NULL   
 END
 GO
+
+ ------------------------------CHAT SCRIPTS 11/11/2023-------------------------------
+ -- =============================================
+-- Creation date:   11/11/2023
+-- Description:	REMOVE TABLE Messages
+-- =============================================
+ 
+
+IF OBJECT_ID(N'[chat].[Messages]', N'U') IS NOT NULL
+BEGIN
+DROP TABLE [chat].[Messages]
+END
+GO
+
+-- =============================================
+-- Creation date:   11/11/2023
+-- Description:	ADD TABLE Messages
+-- =============================================
+ 
+
+IF OBJECT_ID(N'[chat].[WeMessages]', N'U') IS NULL
+BEGIN
+
+CREATE TABLE [chat].[WeMessages](
+	[Id] [bigint] IDENTITY(1,1) NOT NULL,
+	[IsOpen] [bit] NOT NULL,
+	[Code] [nvarchar](100) NOT NULL,
+	[LastUpdateDate] [datetime] NULL,
+	[Message] [nvarchar](MAX) NOT NULL,
+	CONSTRAINT ck_message_json CHECK(ISJSON([Message])=1))
+END
+GO
+
+
+-- =============================================
+-- Creation date:   11/11/2023
+-- Description:	PS INSERT CHAT MESSAGES
+-- =============================================
+ CREATE OR ALTER      PROCEDURE [chat].[Insert_Chat_Message]
+	@Code NVARCHAR(100),
+	@IsOpen bit = 0, 
+	@LastUpdateDate DateTime,
+	@Message NVARCHAR(MAX)
+
+AS
+
+BEGIN
+
+	INSERT INTO [chat].[WeMessages]
+           ([IsOpen]
+           ,[Code]
+           ,[LastUpdateDate]
+           ,[Message])
+     VALUES
+           (@IsOpen
+           ,@Code
+           ,@LastUpdateDate
+           ,@Message)
+
+END
+GO
+
+-- =============================================
+-- Creation date:   11/11/2023
+-- Description:	PS SAVE CHAT MESSAGES
+-- =============================================
+
+CREATE OR ALTER           PROCEDURE [chat].[Save_Chat_Message]
+(
+@Code NVARCHAR(100),
+@LastUpdateDate DateTime,
+@NewMessage NVARCHAR(MAX)
+)
+AS
+
+BEGIN
+
+DECLARE @selectedMsg NVARCHAR(MAX);
+DECLARE @lastDateTimeMessage DATETIME;
+DECLARE	@msgId BIGINT;
+DECLARE @diffLimitter INT;
+
+SELECT TOP 1 @msgId = m.[Id], @selectedMsg =  m.[MESSAGE] , @lastDateTimeMessage = m.[LastUpdateDate] FROM [chat].[WeMessages] m
+WHERE m.Code = @Code
+ORDER BY m.LastUpdateDate desc
+
+DECLARE @limitter INT = 1 ;
+
+ SET @diffLimitter = DATEDIFF(day,  @lastDateTimeMessage, @LastUpdateDate)
+
+IF(@diffLimitter IS NOT NULL AND @diffLimitter < @limitter)
+BEGIN -- UPDATE
+    DECLARE @updatemsg NVARCHAR(MAX) = (SELECT  newMsg.value  from   OPENJSON (@NewMessage, '$') newMsg)
+	EXEC [chat].[Update_Chat_Message] 0 , @LastUpdateDate , @selectedMsg , @updatemsg, @msgId
+END
+ ELSE -- INSERT
+BEGIN
+   EXEC [chat].[Insert_Chat_Message] @Code, 0, @LastUpdateDate , @NewMessage
+END
+END
+
+GO
+-- =============================================
+-- Creation date:   11/11/2023
+-- Description:	PS SAVE LINKED SUERS
+-- =============================================
+
+CREATE OR ALTER      PROCEDURE [chat].[Save_LinkedUsers]
+(
+@Code NVARCHAR(100),
+@ProfileFromId BIGINT , 
+@ProfileToId BIGINT,
+@MsgContent NVARCHAR(MAX),
+@ModifiedDate DateTime
+)
+AS
+
+BEGIN
+
+ IF EXISTS (SELECT 1 FROM chat.LinkedUsers WHERE Code = @Code)
+BEGIN   --UPDATE
+ UPDATE chat.LinkedUsers
+        SET    LastMessage = @MsgContent,
+               IsOpen = 0,
+               SendBy = @ProfileFromId,
+               ModifiedDate= @ModifiedDate
+        WHERE Code = @Code
+ END
+
+ ELSE  -- INSERT
+
+ BEGIN
+  INSERT INTO [chat].[LinkedUsers]
+           ([ProfileIdA]
+           ,[ProfileIdB]
+           ,[Code]
+           ,[LastMessage]
+           ,[IsOpen]
+           ,SendBy
+           ,[ModifiedDate])
+        VALUES (@ProfileFromId, @ProfileToId, @code, @MsgContent,0, @ProfileFromId, @ModifiedDate)
+END
+END
+GO
+
+-- =============================================
+-- Creation date:   11/11/2023
+-- Description:	PS Select_Last_Message_By_Code
+-- =============================================
+
+CREATE OR ALTER             PROCEDURE [chat].[Select_Last_Message_By_Code]
+(
+@Code NVARCHAR(100)
+)
+AS
+
+BEGIN
+
+WITH Simple_CTE
+AS (
+ SELECT TOP 1 p.[Id], p.[LastUpdateDate], p.[Message] FROM [chat].[WeMessages] p 
+ WHERE p.Code = @Code
+ ORDER BY p.LastUpdateDate desc
+ )
+SELECT 
+Simple_CTE.[Id],
+Simple_CTE.[LastUpdateDate],
+a.* from Simple_CTE
+
+CROSS APPLY OPENJSON (Simple_CTE.[Message]) WITH (   
+              FileId        BIGINT '$.FileId' , 
+			  FileName      VARCHAR '$.FileName',
+			  ProfileFromId BIGINT '$.ProfileFromId' , 
+			  ProfileToId   BIGINT '$.ProfileToId' , 
+              MsgContent    NVARCHAR(500)  '$.MsgContent',
+			  CreationDate  NVARCHAR(150) '$.CreationDate'
+     ) a
+ORDER BY  a.CreationDate ASC
+           
+END
+GO
+
+-- =============================================
+-- Creation date:   11/11/2023
+-- Description:	PS Update Chat Message
+-- =============================================
+
+CREATE OR ALTER            PROCEDURE [chat].[Update_Chat_Message]
+	(
+	@IsOpen bit = 0, 
+	@LastUpdateDate DateTime,
+	@selectedMsg 	VARCHAR(max),
+	@newMesg	VARCHAR(max),
+	@msgId BIGINT
+	)
+
+AS
+
+BEGIN
+
+	 UPDATE [chat].[WeMessages]
+       SET [IsOpen] = @IsOpen ,
+	       [LastUpdateDate] = @LastUpdateDate,
+		   [Message] = JSON_MODIFY(@selectedMsg, 'append $', JSON_QUERY(@newMesg))
+		   WHERE  Id = @msgId
+           
+END
