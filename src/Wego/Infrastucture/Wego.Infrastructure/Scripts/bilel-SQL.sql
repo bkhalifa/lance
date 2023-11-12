@@ -324,3 +324,34 @@ BEGIN
 		   WHERE  Id = @msgId
            
 END
+
+
+--************************************************************
+-- Creation date:   11/11/2023 
+-- Descrition : Porifle Add Column
+--************************************************************
+
+-- ADD CountryId
+IF COL_LENGTH('[profile].[Profiles]', 'CountryId') IS  NULL
+BEGIN
+ALTER TABLE  [profile].[Profiles]
+ADD  CountryId INT NULL  DEFAULT NULL; 
+END
+GO
+
+-- ADD SkillS
+IF COL_LENGTH('[profile].[Profiles]', '[Skills]') IS NULL
+begin
+ALTER TABLE [profile].[Profiles]
+DROP COLUMN Skills;
+end
+GO
+
+-- ADD linkLinkedIn
+IF COL_LENGTH('[profile].[Profiles]', 'linkLinkedIn') IS  NULL
+BEGIN
+ALTER TABLE  [profile].[Profiles]
+ADD  linkLinkedIn NVARCHAR(150) NULL  DEFAULT NULL; 
+END
+GO
+
