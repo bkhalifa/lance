@@ -34,7 +34,7 @@ namespace Wego.Persistence.Repositories.Offers
 
             using (var connection = _context.CreateConnection())
             {
-                return await connection.QueryAsync<OfferSearchModel>(new CommandDefinition("OfferSearchEngine", parameters, 
+                return await connection.QueryAsync<OfferSearchModel>(new CommandDefinition("OfferSearchEngine", parameters,
                     commandType: CommandType.StoredProcedure, cancellationToken: cancellationToken));
             }
         }
@@ -54,7 +54,8 @@ namespace Wego.Persistence.Repositories.Offers
         {
             if (string.IsNullOrWhiteSpace(field))
                 return null;
-            else return field;
+            else return $"|{field}|";
+
         }
 
         private static int? CheckField(OrderByType? field)
