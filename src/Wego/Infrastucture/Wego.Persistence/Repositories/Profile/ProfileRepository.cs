@@ -1,9 +1,12 @@
 ﻿using Dapper;
 
+using Newtonsoft.Json;
+
 using System.Data;
 
 using Wego.Application.IRepository;
 using Wego.Application.Models.Profile;
+using Wego.Application.Models.Profile.request;
 using Wego.Domain.Common;
 using Wego.Domain.Profile;
 using WegoPro.Domain.Profile;
@@ -217,10 +220,10 @@ public class ProfileRepository : IProfileRepository
                 return await connection.QuerySingleOrDefaultAsync<long>(new CommandDefinition(sql, parameters, cancellationToken: cancellationtoken));
             }
         }
-        catch (Exception e)
+        catch (Exception)
         {
 
-            throw e;
+            throw;
         }
 
     }
@@ -314,10 +317,10 @@ public class ProfileRepository : IProfileRepository
                 return await connection.QuerySingleOrDefaultAsync<long>(new CommandDefinition(query, parameters, cancellationToken: cancellationtoken));
             }
         }
-        catch (Exception e)
+        catch (Exception)
         {
 
-            throw e;
+            throw;
         }
     }
     public async Task DeleteGroundProfile(long fileId, CancellationToken cancellationtoken)
@@ -328,6 +331,26 @@ public class ProfileRepository : IProfileRepository
         using (var connection = _context.CreateConnection())
         {
             await connection.ExecuteAsync(new CommandDefinition(query, parameters, cancellationToken: cancellationtoken));
+        }
+
+    }
+
+    public async Task<long> UpdateProfileInfoAsync(ProfileInfoRequest profileRequest, CancellationToken cancellationToken)
+    {
+        var parameters = new DynamicParameters();
+
+        parameters.Add("ProfileId", profileRequest.Id);
+        parameters.Add("FirstName", profileRequest.LastName);
+        parameters.Add("LastName", profileRequest.LastName);
+        parameters.Add("PhoneNumber", profileRequest.PhoneNumber);
+        parameters.Add("Position", profileRequest.Position);
+        parameters.Add("CountryId", profileRequest.CountryId);
+        parameters.Add("linkLinkedIn", profileRequest.LinkedInLink);
+        
+
+        using (var connection = _context.CreateConnection())
+        {
+            return await connection.ExecuteAsync(new CommandDefinition("[profile].[UpdateProfileInfo]", parameters, cancellationToken: cancellationToken, commandType: CommandType.StoredProcedure));
         }
 
     }

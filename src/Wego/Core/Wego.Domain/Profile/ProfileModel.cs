@@ -15,6 +15,8 @@ public class ProfileModel
     public DateTime? UpdateDate { get; set; }
     public string UsId { get; private set; }
     public string Position { get; set; }
+    public int CountryId { get; set; }
+    public string LinkedIn { get; set; }
 
     public ProfileModel()
     {
@@ -27,7 +29,19 @@ public class ProfileModel
         UsId = SplitMail(email)+ GetRandomId();
         InitialUserName = GetInitials(email);
     }
-
+    public ProfileModel BuildProfileInfo(long id, string fname, string lname, int? pnumber, string position, int coutryId, string link)
+    {
+        return new ProfileModel()
+        {
+            Id = id,
+            FirstName = fname,
+            LastName = lname,
+            PhoneNumber = pnumber,
+            Position = position,
+            CountryId = coutryId,
+            LinkedIn = link
+        };
+    }
     public string SetUsId() => UsId.Substring(0, UsId.Length - 1) + GenerateRandomNumber();
     public int GenerateRandomNumber() => Random.Shared.Next(1, 9);
     public static string SplitMail(string adressMail)

@@ -1,4 +1,5 @@
 ﻿using Wego.Application.Models.Profile;
+using Wego.Application.Models.Profile.request;
 using Wego.Domain.Common;
 using Wego.Domain.Profile;
 using WegoPro.Domain.Profile;
@@ -27,5 +28,6 @@ public interface IProfileRepository
     Task<long> AddBackGroundProfile(BackGroundFile model, CancellationToken cancellationtoken);
     Task<long> UpdateBackGroundProfile(BackGroundFile model, CancellationToken cancellationtoken);
     Task DeleteGroundProfile(long fileId, CancellationToken cancellationtoken);
+    Task<long> UpdateProfileInfoAsync(ProfileInfoRequest profileReques, CancellationToken cancellationToken);
 }
 

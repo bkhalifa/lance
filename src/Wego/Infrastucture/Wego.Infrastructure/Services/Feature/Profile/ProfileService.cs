@@ -1,6 +1,7 @@
 ﻿using Microsoft.Data.SqlClient;
 
 using System.Drawing;
+using System.Threading;
 
 using Wego.Application.Contracts.Context;
 using Wego.Application.Extensions;
@@ -8,6 +9,7 @@ using Wego.Application.IRepository;
 using Wego.Application.IService.Feature.Profile;
 using Wego.Application.Models.Common;
 using Wego.Application.Models.Profile;
+using Wego.Application.Models.Profile.request;
 using Wego.Domain.Common;
 using Wego.Domain.Profile;
 using WegoPro.Domain.Profile;
@@ -130,6 +132,16 @@ public class ProfileService : IProfileService
         return result;
     }
 
+    public async Task<ProfileModel> UpdateProfileInfoAsync(ProfileInfoRequest profileRequest, CancellationToken cancellationToken = default)
+    {
+        var profileId = await _profileRepository.UpdateProfileInfoAsync(profileRequest, cancellationToken).ConfigureAwait(false);
+
+        if (profileId <= 0)
+            throw new ArgumentNullException(nameof(profileId));
+
+        return new ProfileModel();
+    }
+
     private static byte[] ToArrayBase(string FileAsBase64)
     {
         return FileAsBase64.Contains(",") ?
@@ -145,6 +157,4 @@ public class ProfileService : IProfileService
             return ms.ToArray();
         }
     }
-
- 
 }

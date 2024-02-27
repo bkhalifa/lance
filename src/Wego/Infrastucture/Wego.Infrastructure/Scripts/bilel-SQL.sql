@@ -355,3 +355,35 @@ ADD  linkLinkedIn NVARCHAR(150) NULL  DEFAULT NULL;
 END
 GO
 
+--************************************************************
+-- Creation date:   27/02/2024
+-- Descrition : PS Profile : Update profile infos
+--************************************************************
+
+
+CREATE OR ALTER   PROCEDURE [profile].[UpdateProfileInfo](
+    @ProfileId BIGINT,
+	@FirstName NVARCHAR(50),
+	@LastName NVARCHAR(50),
+	@PhoneNumber INT,
+	@Position NVARCHAR(100),
+    @CountryId INT,
+	@linkLinkedIn NVARCHAR(100)
+	)
+AS
+
+BEGIN
+UPDATE [profile].[Profiles]
+   SET [FirstName] = @FirstName,
+       [LastName] = @LastName,
+       [PhoneNumber] = @PhoneNumber,
+       [UpdateDate] = GETDATE(),
+       [Position] = @Position,
+       [CountryId] = @CountryId,
+       [linkLinkedIn] = @linkLinkedIn
+ WHERE 
+     [Id] = @ProfileId
+
+SELECT @@IDENTITY
+
+END
