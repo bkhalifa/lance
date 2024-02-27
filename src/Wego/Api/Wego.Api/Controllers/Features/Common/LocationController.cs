@@ -25,4 +25,7 @@ public class LocationController : ControllerBase
     public async Task<ActionResult<GetLocationsByCodeModel>> GetLocationsByCode(string codes)
         => Ok(await _mediator.Send(new GetLocationsByCodeListQuery(codes)));
 
+    [HttpGet("countries")]
+    public async Task<ActionResult<GetLocationsByCodeModel>> GetCountries()
+        => Ok(await _mediator.Send(new GetCountryListQuery()));
 }

@@ -1,6 +1,4 @@
-﻿using Wego.Domain;
-
-namespace Wego.Application.Models.Profile
+﻿namespace Wego.Application.Models.Profile
 {
     public record ImageProfileModel
     {

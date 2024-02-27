@@ -1,7 +1,7 @@
 ﻿using MediatR;
-using Microsoft.Data.SqlClient;
+
 using System.ComponentModel.DataAnnotations;
-using Wego.Application.Contracts.Persistence;
+
 using Wego.Application.IRepo;
 using Wego.Domain.Common;
 

@@ -23,11 +23,12 @@ public class ProfileService : IProfileService
         _profileRepository = profileRepository;
         _currentContext = currentContext;
     }
-    public async Task<ImageProfileResponse> SaveImageAsync(ImageProfileModel model, CancellationToken cancellationtoken = default)
+    public async Task<ImageProfileResponse> SaveImageAsync(long profileId, ImageProfileModel model, CancellationToken cancellationtoken = default)
     {
+        model.ProfileId = profileId;
         ArgumentNullException.ThrowIfNull(model);
 
-        var image = await _profileRepository.GetImageByProfileIdAsync(model.ProfileId, cancellationtoken);
+        var image = await _profileRepository.GetImageByProfileIdAsync(profileId, cancellationtoken);
         model.Base64 = MakeThumbnail(model.Base64, 200, 200);
 
         if (image is null)
@@ -108,9 +109,10 @@ public class ProfileService : IProfileService
         var result = await _profileRepository.GetAllBackGroundAsync(cancellationtoken).ConfigureAwait(false);
         return result;
     }
-    public async Task<long> SaveBackGroudProfile(BackGroundProfileModel model, CancellationToken cancellationtoken)
+    public async Task<long> SaveBackGroudProfile(long profileId, BackGroundProfileModel model, CancellationToken cancellationtoken)
     {
-        var backGround = await _profileRepository.GetBackGroundByProfileId(model.profileId, cancellationtoken);
+
+        var backGround = await _profileRepository.GetBackGroundByProfileId(profileId, cancellationtoken);
 
         if (backGround is not null)
         {
@@ -118,7 +120,7 @@ public class ProfileService : IProfileService
         }
 
         var bgModel = await _profileRepository.GetBackGroundByFileId(model.fileId, cancellationtoken);
-        bgModel.ProfileId = model.profileId;
+        bgModel.ProfileId = profileId;
         return await _profileRepository.AddBackGroundProfile(bgModel, cancellationtoken); ;
     }
 
@@ -144,5 +146,5 @@ public class ProfileService : IProfileService
         }
     }
 
-
+ 
 }

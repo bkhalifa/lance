@@ -1,9 +1,11 @@
 ﻿using MediatR;
 
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 
 using Wego.Application.Features.BackGround.Commands;
 using Wego.Application.Features.BackGround.Queries;
+using Wego.Application.Features.Profile.Commands;
 using Wego.Application.Features.Profile.Queries;
 using Wego.Application.Models.Common;
 
@@ -65,6 +67,14 @@ namespace Wego.Api.Controllers.Features.Common
         [ProducesResponseType(StatusCodes.Status401Unauthorized)]
         public async Task<ActionResult<long>> SaveBgProfile([FromBody] BackGroundModel model, CancellationToken cancellationToken = default)
             => Ok(await _mediator.Send(new BackGroundModelCommand(model, cancellationToken)));
+
+
+        [HttpDelete("{fid}/delete-thumbnail")]
+        [Authorize]
+        [ProducesResponseType(StatusCodes.Status200OK)]
+        [ProducesResponseType(StatusCodes.Status404NotFound)]
+        public async Task<ActionResult> DeleteImageProfile(long fid, CancellationToken cancellationToken = default)
+          => Ok(await _mediator.Send(new DeleteImageProfileModelCommand(fid, cancellationToken)));
 
     }
 }

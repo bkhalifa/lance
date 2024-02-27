@@ -8,7 +8,7 @@ namespace Wego.Application.IService.Feature.Profile;
 
 public interface IProfileService
 {
-    Task<ImageProfileResponse> SaveImageAsync(ImageProfileModel model, CancellationToken cancellationtoken);
+    Task<ImageProfileResponse> SaveImageAsync(long profileId, ImageProfileModel model, CancellationToken cancellationtoken);
     Task<ImageProfileResponse> GetImageByIdAsync(long profileId, CancellationToken ct);
     Task<bool> DeleteImageByIdAsync(long fileId, CancellationToken ct);
     Task<ProfileInfoResponse> GetProfileInfo(string suID, CancellationToken cancellationtoken);
@@ -20,5 +20,5 @@ public interface IProfileService
     Task<long> SaveBackGroundProfileAsync(BackGroundModel file, CancellationToken cancellationtoken);
     Task<FileResponse> GetFileByIdAsync(long fileId, CancellationToken cancellationtoken);
     Task<IEnumerable<AllBackGroundResponse>> GetAllBackGroundAsync(CancellationToken cancellationtoken);
-    Task<long>SaveBackGroudProfile(BackGroundProfileModel model,  CancellationToken cancellationtoken);
+    Task<long>SaveBackGroudProfile(long profileId, BackGroundProfileModel model,  CancellationToken cancellationtoken);
 }

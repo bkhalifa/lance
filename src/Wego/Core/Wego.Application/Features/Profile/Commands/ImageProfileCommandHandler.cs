@@ -6,7 +6,7 @@ using Wego.Domain.Profile;
 
 namespace Wego.Application.Features.Profile.Commands;
 
-public record ImageProfileModelCommand(ImageProfileModel model, CancellationToken cancellationToken = default) 
+public record ImageProfileModelCommand(long profileId, ImageProfileModel model, CancellationToken cancellationToken = default) 
                                       : IRequest<ImageProfileResponse>;
 
 public class ImageProfileCommandHandler : IRequestHandler<ImageProfileModelCommand, ImageProfileResponse>
@@ -18,6 +18,6 @@ public class ImageProfileCommandHandler : IRequestHandler<ImageProfileModelComma
     }
 
     public async Task<ImageProfileResponse> Handle(ImageProfileModelCommand request, CancellationToken cancellationToken)
-    => await _profileService.SaveImageAsync(request.model, cancellationToken).ConfigureAwait(false);
+    => await _profileService.SaveImageAsync(request.profileId , request.model, cancellationToken).ConfigureAwait(false);
 
 }
