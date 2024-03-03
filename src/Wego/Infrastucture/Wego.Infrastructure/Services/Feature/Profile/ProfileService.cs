@@ -132,14 +132,17 @@ public class ProfileService : IProfileService
         return result;
     }
 
-    public async Task<ProfileModel> UpdateProfileInfoAsync(ProfileInfoRequest profileRequest, CancellationToken cancellationToken = default)
+    public async Task<ProfileModel> UpdateProfileInfoAsync(long profileId, ProfileInfoRequest profileRequest, CancellationToken cancellationToken = default)
     {
-        var profileId = await _profileRepository.UpdateProfileInfoAsync(profileRequest, cancellationToken).ConfigureAwait(false);
+        ArgumentNullException.ThrowIfNull(profileRequest);
 
-        if (profileId <= 0)
-            throw new ArgumentNullException(nameof(profileId));
+        profileRequest.Id = profileId;
+        var newProfileId = await _profileRepository.UpdateProfileInfoAsync(profileRequest, cancellationToken).ConfigureAwait(false);
 
-        return new ProfileModel();
+        return (newProfileId <= 0) ?
+            throw new ArgumentNullException(nameof(profileId)):
+            ProfileModel.BuildProfileInfo(profileRequest);
+
     }
 
     private static byte[] ToArrayBase(string FileAsBase64)

@@ -9,6 +9,7 @@ using Wego.Application.Models.Profile;
 using Wego.Application.Models.Profile.request;
 using Wego.Domain.Common;
 using Wego.Domain.Profile;
+
 using WegoPro.Domain.Profile;
 
 namespace Wego.Persistence.Repositories.Profile;
@@ -70,7 +71,7 @@ public class ProfileRepository : IProfileRepository
         }
     }
     public async Task<long> GetBgImageByProfileIdAsync(long pid, CancellationToken cancellationtoken = default)
-     {
+    {
         var query = "SELECT Id FROM profile.BackGroundImage WHERE ProfileId = @pid";
         var parameters = new DynamicParameters();
         parameters.Add("pid", pid);
@@ -80,7 +81,7 @@ public class ProfileRepository : IProfileRepository
             var result = await connection.QueryFirstOrDefaultAsync<long>(new CommandDefinition(query, parameters, cancellationToken: cancellationtoken));
             return result;
         }
-     }
+    }
     public async Task<BackGroundResponse> GetBgImageByIdAsync(long fid, CancellationToken cancellationtoken = default)
     {
         var query = "SELECT Id, ContentType, Extension, BigData, LittleData FROM profile.BackGroundImage WHERE Id = @fid";
@@ -340,13 +341,13 @@ public class ProfileRepository : IProfileRepository
         var parameters = new DynamicParameters();
 
         parameters.Add("ProfileId", profileRequest.Id);
-        parameters.Add("FirstName", profileRequest.LastName);
+        parameters.Add("FirstName", profileRequest.FirstName);
         parameters.Add("LastName", profileRequest.LastName);
         parameters.Add("PhoneNumber", profileRequest.PhoneNumber);
         parameters.Add("Position", profileRequest.Position);
         parameters.Add("CountryId", profileRequest.CountryId);
         parameters.Add("linkLinkedIn", profileRequest.LinkedInLink);
-        
+
 
         using (var connection = _context.CreateConnection())
         {

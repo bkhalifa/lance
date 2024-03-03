@@ -22,5 +22,5 @@ public interface IProfileService
     Task<FileResponse> GetFileByIdAsync(long fileId, CancellationToken cancellationtoken);
     Task<IEnumerable<AllBackGroundResponse>> GetAllBackGroundAsync(CancellationToken cancellationtoken);
     Task<long>SaveBackGroudProfile(long profileId, BackGroundProfileModel model,  CancellationToken cancellationtoken);
-    Task<ProfileModel> UpdateProfileInfoAsync(ProfileInfoRequest profileRequest, CancellationToken cancellationToken);
+    Task<ProfileModel> UpdateProfileInfoAsync(long profileId, ProfileInfoRequest profileRequest, CancellationToken cancellationToken);
 }

@@ -29,17 +29,23 @@ public class ProfileModel
         UsId = SplitMail(email)+ GetRandomId();
         InitialUserName = GetInitials(email);
     }
-    public ProfileModel BuildProfileInfo(long id, string fname, string lname, int? pnumber, string position, int coutryId, string link)
+
+    /// <summary>
+    /// build profile info
+    /// </summary>
+    /// <param name="request"></param>
+    /// <returns> ProfileModel </returns>
+    public static ProfileModel BuildProfileInfo(dynamic request)
     {
         return new ProfileModel()
         {
-            Id = id,
-            FirstName = fname,
-            LastName = lname,
-            PhoneNumber = pnumber,
-            Position = position,
-            CountryId = coutryId,
-            LinkedIn = link
+            Id = request.Id,
+            FirstName = request.FirstName,
+            LastName = request.LastName,
+            PhoneNumber = request.PhoneNumber,
+            Position = request.Position,
+            CountryId = request.CountryId,
+            LinkedIn = request.LinkedInLink
         };
     }
     public string SetUsId() => UsId.Substring(0, UsId.Length - 1) + GenerateRandomNumber();

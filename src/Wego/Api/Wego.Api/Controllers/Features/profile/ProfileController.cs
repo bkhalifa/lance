@@ -3,8 +3,9 @@
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 
+using Wego.Application.Features.Profile.Commands;
 using Wego.Application.Features.Profile.Queries;
-
+using Wego.Application.Models.Profile.request;
 
 namespace Wego.Api.Controllers.Features.profile;
 
@@ -19,8 +20,9 @@ public class ProfileController : ControllerBase
     {
         _mediator = mediator;
     }
+
     /// <summary>
-    /// 
+    /// get profile info 
     /// </summary>
     /// <param name="uid"></param>
     /// <param name="cancellationToken"></param>
@@ -39,20 +41,19 @@ public class ProfileController : ControllerBase
         return Ok(result);
     }
 
-    [HttpPatch("{uid}/update-info")]
+    /// <summary>
+    /// update profile info 
+    /// </summary>
+    /// <param name="pid">profileID</param>
+    /// <param name="profileInfoRequest"></param>
+    /// <param name="cancellationToken"></param>
+    /// <returns>ProfileModel</returns>
+    [HttpPatch("{pid}/update-info")]
     [ProducesResponseType(StatusCodes.Status200OK)]
     [ProducesResponseType(StatusCodes.Status500InternalServerError)]
     [ProducesResponseType(StatusCodes.Status401Unauthorized)]
-    public async Task<ActionResult> UpdateProfileInfo(string uid, CancellationToken cancellationToken = default)
-    {
-        var result = await _mediator.Send(new GetProfileInfoQuery(uid, cancellationToken));
-
-        if (result is null)
-            return Unauthorized();
-
-        return Ok(result);
-    }
-
+    public async Task<ActionResult> UpdateProfileInfo(long pid, [FromBody]ProfileInfoRequest profileInfoRequest ,CancellationToken cancellationToken = default)
+     => Ok( await _mediator.Send(new UpdateProfileInfoModelCommand(pid, profileInfoRequest, cancellationToken)));
 
 
 }
