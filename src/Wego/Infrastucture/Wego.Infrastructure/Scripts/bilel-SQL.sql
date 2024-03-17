@@ -361,14 +361,16 @@ GO
 --************************************************************
 
 
-CREATE OR ALTER   PROCEDURE [profile].[UpdateProfileInfo](
+
+CREATE OR ALTER         PROCEDURE [profile].[UpdateProfileInfo](
     @ProfileId BIGINT,
 	@FirstName NVARCHAR(50),
 	@LastName NVARCHAR(50),
 	@PhoneNumber INT,
 	@Position NVARCHAR(100),
     @CountryId INT,
-	@linkLinkedIn NVARCHAR(100)
+	@linkLinkedIn NVARCHAR(100),
+	@RegionCode VARCHAR(120)
 	)
 AS
 
@@ -380,10 +382,13 @@ UPDATE [profile].[Profiles]
        [UpdateDate] = GETDATE(),
        [Position] = @Position,
        [CountryId] = @CountryId,
-       [linkLinkedIn] = @linkLinkedIn
+       [linkLinkedIn] = @linkLinkedIn,
+	   [RegionCode] = @RegionCode
  WHERE 
      [Id] = @ProfileId
 
-SELECT @@IDENTITY
+END
+
+go
 
 END

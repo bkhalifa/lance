@@ -1,7 +1,4 @@
-﻿using Microsoft.Data.SqlClient;
-
-using System.Drawing;
-using System.Threading;
+﻿using System.Drawing;
 
 using Wego.Application.Contracts.Context;
 using Wego.Application.Extensions;
@@ -12,6 +9,7 @@ using Wego.Application.Models.Profile;
 using Wego.Application.Models.Profile.request;
 using Wego.Domain.Common;
 using Wego.Domain.Profile;
+
 using WegoPro.Domain.Profile;
 
 namespace Wego.Infrastructure.Services.Feature.Profile;
@@ -140,7 +138,7 @@ public class ProfileService : IProfileService
         var newProfileId = await _profileRepository.UpdateProfileInfoAsync(profileRequest, cancellationToken).ConfigureAwait(false);
 
         return (newProfileId <= 0) ?
-            throw new ArgumentNullException(nameof(profileId)):
+            throw new ArgumentNullException(nameof(profileId)) :
             ProfileModel.BuildProfileInfo(profileRequest);
 
     }

@@ -347,6 +347,7 @@ public class ProfileRepository : IProfileRepository
         parameters.Add("Position", profileRequest.Position);
         parameters.Add("CountryId", profileRequest.CountryId);
         parameters.Add("linkLinkedIn", profileRequest.LinkedInLink);
+        parameters.Add("RegionCode", profileRequest.RegionCode); 
 
 
         using (var connection = _context.CreateConnection())
